@@ -60,14 +60,14 @@ class OwnerCog(commands.Cog):
     async def shutdown(self, ctx):
         """봇을 셧다운 시킵니다!"""
         await ctx.send('봇이 재시작 합니다!')
-        await self.bot.logout()
+        await self.bot.shutdown()
 
     @commands.command()
     @commands.check(is_owner)
     async def restart(self, ctx):
         """봇을 재시작 시킵니다!"""
         await ctx.send('봇이 쥬급니다')
-        await self.bot.logout(restart=True)
+        await self.bot.logout()
     
     @commands.command()
     @commands.check(is_owner)

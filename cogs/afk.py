@@ -11,8 +11,6 @@ class Afk(commands.Cog):
         self.data = {}
         self.profile = "data/afk/afk.json"
         self.riceCog = dataIO.load_json(self.profile)
-        self.ko = "data/language/ko_kr.json"
-        self.ko_kr = dataIO.load_json(self.ko)
         
     @commands.command(no_pm=True, pass_context=True)
     async def afk(self, ctx, *, reason=None):
@@ -25,9 +23,12 @@ class Afk(commands.Cog):
         em.add_field(name='{} 님의 잠수 상태가 시작되었습니다!'.format(author.name), value='잠수 상태를 해지 하시려면 아무 메시지나 작성해주세요!', inline=False)
         if reason:
             em.add_field(name='사유', value=reason, inline=False)
+        else:
+            pass
+        await ctx.send(embed=em)
         self.riceCog[author.id] = {}
         self.riceCog[author.id].update({"reason": str(reason)})
-        dataIO.save_json(self.profile,
+        dataIO._save_json(self.profile,
                      self.riceCog)        
         await ctx.send(embed=em)
                 

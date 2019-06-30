@@ -34,23 +34,25 @@ class general(commands.Cog):
                 if isinstance(activity, Spotify):            
                     yee = "Spotify에서 {}의  {} 노래 듣는중".format(activity.artist, activity.title)
                 else:
-                    yee = None
+                    pass
             else:
-                yee = None
+                pass
         created_on = user.created_at.strftime("%Y-%m-%d %H:%M")
         joined_on = user.joined_at.strftime("%Y-%m-%d %H:%M")
-        if yee:
+        try:
             em = discord.Embed(colour=author.colour, title='USERINFO || 유저정보', description=yee, timestamp=datetime.datetime.utcnow())
-        else:
+        except UnboundLocalError:
             em = discord.Embed(colour=author.colour, title='USERINFO || 유저정보')
         em.add_field(name='유저 태그', value=user)
         em.add_field(name='**ID**', value=user.id, inline=False)
-        if user.activity.name == None:
+        try:
+            for activity in user.activities:
+                if isinstance(activity, Spotify):
+                    pass
+                else:
+                    em.add_field(name='활동', value=user.activity.name, inline=False)        
+        except:
             pass
-        elif user.activity.name == 'Spotify':
-            pass
-        else:
-            em.add_field(name='활동', value=user.activity.name, inline=False)
         em.add_field(name='가입 한 날짜', value=created_on, inline=False)
         em.add_field(name='이 서버 들어온 날짜', value=joined_on, inline=False)
         if len(lol) > 1024:
@@ -98,7 +100,7 @@ class general(commands.Cog):
         author = ctx.author
         channel = ctx.message.channel
         t1 = time.perf_counter()
-        channel.typing(channel)
+        channel.typing()
         t2 = time.perf_counter()
         em = discord.Embed(colour=author.colour)
         em.add_field(name='**퐁!**', value='디스코드 API 핑 {}ms'.format(round((t2-t1)*1000)))

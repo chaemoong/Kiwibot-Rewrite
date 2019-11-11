@@ -4,4 +4,4 @@
 
 # 개발하시는 분들
 
-chaemoong(채뭉), 헤브어
+chaemoong(채뭉)

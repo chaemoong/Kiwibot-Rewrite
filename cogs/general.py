@@ -3,6 +3,7 @@ import datetime
 import inspect
 import os
 import time
+from pytz import timezone, utc
 from discord import Spotify
 from discord.ext import commands
 from cogs.utils.dataIO import dataIO
@@ -11,72 +12,86 @@ from discord import Game
 import subprocess
 import sys
 import time
+import json
+import random
+from random import choice
 
 class general(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.client = dataIO.load_json('data/general/status.json')
+        self.author = dataIO.load_json('data/general/author.json')
+        self.status = dataIO.load_json('data/general/stat.json')
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def userinfo(self, ctx, user:discord.Member=None):
-        author = ctx.message.author
+        author = ctx.author
+        server = author.guild
+        self.author[f'{author.id}'] = []
+        d = self.author[f'{author.id}']
         if not user:
             user = author
-        else:
-            pass
+        a = user.web_status
+        b = user.mobile_status
+        c = user.desktop_status
         roles = [role.mention for role in user.roles]
         if roles:
             for page in roles:
                 lol = ', '.join(roles)     
         else:
             lol = '없음'
+        if self.client['{}'.format(a)] == 'ok':
+            d.append('웹 :globe_with_meridians:')
+        else:
+            pass
+        if self.client['{}'.format(b)] == 'ok':
+            d.append('모바일 :iphone:')
+        else:
+            pass
+        if self.client['{}'.format(c)] == 'ok':
+            d.append('데스크톱 :desktop:')
+        else:
+            pass
+        if a == 'offline' and b == 'offline' and c == 'offline':
+            d.append('오프라인')
+        for hmm in d:
+            lll = ', '.join(d)
         for activity in user.activities:
             if isinstance(activity, Spotify or Game):
-                if isinstance(activity, Spotify):            
+                yee = user.activity.name
+                if yee == "Spotify":                   
                     yee = "Spotify에서 {}의  {} 노래 듣는중".format(activity.artist, activity.title)
                 else:
-                    pass
+                    yee = yee + ' 플레이 중'
             else:
-                pass
-        created_on = user.created_at.strftime("%Y-%m-%d %H:%M")
-        joined_on = user.joined_at.strftime("%Y-%m-%d %H:%M")
-        try:
-            em = discord.Embed(colour=author.colour, title='USERINFO || 유저정보', description=yee, timestamp=datetime.datetime.utcnow())
-        except UnboundLocalError:
-            em = discord.Embed(colour=author.colour, title='USERINFO || 유저정보')
-        em.add_field(name='유저 태그', value=user)
-        em.add_field(name='**ID**', value=user.id, inline=False)
-        try:
-            for activity in user.activities:
-                if isinstance(activity, Spotify):
-                    pass
+                yee = user.activity.name
+                if yee == None:
+                    yee = self.status[str(user.status)]
                 else:
-                    em.add_field(name='활동', value=user.activity.name, inline=False)        
-        except:
-            pass
-        em.add_field(name='가입 한 날짜', value=created_on, inline=False)
-        em.add_field(name='이 서버 들어온 날짜', value=joined_on, inline=False)
+                    yee = yee + ' 플레이 중'
+        em = discord.Embed(colour=author.colour, title='USERINFO || 유저정보', timestamp=datetime.datetime.utcnow(), description=yee)
+        em.add_field(name='**유저 이름**', value=str(user))
+        em.add_field(name='**ID**', value=f'{user.id}')
         if len(lol) > 1024:
-            em.add_field(name='역할', value='1024자를 넘겨서 더이상 출력이 불가합니다!')
+            em.add_field(name='역할', value='역할이 너무 많아 출력 할 수 없습니다! ~~WTF?~~')
         else:
             em.add_field(name='역할', value=lol)
-
+        em.add_field(name='계정 생성일', value=user.created_at.strftime("%Y년 %m월 %d일 %H시 %M분".encode('unicode-escape').decode()).encode().decode('unicode-escape'))
+        em.add_field(name='서버 가입일', value=user.joined_at.strftime("%Y년 %m월 %d일 %H시 %M분".encode('unicode-escape').decode()).encode().decode('unicode-escape'))
+        em.add_field(name='디스코드 클라이언트 상태', value=lll)
+        em.set_footer(text=f'Request By {author} | Helped by 매리#4633')
         if user.avatar_url:
             em.set_thumbnail(url=user.avatar_url)
-        else:
-            pass
-        try:
-            await ctx.send(author.mention)
-            await ctx.send(embed=em)
-        except Exception as e:
-            print(e)
+        await ctx.send(author.mention, embed=em)
+
 
     @commands.command(pass_context=True, no_pm=True)
     async def serverinfo(self, ctx):
         author = ctx.author
         server = ctx.author.guild
-        created_at = server.created_at.strftime("%Y-%m-%d %H:%M")
-        level = dataIO.load_json('server_level/level.json')["{}".format(server.verification_level)]
-        region = dataIO.load_json('region/region.json')["{}".format(server.region)]
+        a = server.created_at.strftime("%Y-%m-%d %h:%m")
+        level = dataIO.load_json('server_level/level.json')[f"{server.verification_level}"]
+        region = dataIO.load_json('region/region.json')[f"{server.region}"]
         roles =  [role.mention for role in server.roles]
         if roles:
             for page in roles:
@@ -87,24 +102,47 @@ class general(commands.Cog):
         em.add_field(name='서버 이름', value=server.name, inline=False)
         em.add_field(name="`ID`", value=server.id, inline=False)
         em.add_field(name='서버 위치', value=region, inline=False)
-        em.add_field(name='서버 생성일', value=created_at, inline=False)
+        em.add_field(name='서버 생성일', value=a, inline=False)
+        em.add_field(name='서버 주인', value=server.owner.mention)
         if len(lol) > 1024:
             em.add_field(name='역할', value='1024자를 넘겨서 더이상 출력이 불가합니다!', inline=False)
         else:
             em.add_field(name='역할', value=lol, inline=False)
         em.add_field(name='서버 인원', value="**{} 명**".format(len(server.members)))
-        await ctx.send(embed=em)
-    
-    @commands.command(pass_context=True)
+        em.set_footer(text='Request By: {}'.format(author))
+        if author.avatar_url:
+            em.set_thumbnail(url=author.avatar_url)
+        else:
+            pass
+        await ctx.send(author.mention, embed=em)
+
+    @commands.command(pass_context=True, no_pm=True)
+    async def 화공(self, ctx):
+        """통화방에서 화면공유를 도와주는 명령어입니다!"""
+        author = ctx.author
+        server = author.guild
+        em = discord.Embed(colour=author.colour, timestamp=datetime.datetime.utcnow())
+        em.set_footer(text=f'Request By: {author}')
+        try:
+            a = author.voice.channel
+            url = f"https://discordapp.com/channels/{server.id}/{a.id}"
+            em.add_field(name='화면 공유', value=f'**서버: {server.name}\n음성 채널: [{a.name}]({url})**')
+            await ctx.send(embed=em)
+        except AttributeError:
+            await ctx.send('먼저 음성 채널에 접속해주세요!')
+            
+    @commands.command(pass_context=True, no_pm=True)
     async def ping(self, ctx):
         author = ctx.author
-        channel = ctx.message.channel
-        t1 = time.perf_counter()
-        channel.typing()
-        t2 = time.perf_counter()
-        em = discord.Embed(colour=author.colour)
-        em.add_field(name='**퐁!**', value='디스코드 API 핑 {}ms'.format(round((t2-t1)*1000)))
-        await ctx.send(embed=em)
+        em = discord.Embed(colour=author.colour, title='PING! || 핑!', timestamp=datetime.datetime.utcnow())
+        em.set_author(name=self.bot.user.name, icon_url=self.bot.user.avatar_url)
+        before = time.monotonic()
+        msg = await ctx.send(embed=em)
+        msgping = round((time.monotonic() - before) * 1000)
+        em2 = discord.Embed(title='핑! 퐁!', colour=author.colour, timestamp=datetime.datetime.utcnow())
+        em2.add_field(name=f"**디스코드 API: `{round(self.bot.latency * 1000)}ms`**", value=f'메세지: `{msgping}ms`')
+        await msg.edit(embed=em2)
 
+    
 def setup(bot):
     bot.add_cog(general(bot))

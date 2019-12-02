@@ -93,14 +93,19 @@ class Music(commands.Cog):
 
         embed = discord.Embed(color=discord.Color.blurple())
 
-        if results['loadType'] == 'PLAYLIST_LOADED':
+        if results['loadType'] == 'PLAYLIST_LOADED':           
             tracks = results['tracks']
+            a = await ctx.send(f'이 플레이 리스트에는 총 {len(tracks)} 개의 노래(혹은 영상)들이 담겨 있습니다!\n재생 하시려면 `재생` 안하시려면 `취소` 아니면 30초동안 기달려주세요!')
+            msg = await self.bot.wait_for('message', timeout=30)
+            b = int(msg.content)
+            if b == '재생':
+                for track in tracks:
+                    player.add(requester=ctx.author.id, track=track)
 
-            for track in tracks:
-                player.add(requester=ctx.author.id, track=track)
-
-            embed.title = '재생목록에 추가된 노래!'
-            embed.description = f'{results["playlistInfo"]["name"]} - {len(tracks)} tracks'
+                embed.title = '재생목록에 추가된 노래!'
+                embed.description = f'{results["playlistInfo"]["name"]} - {len(tracks)} 곡들을 추가했습니다!'
+            elif b == '취소':
+                await a.edit('정상적으로 취소되었습니다!')               
         else:
             track = results['tracks'][0]
             embed.title = '재생목록에 추가된 노래'
@@ -214,10 +219,10 @@ class Music(commands.Cog):
 
         if player.paused:
             await player.set_pause(False)
-            await ctx.send('⏯ | 다시 비트 올려!')
+            await ctx.send('⏯ | 다시 음악좀 올릴게유!')
         else:
             await player.set_pause(True)
-            await ctx.send('⏯ | 잠시 비트 내릴께!')
+            await ctx.send('⏯ | 잠시 음악좀 멈출게유!')
 
     @commands.command()
     async def shuffle(self, ctx):
@@ -288,10 +293,10 @@ class Music(commands.Cog):
         player = self.bot.lavalink.players.get(ctx.guild.id)
 
         if not player.is_connected:
-            return await ctx.send('너 보이스 채널에 없거나 나랑 같은 보이스 채널에 없는거 같아!')
+            return await ctx.send('봇이 음악을 켜지 않았습니다!')
 
         if not ctx.author.voice or (player.is_connected and ctx.author.voice.channel.id != int(player.channel_id)):
-            return await ctx.send('너는 나랑 같은 보이스 채널에 있어야 이 명령어를 쓸수 있어!')
+            return await ctx.send('같은 보이스 채널에 있어야 이 명령어를 쓸수 있어욧!')
 
         player.queue.clear()
         await player.stop()

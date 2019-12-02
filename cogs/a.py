@@ -70,7 +70,7 @@ class owner(commands.Cog):
         """cogs를 리로드 하는 명령어 입니다!"""
         try:
             await ctx.send('그 기능이 로드 되었습니다!')
-            self.bot.load_extension('cogs.' + cogs)
+            self.bot.load_extension(cogs)
         except discord.ext.commands.errors.ExtensionAlreadyLoaded:
             await ctx.send('그 기능이 이미 로드 되어있습니다!')
         except discord.ext.commands.errors.ExtensionNotFound:
@@ -84,10 +84,16 @@ class owner(commands.Cog):
     async def reload(self, ctx, cogs):
         """cogs를 리로드 하는 명령어 입니다!"""
         try:
-            self.bot.reload_extension('cogs.' + cogs)
+            if cogs == 'music':
+                self.bot.reload_extension(cogs)
+            else:
+                self.bot.reload_extension('cogs.' + cogs)
             await ctx.send('그 기능이 리로드 되었습니다!')
         except discord.ext.commands.errors.ExtensionNotLoaded:
-            self.bot.load_extension('cogs.' + cogs)
+            if cogs == 'music':
+                self.bot.load_extension(cogs)
+            else:
+                self.bot.load_extension('cogs.' + cogs)
             await ctx.send('그 기능이 리로드 되었습니다!')
         except discord.ext.commands.errors.ExtensionNotFound:
             await ctx.send('그 기능을 찾을수 없습니다!')

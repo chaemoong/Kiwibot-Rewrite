@@ -15,6 +15,7 @@ import time
 import json
 import random
 from random import choice
+import aiohttp
 
 class general(commands.Cog):
     def __init__(self, bot):
@@ -142,6 +143,32 @@ class general(commands.Cog):
         em2 = discord.Embed(title='핑! 퐁!', colour=author.colour, timestamp=datetime.datetime.utcnow())
         em2.add_field(name=f"**디스코드 API: `{round(self.bot.latency * 1000)}ms`**", value=f'메세지: `{msgping}ms`')
         await msg.edit(embed=em2)
+
+    @commands.command(pass_context=True, no_pm=True)
+    async def chinobot(self, ctx):
+        """ChinoBot의 API 정보를 불러와요!"""
+        a = await ctx.send('잠시만 기달려주세요!')
+        author = ctx.author
+        url = "https://chinobot.xyz/api/main_module"
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as response:
+                Data = await response.json() 
+        ping = Data['ping']
+        user = Data['users']
+        server = Data['guilds']
+        uptime = Data['uptime']
+        chino = self.bot.get_user(426722888293548032)
+        em=discord.Embed(colour=author.colour)
+        em.add_field(name='치노봇의 핑', value=str(ping) + 'ms', inline=False)
+        em.add_field(name='치노봇의 유저수', value=str(user) + '명', inline=False)
+        em.add_field(name='치노봇의 서버수', value=str(server) + '개', inline=False)
+        em.add_field(name='치노봇의 업타임 시간', value=uptime)
+        em.set_thumbnail(url=chino.avatar_url)
+        if author.avatar_url:
+            em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
+        else:
+            em.set_footer(text=f'Request By {author}')
+        await ctx.send(embed=em)
 
     
 def setup(bot):

@@ -7,7 +7,6 @@ from pytz import timezone, utc
 from discord import Spotify
 from discord.ext import commands
 from cogs.utils.dataIO import dataIO
-from discord import VoiceRegion
 from discord import Game
 import subprocess
 import sys
@@ -58,28 +57,22 @@ class general(commands.Cog):
         for hmm in d:
             lll = ', '.join(d)
         for activity in user.activities:
-            if isinstance(activity, Spotify or Game):
-                yee = user.activity.name
-                if yee == "Spotify":                   
-                    yee = "Spotify에서 {}의  {} 노래 듣는중".format(activity.artist, activity.title)
-                else:
-                    yee = yee + ' 플레이 중'
+            if isinstance(activity, Game and Spotify):
+                yee = str(user.activity) + ' 플레이 중'
+            if isinstance(activity, Spotify):
+                yee = f"Spotify에서 {str(activity.artist)}의  {str(activity.title)} 노래 듣는중"
             else:
-                yee = user.activity.name
-                if yee == None:
-                    yee = self.status[str(user.status)]
-                else:
-                    yee = yee + ' 플레이 중'
+                yee = self.status[str(user.status)]
         em = discord.Embed(colour=author.colour, title='USERINFO || 유저정보', timestamp=datetime.datetime.utcnow(), description=yee)
         em.add_field(name='**유저 이름**', value=str(user))
         em.add_field(name='**ID**', value=f'{user.id}')
         if len(lol) > 1024:
-            em.add_field(name='역할', value='역할이 너무 많아 출력 할 수 없습니다! ~~WTF?~~')
+            em.add_field(name='역할', value='역할이 너무 많아 출력 할 수 없습니다! ~~WTF?~~', inline=False)
         else:
-            em.add_field(name='역할', value=lol)
-        em.add_field(name='계정 생성일', value=user.created_at.strftime("%Y년 %m월 %d일 %H시 %M분".encode('unicode-escape').decode()).encode().decode('unicode-escape'))
-        em.add_field(name='서버 가입일', value=user.joined_at.strftime("%Y년 %m월 %d일 %H시 %M분".encode('unicode-escape').decode()).encode().decode('unicode-escape'))
-        em.add_field(name='디스코드 클라이언트 상태', value=lll)
+            em.add_field(name='역할', value=lol, inline=False)
+        em.add_field(name='계정 생성일', value=user.created_at.strftime("%Y년 %m월 %d일 %H시 %M분".encode('unicode-escape').decode()).encode().decode('unicode-escape'), inline=False)
+        em.add_field(name='서버 가입일', value=user.joined_at.strftime("%Y년 %m월 %d일 %H시 %M분".encode('unicode-escape').decode()).encode().decode('unicode-escape'), inline=False)
+        em.add_field(name='디스코드 클라이언트 상태', value=lll, inline=False)
         em.set_footer(text=f'Request By {author} | Helped by 매리#4633')
         if user.avatar_url:
             em.set_thumbnail(url=user.avatar_url)
@@ -149,7 +142,7 @@ class general(commands.Cog):
         """ChinoBot의 API 정보를 불러와요!"""
         a = await ctx.send('잠시만 기달려주세요!')
         author = ctx.author
-        url = "https://chinobot.xyz/api/main_module"
+        url = "http://siru.ga/api/main_module"
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as response:
                 Data = await response.json() 
@@ -168,6 +161,7 @@ class general(commands.Cog):
             em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
         else:
             em.set_footer(text=f'Request By {author}')
+        await a.delete()
         await ctx.send(embed=em)
 
     

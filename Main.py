@@ -7,8 +7,6 @@ try:
 except ModuleNotFoundError:
     os.system('python3 -m pip install -U discord.py[voice]')
     import discord
-import random
-import json
 from discord.ext.commands import AutoShardedBot as a
 from os import listdir
 from os.path import isfile, join

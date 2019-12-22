@@ -57,21 +57,27 @@ class general(commands.Cog):
         for hmm in d:
             lll = ', '.join(d)
         for activity in user.activities:
-            if isinstance(activity, Game and Spotify):
-                yee = str(user.activity) + ' 플레이 중'
-            if isinstance(activity, Spotify):
+            if isinstance(activity, Game):
+                yee = f'{str(activity.name)} 플레이 중'
+            elif isinstance(activity, Spotify):
                 yee = f"Spotify에서 {str(activity.artist)}의  {str(activity.title)} 노래 듣는중"
             else:
-                yee = self.status[str(user.status)]
-        em = discord.Embed(colour=author.colour, title='USERINFO || 유저정보', timestamp=datetime.datetime.utcnow(), description=yee)
+                if user.activity.name == None:
+                    yee = self.status[str(user.status)]
+                else:
+                    yee = str(user.activity.name) + " 플레이 중"
+        try:
+            em = discord.Embed(colour=author.colour, title='USERINFO || 유저정보', timestamp=datetime.datetime.utcnow(), description=yee)
+        except:
+            em = discord.Embed(colour=author.colour, title='USERINFO || 유저정보', timestamp=datetime.datetime.utcnow(), description=self.status[str(user.status)])
         em.add_field(name='**유저 이름**', value=str(user))
         em.add_field(name='**ID**', value=f'{user.id}')
         if len(lol) > 1024:
-            em.add_field(name='역할', value='역할이 너무 많아 출력 할 수 없습니다! ~~WTF?~~', inline=False)
+            em.add_field(name='역할', value='역할이 너무 많아 출력 할 수 없습니다!', inline=False)
         else:
             em.add_field(name='역할', value=lol, inline=False)
-        em.add_field(name='계정 생성일', value=user.created_at.strftime("%Y년 %m월 %d일 %H시 %M분".encode('unicode-escape').decode()).encode().decode('unicode-escape'), inline=False)
-        em.add_field(name='서버 가입일', value=user.joined_at.strftime("%Y년 %m월 %d일 %H시 %M분".encode('unicode-escape').decode()).encode().decode('unicode-escape'), inline=False)
+        em.add_field(name='계정 생성일', value=user.created_at.strftime("%Y년 %m월 %d일 %H시 %M분 (UTC)".encode('unicode-escape').decode()).encode().decode('unicode-escape'), inline=False)
+        em.add_field(name='서버 가입일', value=user.joined_at.strftime("%Y년 %m월 %d일 %H시 %M분 (UTC)".encode('unicode-escape').decode()).encode().decode('unicode-escape'), inline=False)
         em.add_field(name='디스코드 클라이언트 상태', value=lll, inline=False)
         em.set_footer(text=f'Request By {author} | Helped by 매리#4633')
         if user.avatar_url:
@@ -130,11 +136,22 @@ class general(commands.Cog):
         author = ctx.author
         em = discord.Embed(colour=author.colour, title='PING! || 핑!', timestamp=datetime.datetime.utcnow())
         em.set_author(name=self.bot.user.name, icon_url=self.bot.user.avatar_url)
+        ping = {round(self.bot.latency * 1000)}
+        if ping > 100: Color = 0x95f0ad
+        if ping > 200: Color = 0x8ddcf0
+        if ping > 300: Color = 0xf0dc8d
+        if ping > 400: Color = 0xf0bf95
+        if ping > 500: Color = 0xf09595
+        if ping > 600: Color = 0xe86666
         before = time.monotonic()
         msg = await ctx.send(embed=em)
         msgping = round((time.monotonic() - before) * 1000)
-        em2 = discord.Embed(title='핑! 퐁!', colour=author.colour, timestamp=datetime.datetime.utcnow())
-        em2.add_field(name=f"**디스코드 API: `{round(self.bot.latency * 1000)}ms`**", value=f'메세지: `{msgping}ms`')
+        em2 = discord.Embed(title='핑! 퐁!', colour=Color, timestamp=datetime.datetime.utcnow())
+        em2.add_field(name=f"**디스코드 API: `{ping}ms`**", value=f'메세지: `{msgping}ms`')
+        if author.avatar_url:
+            em2.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
+        else:
+            em2.set_footer(text=f'Request By {author}')
         await msg.edit(embed=em2)
 
     @commands.command(pass_context=True, no_pm=True)
@@ -151,7 +168,13 @@ class general(commands.Cog):
         server = Data['guilds']
         uptime = Data['uptime']
         chino = self.bot.get_user(426722888293548032)
-        em=discord.Embed(colour=author.colour)
+        if ping > 100: Color = 0x95f0ad
+        if ping > 200: Color = 0x8ddcf0
+        if ping > 300: Color = 0xf0dc8d
+        if ping > 400: Color = 0xf0bf95
+        if ping > 500: Color = 0xf09595
+        if ping > 600: Color = 0xe86666
+        em=discord.Embed(colour=Color)
         em.add_field(name='치노봇의 핑', value=str(ping) + 'ms', inline=False)
         em.add_field(name='치노봇의 유저수', value=str(user) + '명', inline=False)
         em.add_field(name='치노봇의 서버수', value=str(server) + '개', inline=False)

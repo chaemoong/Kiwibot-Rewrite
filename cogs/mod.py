@@ -5,14 +5,15 @@ from cogs.utils.dataIO import dataIO
 import json
 import asyncio
 import datetime
+original = 10
 
 class Mod(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.ang = 'data/mod/settings.json'
         self.data = dataIO.load_json(self.ang)
-        self.cass = 'data/mod/case.json'
-        self.case = dataIO.load_json(self.cass)
+        self.warn = 'data/mod/warning.json'
+        self.data2 = dataIO.load_json(self.warn)
 
     async def owner(ctx):
         ctx.author.id == 431085681847042048
@@ -30,7 +31,6 @@ class Mod(commands.Cog):
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.check(admin)
-    @commands.has_permissions(administrator=True)
     async def language(self, ctx, language=None):
         """봇의 언어를 설정하는 명령어 입니다!"""
         server = ctx.guild
@@ -126,8 +126,53 @@ class Mod(commands.Cog):
             await ctx.send('> 완료하였습니다!')
         except discord.HTTPException:
             await ctx.send("> 권한이 없거나 혹은 디스코드 API에 문제가 있는거 같습니다!\n> 권한을 추가 해 주시고 다시 시도 해주시기 바라며, 그래도 안될시 API 문제이니 잠시후에 다시 해주세요!")
-            return        
-            
+            return       
+
+    @commands.command(pass_context=True, no_pm=True, aliases=['warn', 'rudrh', 'ㅈㅁ구'])
+    @commands.check(admin)
+    async def 경고(self, ctx, user:discord.Member=None, *, reason=None):
+        author = ctx.author
+        server = ctx.guild
+        if user == None:
+            return await ctx.send('> 경고를 줄 유저를 멘션해주세요!')
+        try:
+            if 'all' in self.data2[f'{server.id}']: pass   
+        except KeyError:
+            try:
+                self.data2[f'{server.id}'].update({"all": original})
+            except:
+                self.data2[f'{server.id}'] = {}
+                self.data2[f'{server.id}'].update({"all": original})
+        try:
+            if 'count' in self.data2[f'{server.id}'][f'{user.id}']:
+                pass
+        except KeyError:
+            try:
+                self.data2[f'{server.id}'][f'{user.id}'].update({"count": 0})
+            except:
+                self.data2[f'{server.id}'][f'{user.id}'] = {}
+                self.data2[f'{server.id}'][f'{user.id}'].update({"count": 0})
+        dataIO.save_json(self.warn, self.data2)
+        count = self.data2[f'{server.id}'][f'{user.id}']["count"]
+        all_warn = self.data2[f'{server.id}']["all"]
+        count += 1
+        self.data2[f'{server.id}'][f'{user.id}'].update({"count": int(count)})
+        dataIO.save_json(self.warn, self.data2)
+        em = discord.Embed(colour=author.colour)
+        if author.avatar_url:
+            em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
+        else:
+            em.set_footer(text=f'Request By {author}')
+        if all_warn == count or all_warn < count:
+            em2 = discord.Embed(colour=author.colour)
+            em2.add_field(name=f'당신은 {server.name} 서버에서 벤 당하셨습니다!', value='사유: 경고 초과로 인한 벤')
+            em2.set_footer(text=f'만약 반박 하실 내용이 있으시면 {author}({author.id})님에게 문의하세요!')
+            await user.send(embed=em2)
+            await server.ban(user, reason='경고 누적으로 인한 벤')
+            em.add_field(name='경고 발생!', value=f'{user.mention}({user.id})님은 경고 초과로 인하여 벤 되었습니다!')
+        else:          
+            em.add_field(name='경고 발생!', value=f'{user.mention} 님은 경고 1회를 받으셨습니다!\n만약 그 유저의 경고가 {all_warn}개가 될경우 그 유저는 벤이 됩니다!', inline=False)
+        await ctx.send(embed=em)
 
 
     async def send_cmd_help(self, ctx):

@@ -23,7 +23,7 @@ async def on_ready():
 async def playing():
     await bot.wait_until_ready()
 
-    status = ['도움말은 k!help으로 받을 수 있어요!', f'{len(bot.guilds)} SERVERS | {len(set(bot.get_all_members()))} USERS', '키위봇은 꾸준히 성장중이에요!', f'{len(bot.guilds)} 서버 감사합니다!', '베타봇은 !!help으로 도움말을 받아보세요!']
+    status = ['도움말은 c!help으로 받을 수 있어요!', f'{len(bot.guilds)} SERVERS | {len(set(bot.get_all_members()))} USERS', '키위봇은 꾸준히 성장중이에요!', f'{len(bot.guilds)} 서버 감사합니다!', '리라이트 거의 끝나갑니다!']
 
     while not bot.is_closed():
         for i in status:

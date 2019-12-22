@@ -18,16 +18,8 @@ class error(commands.Cog):
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
         server = ctx.author.guild
-        settings = dataIO.load_json(self.setting)
-        data1 = json.load(self.ko)
-        data2 = json.load(self.ko)
-        sangoon = settings["{}".format(server.id)]['language']
-        if sangoon == 'ko':
-            lan = data1['command_none']
-        elif sangoon == 'en':
-            lan = data2['command_none']
-        else:
-            lan = data1['command_none']
+        data1 = dataIO.load_json(self.ko)
+        lan = data1['command_none']
         if isinstance(error, commands.CommandInvokeError):
             # A bit hacky, couldn't find a better way
             no_dms = "Cannot send messages to this user"

@@ -135,6 +135,10 @@ class Mod(commands.Cog):
         server = ctx.guild
         if user == None:
             return await ctx.send('> 경고를 줄 유저를 멘션해주세요!')
+        if user.bot:
+            return await ctx.send('> 봇에게 경고를 줄순 없습니다!')
+        if reason == None:
+            reason = '없음'
         try:
             if 'all' in self.data2[f'{server.id}']: pass   
         except KeyError:
@@ -152,6 +156,10 @@ class Mod(commands.Cog):
             except:
                 self.data2[f'{server.id}'][f'{user.id}'] = {}
                 self.data2[f'{server.id}'][f'{user.id}'].update({"count": 0})
+        try:
+            self.data2[f'{server.id}'][f'{user.id}']["reason"]
+        except:
+            self.data2[f'{server.id}'][f'{user.id}']["reason"] = []
         dataIO.save_json(self.warn, self.data2)
         count = self.data2[f'{server.id}'][f'{user.id}']["count"]
         all_warn = self.data2[f'{server.id}']["all"]
@@ -170,9 +178,75 @@ class Mod(commands.Cog):
             await user.send(embed=em2)
             await server.ban(user, reason='경고 누적으로 인한 벤')
             em.add_field(name='경고 발생!', value=f'{user.mention}({user.id})님은 경고 초과로 인하여 벤 되었습니다!')
+            self.data2[f'{server.id}'][f'{user.id}'].update({"count": 0})
+            dataIO.save_json(self.warn, self.data2)
         else:          
-            em.add_field(name='경고 발생!', value=f'{user.mention} 님은 경고 1회를 받으셨습니다!\n만약 그 유저의 경고가 {all_warn}개가 될경우 그 유저는 벤이 됩니다!', inline=False)
+            em.add_field(name='경고 발생!', value=f'{user.mention} 님은 경고 1회를 받으셨습니다!\n만약 그 유저의 경고가 {all_warn}개가 될경우 그 유저는 벤이 됩니다!\n사유: {reason}', inline=False)
+            self.data2[f'{server.id}'][f'{user.id}']["reason"].append(reason)
+            dataIO.save_json(self.warn, self.data2)
         await ctx.send(embed=em)
+
+    @commands.command(pass_context=True)
+    @commands.check(admin)
+    async def unwarn(self, ctx, user:discord.Member=None):
+        author = ctx.author
+        server = ctx.guild
+        if user == None:
+            return await ctx.send('> 경고를 지울 유저를 멘션해주세요!')
+        if user.bot:
+            return await ctx.send('> 봇에게 경고 명령어를 사용할 수 없습니다!')
+        try:
+            count = self.data2[f'{server.id}'][f'{user.id}']["count"]
+        except KeyError:
+            return await ctx.send('> 그 유저에 대한 경고데이터가 없습니다!')
+        count -= 1
+        if count < 0: return await ctx.send('> 그 유저에 대한 경고데이터가 없습니다!')
+        self.data2[f'{server.id}'][f'{user.id}'].update({"count": int(count)})
+        a = self.data2[f'{server.id}'][f'{user.id}']["reason"]
+        self.data2[f'{server.id}'][f'{user.id}']["reason"].pop()
+        dataIO.save_json(self.warn, self.data2)
+        em = discord.Embed(colour=author.colour)
+        if author.avatar_url:
+            em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
+        else:
+            em.set_footer(text=f'Request By {author}')
+        await ctx.send(embed=em)
+
+    @commands.command(pass_context=True)
+    async def check(self, ctx, user:discord.Member):
+        pass
+    
+
+    @commands.group()
+    async def warnset(self, ctx):
+        if ctx.invoked_subcommand is None:
+            pass
+    
+    @warnset.command(pass_context=True)
+    async def limit(self, ctx, limit:int=None):
+        if limit == None:
+            return await ctx.send('> 경고 제한 갯수를 적어주셔야 되요!')
+        author = ctx.author
+        server = ctx.guild
+        try:
+            if limit < 1: return await ctx.send('> 경고 제한 갯수는 1 이상 혹은 정수 여야 되요!')
+        except:
+            pass
+        try:
+            self.data2[f'{server.id}'].update({"all": limit})
+        except:
+            self.data2[f'{server.id}'] = {}
+            self.data2[f'{server.id}'].update({"all": limit})
+        dataIO.save_json(self.warn, self.data2)
+        em = discord.Embed(colour=author.colour)
+        if author.avatar_url:
+            em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
+        else:
+            em.set_footer(text=f'Request By {author}')
+        em.add_field(name='성공!', value=f'경고 제한을 {limit} 으로 설정했어요!')
+        return await ctx.send(embed=em)
+        
+
 
 
     async def send_cmd_help(self, ctx):

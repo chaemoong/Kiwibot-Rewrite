@@ -89,7 +89,7 @@ class general(commands.Cog):
     async def serverinfo(self, ctx):
         author = ctx.author
         server = ctx.author.guild
-        a = server.created_at.strftime("%Y-%m-%d %h:%m")
+        a = server.created_at.strftime("%Y년 %m월 %d일 %H시 %M분 (UTC)".encode('unicode-escape').decode()).encode().decode('unicode-escape')
         level = dataIO.load_json('server_level/level.json')[f"{server.verification_level}"]
         region = dataIO.load_json('region/region.json')[f"{server.region}"]
         roles =  [role.mention for role in server.roles]

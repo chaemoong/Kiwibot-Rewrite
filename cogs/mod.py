@@ -136,7 +136,7 @@ class Mod(commands.Cog):
         if user == None:
             return await ctx.send('> 경고를 줄 유저를 멘션해주세요!')
         if user.bot:
-            return await ctx.send('> 봇에게 경고를 줄순 없습니다!')
+            return await ctx.send('> 봇에게 경고 명령어를 사용할 수 없습니다!')
         if reason == None:
             reason = '없음'
         try:
@@ -181,8 +181,8 @@ class Mod(commands.Cog):
             self.data2[f'{server.id}'][f'{user.id}'].update({"count": 0})
             dataIO.save_json(self.warn, self.data2)
         else:          
-            em.add_field(name='경고 발생!', value=f'{user.mention} 님은 경고 1회를 받으셨습니다!\n만약 그 유저의 경고가 {all_warn}개가 될경우 그 유저는 벤이 됩니다!\n사유: {reason}', inline=False)
-            self.data2[f'{server.id}'][f'{user.id}']["reason"].append(reason)
+            em.add_field(name='경고 발생!', value=f'{user.mention} 님은 경고 1회를 받으셨습니다!\n만약 그 유저의 경고가 {all_warn}개가 될경우 그 유저는 벤이 됩니다!\n사유: {reason}\n현재 경고 개수: {count}', inline=False)
+            self.data2[f'{server.id}'][f'{user.id}']["reason"].append(f'{count} ' + reason)
             dataIO.save_json(self.warn, self.data2)
         await ctx.send(embed=em)
 
@@ -202,7 +202,6 @@ class Mod(commands.Cog):
         count -= 1
         if count < 0: return await ctx.send('> 그 유저에 대한 경고데이터가 없습니다!')
         self.data2[f'{server.id}'][f'{user.id}'].update({"count": int(count)})
-        a = self.data2[f'{server.id}'][f'{user.id}']["reason"]
         self.data2[f'{server.id}'][f'{user.id}']["reason"].pop()
         dataIO.save_json(self.warn, self.data2)
         em = discord.Embed(colour=author.colour)
@@ -210,12 +209,52 @@ class Mod(commands.Cog):
             em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
         else:
             em.set_footer(text=f'Request By {author}')
+        em.add_field(name='성공!', value='그 유저의 경고를 1개 지웠습니다!')
         await ctx.send(embed=em)
 
     @commands.command(pass_context=True)
-    async def check(self, ctx, user:discord.Member):
-        pass
-    
+    async def check(self, ctx, user:discord.Member=None):
+        author = ctx.author
+        server = ctx.guild
+        if user == None:
+            user = author
+        if user.bot:
+            return await ctx.send('> 봇에게 경고 명령어를 사용할 수 없습니다!')
+        try:
+            count = self.data2[f'{server.id}'][f'{user.id}']["count"]
+            if count == 0: return await ctx.send('> 그 유저에 대한 경고데이터가 없습니다!')
+        except KeyError:
+            return await ctx.send('> 그 유저에 대한 경고데이터가 없습니다!')
+        a = self.data2[f'{server.id}'][f'{user.id}']["reason"]
+        em = discord.Embed(colour=user.colour)
+        em.add_field(name=f'경고 수', value=f'{user.mention} 님의 경고는 {count}개 이며 사유는 아래와 같습니다!')
+        for reason in a:
+            em.add_field(name=f'사유 {reason[:1]}', value=reason[2:], inline=False)
+        await ctx.send(embed=em)
+
+    @commands.command(pass_context=True)
+    @commands.check(admin)
+    async def clean(self, ctx, user:discord.Member=None):
+        author = ctx.author
+        server = ctx.guild
+        if user == None:
+            user = author
+        if user.bot:
+            return await ctx.send('> 봇에게 경고 명령어를 사용할 수 없습니다!')
+        try:
+            count = self.data2[f'{server.id}'][f'{user.id}']["count"]
+            if count == 0: return await ctx.send('> 그 유저에 대한 경고데이터가 없습니다!')
+        except KeyError:
+            return await ctx.send('> 그 유저에 대한 경고데이터가 없습니다!')
+        a = self.data2[f'{server.id}'][f'{user.id}']["reason"]
+        em = discord.Embed(colour=user.colour)
+        em.add_field(name=f'성공!', value=f'{user.mention} 님의 경고는 0개로 초기화 되었습니다!')
+        for b in range(count):
+            a.pop()
+        self.data2[f'{server.id}'][f'{user.id}'].update({"count": 0})
+        dataIO.save_json(self.warn, self.data2)
+        await ctx.send(embed=em)
+
 
     @commands.group()
     async def warnset(self, ctx):

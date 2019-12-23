@@ -17,7 +17,6 @@ class error(commands.Cog):
    
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
-        server = ctx.author.guild
         data1 = dataIO.load_json(self.ko)
         lan = data1['command_none']
         if isinstance(error, commands.CommandInvokeError):

@@ -14,6 +14,7 @@ class error(commands.Cog):
         self.setting = 'data/mod/settings.json'
         self.ko = 'data/language/ko.json'
         self.en = 'data/language/en.json'
+        self.asdf = dataIO.load_json('data/mod/list.json')
    
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
@@ -50,11 +51,21 @@ class error(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        if message.author.bot == False:
+        if message.author.bot == True:
             return
-        if '시발' in message.content:
-            await message.delete()
-            return await message.channel.send('욕 하면 게렌 개색히')
+        try:
+            for a in self.asdf['list']:
+                on = dataIO.load_json(self.setting)[f'{message.guild.id}']['dyr']
+                if on == 'a':
+                    if a in message.content:
+                        await message.delete()
+                        return await message.channel.send('욕 하시면 안되요!')
+                    else:
+                        return 
+                else:
+                    return
+        except KeyError:
+            return
             
     
 

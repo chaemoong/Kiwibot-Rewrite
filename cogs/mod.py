@@ -335,11 +335,22 @@ class Mod(commands.Cog):
             except KeyError:
                 self.data[f'{server.id}'].update({"log": '없음'})
                 log = self.data[f'{server.id}']['log']
+            try:
+                d = self.data[f'{server.id}']['dyr']
+                try:
+                    if d:
+                        pass
+                except:
+                    d = '꺼짐'
+            except KeyError:
+                self.data[f'{server.id}'].update({"dyr": False})
+                d = self.data[f'{server.id}']['dyr']
                 dataIO.save_json(self.warn, self.data2)
             if admin == None: admin = '없음'
             if mod == None: mod = '없음'
             if log == None: log = '없음'
-            await ctx.send(f"```fix\n> 관리자 역할: {admin}\n> 부관리자 역할: {mod}\n> 로그: {log}```\n")
+            if d == False: d = '꺼짐'
+            await ctx.send(f"```fix\n> 관리자 역할: {admin}\n> 부관리자 역할: {mod}\n> 로그: {log}\n> 비속어 필터: {d}```\n")
             return await ctx.send(f'```fix\n> 관리자 역할 설정: {ctx.prefix}{ctx.command} admin [역할]\n> 부관리자 역할 설정: {ctx.prefix}{ctx.command} mod [역할]\n> 로그 설정: {ctx.prefix}{ctx.command} log [채널]```')
 
     @modset.command(pass_context=True)
@@ -412,6 +423,36 @@ class Mod(commands.Cog):
         em.add_field(name='성공!', value=f'{channel.name} 채널을 로그로 정했습니다!')
         await ctx.send(embed=em)
 
+    @modset.command(pass_context=True)
+    async def 욕필터(self, ctx):
+        author = ctx.author
+        server = ctx.guild
+        try:
+            if self.data[f'{server.id}']: pass
+        except:
+            self.data[f'{server.id}'] = {}
+        try:
+            if self.data[f'{server.id}']['dyr'] == 'a':
+                del self.data[f'{server.id}']['dyr']
+                self.data[f'{server.id}'].update({"dyr": 'b'})
+            else:
+                del self.data[f'{server.id}']['dyr']
+                self.data[f'{server.id}'].update({"dyr": 'a'})
+        except KeyError:
+            self.data[f'{server.id}'].update({"dyr": 'a'})        
+        em = discord.Embed(colour=author.colour)
+        if author.avatar_url:
+            em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
+        else:
+            em.set_footer(text=f'Request By {author}')
+        if self.data[f'{server.id}']['dyr'] == 'a':
+            b = '켜'
+        else:
+            b = '꺼'
+        dataIO.save_json(self.ang, self.data)
+        em.add_field(name='성공!', value=f'욕필터를 {b}졌습니다!')
+        await ctx.send(embed=em)
+
 
 
     async def send_cmd_help(self, ctx):
@@ -442,14 +483,14 @@ class Mod(commands.Cog):
         time = datetime.datetime.now()
         if reason == None:
             reason = '없음'
-        a = dataIO.load_json('data/mod/warning.json')[f'{server.id}'][f'{user.id}']['count']
-        b = dataIO.load_json('data/mod/warning.json')[f'{server.id}']['all']
         time = time.strftime("%Y년 %m월 %d일 %H시 %M분 (UTC)".encode('unicode-escape').decode()).encode().decode('unicode-escape')
         em = discord.Embed(colour=author.colour)
         em.add_field(name=action, value=f'발생 시각: {time}', inline=False)
         em.add_field(name='유저(ID) | 관리자(id)', value=f'{author.mention} | {user.mention}', inline=False)
         em.add_field(name='사유', value=reason, inline=False)
         if action == '경고 | WARN' or action == '경고 삭제 | DELETED WARN' or action == '경고 초기화 | RESET WARN':
+            a = dataIO.load_json('data/mod/warning.json')[f'{server.id}'][f'{user.id}']['count']
+            b = dataIO.load_json('data/mod/warning.json')[f'{server.id}']['all']
             em.add_field(name='경고 개수', value=f'{a}/{b}')
         if author.avatar_url:
             em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)

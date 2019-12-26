@@ -15,6 +15,27 @@ import json
 import random
 from random import choice
 import aiohttp
+from bs4 import BeautifulSoup
+import requests
+from enum import Enum
+
+
+class RPS(Enum):
+    rock     = "\N{MOYAI}"
+    paper    = "\N{PAGE FACING UP}"
+    scissors = "\N{BLACK SCISSORS}"
+
+class RPSParser:
+    def __init__(self, argument):
+        argument = argument.lower()
+        if argument == "주먹":
+            self.choice = RPS.rock
+        elif argument == "보":
+            self.choice = RPS.paper
+        elif argument == "가위":
+            self.choice = RPS.scissors
+        else:
+            pass
 
 class general(commands.Cog):
     def __init__(self, bot):
@@ -23,10 +44,42 @@ class general(commands.Cog):
         self.author = dataIO.load_json('data/general/author.json')
         self.status = dataIO.load_json('data/general/stat.json')
 
+    @commands.command(pass_context=True)
+    async def 가위바위보(self, ctx, your_choice : RPSParser):
+        """봇 vs 당신"""
+        author = ctx.author
+        player_choice = your_choice.choice
+        red_choice = choice((RPS.rock, RPS.paper, RPS.scissors))
+        cond = {
+                (RPS.rock,     RPS.paper)    : False,
+                (RPS.rock,     RPS.scissors) : True,
+                (RPS.paper,    RPS.rock)     : True,
+                (RPS.paper,    RPS.scissors) : False,
+                (RPS.scissors, RPS.rock)     : False,
+                (RPS.scissors, RPS.paper)    : True
+               }
+        
+        if red_choice == player_choice:
+            outcome = None # Tie
+        else:
+            outcome = cond[(player_choice, red_choice)]
+        em = discord.Embed(colour=author.colour)
+        if outcome is True:
+            em.add_field(name='쳇 당신이 이겼어요!', value=f'당신: {your_choice}\n봇:{red_choice.value}')
+        elif outcome is False:
+            em.add_field(name='오예 제가 이겼어요!', value=f'당신: {your_choice}\n봇:{red_choice.value}')
+        else:
+            em.add_field(name='이런 비겼어요!', value=f'당신: {your_choice.choice}\n봇:{red_choice.value}')
+        if author.avatar_url:
+            em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
+        else:
+            em.set_footer(text=f'Request By {author}')
+        return await ctx.send(embed=em)
+
+
     @commands.command()
     async def userinfo(self, ctx, user:discord.Member=None):
         author = ctx.author
-        server = author.guild
         self.author[f'{author.id}'] = []
         d = self.author[f'{author.id}']
         if not user:
@@ -82,8 +135,44 @@ class general(commands.Cog):
         em.set_footer(text=f'Request By {author} | Helped by 매리#4633')
         if user.avatar_url:
             em.set_thumbnail(url=user.avatar_url)
+        if author.avatar_url:
+            em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
+        else:
+            em.set_footer(text=f'Request By {author}')
         await ctx.send(author.mention, embed=em)
 
+    @commands.command(pass_context=True)
+    async def 멜론(self, ctx):
+        """멜론 차트를 뽑는 명령어입니다!"""
+        author = ctx.author
+        RANK = 10
+    
+        header = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko'}
+        req = requests.get('https://www.melon.com/chart/index.htm', headers = header)
+        html = req.text
+        parse = BeautifulSoup(html, 'html.parser')
+    
+        titles = parse.find_all("div", {"class": "ellipsis rank01"})
+        songs = parse.find_all("div", {"class": "ellipsis rank02"})
+    
+        title = []
+        song = []
+        em = discord.Embed(colour=author.colour, title=':melon: 멜론 차트')
+        if author.avatar_url:
+            em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
+        else:
+            em.set_footer(text=f'Request By {author}')
+        em.set_thumbnail(url='https://cdnimg.melon.co.kr/resource/image/web/common/logo_melon142x99.png')
+        for t in titles:
+            title.append(t.find('a').text)
+    
+        for s in songs:
+            song.append(s.find('span', {"class": "checkEllipsis"}).text)
+    
+        for i in range(RANK):
+            print('%3d위: %s - %s'%(i+1, title[i], song[i]))
+            em.add_field(name='%3d위'%(i+1), value='%s - %s'%(title[i], song[i]), inline=False)
+        return await ctx.send(embed=em)
 
     @commands.command(pass_context=True, no_pm=True)
     async def serverinfo(self, ctx):
@@ -136,7 +225,7 @@ class general(commands.Cog):
         author = ctx.author
         em = discord.Embed(colour=author.colour, title='PING! || 핑!', timestamp=datetime.datetime.utcnow())
         em.set_author(name=self.bot.user.name, icon_url=self.bot.user.avatar_url)
-        ping = {round(self.bot.latency * 1000)}
+        ping = round(self.bot.latency * 1000)
         if ping > 100: Color = 0x95f0ad
         if ping > 200: Color = 0x8ddcf0
         if ping > 300: Color = 0xf0dc8d

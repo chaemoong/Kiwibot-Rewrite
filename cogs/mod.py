@@ -17,18 +17,32 @@ class Mod(commands.Cog):
         self.data2 = dataIO.load_json(self.warn)
 
     async def owner(ctx):
-        ctx.author.id == 431085681847042048
+        return ctx.author.id == 431085681847042048
 
     async def administrator(ctx):
+        a = 'data/mod/settings.json'
+        b = dataIO.load_json(a)
         if ctx.author.id == 431085681847042048:
             return True
-        elif ctx.author.guild_permissions.administrator == True:
+        if ctx.author.guild_permissions.administrator == True:
             return True
-    
-    @commands.command(pass_context=True, no_pm=True)
-    @commands.check(owner)
-    async def asdf(self, ctx):
-        return await self.send_cmd_help(ctx)
+        else:
+            try:
+                admin = get(ctx.author.roles, id=b[f'{ctx.guild.id}']['admin'])
+                if admin == None:
+                    return False
+                else:
+                    return True
+            except KeyError:
+                try:
+                    mod = get(ctx.author.roles, id=b[f'{ctx.guild.id}']['mod'])
+                    if mod == None:
+                        return False
+                    else:
+                        return True
+                except KeyError:
+                    return False
+                        
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.check(administrator)
@@ -37,22 +51,22 @@ class Mod(commands.Cog):
         server = ctx.guild
         if language == None:
             return await self.language_setting(ctx)
-        if language == 'ko':
+        if language == 'ko_kr' or language == '한글' or language == 'ko':
             try:
                 self.data[f'{server.id}'].update({"language": "ko"})
             except KeyError:
                 self.data[f'{server.id}'] = {}
                 self.data[f'{server.id}'].update({"language": "ko"})
-            await ctx.send('> 언어가 성공적으로 `한글` 로 설정 되었습니다! | Succees to language has been set!')
             dataIO.save_json(self.ang, self.data)
-        if language == 'en':
+            return await ctx.send('> 언어가 성공적으로 `한글` 로 설정 되었습니다! | Success to language has been set!')
+        if language == 'en' or language == '영어' or language == 'en':
             try:
                 self.data[f'{server.id}'].update({"language": "en"})
             except KeyError:
                 self.data[f'{server.id}'] = {}
                 self.data[f'{server.id}'].update({"language": "en"})
-            await ctx.send('> 언어가 성공적으로 `영어` 로 설정 되었습니다! | Succees to language has been set!')
             dataIO.save_json(self.ang, self.data)
+            return await ctx.send('> 언어가 성공적으로 `영어` 로 설정 되었습니다! | Success to language has been set!')
         else:
             return await self.language_setting(ctx)
             
@@ -280,8 +294,9 @@ class Mod(commands.Cog):
         server = ctx.guild
         try:
             if limit < 1: return await ctx.send('> 경고 제한 갯수는 1 이상 혹은 정수 여야 되요!')
+            else: return await ctx.send('> 경고 제한 갯수는 1 이상 혹은 정수 여야 되요!')
         except:
-            pass
+            return await ctx.send('> 경고 제한 갯수는 1 이상 혹은 정수 여야 되요!')        
         try:
             self.data2[f'{server.id}'].update({"all": limit})
         except:
@@ -338,12 +353,13 @@ class Mod(commands.Cog):
             try:
                 d = self.data[f'{server.id}']['dyr']
                 try:
-                    if d:
-                        pass
+                    if d == 'a':
+                        d = '켜짐'
+                    else: d = '꺼짐'
                 except:
                     d = '꺼짐'
             except KeyError:
-                self.data[f'{server.id}'].update({"dyr": False})
+                self.data[f'{server.id}'].update({"dyr": 'b'})
                 d = self.data[f'{server.id}']['dyr']
                 dataIO.save_json(self.warn, self.data2)
             if admin == None: admin = '없음'
@@ -366,6 +382,7 @@ class Mod(commands.Cog):
         try:
             if self.data[f'{server.id}']['admin']:
                 del self.data[f'{server.id}']['admin']
+                self.data[f'{server.id}'].update({"admin": role.id})
         except KeyError:
             self.data[f'{server.id}'].update({"admin": role.id})
         em = discord.Embed(colour=author.colour)

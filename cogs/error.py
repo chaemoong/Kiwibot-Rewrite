@@ -18,8 +18,14 @@ class error(commands.Cog):
    
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
-        data1 = dataIO.load_json(self.ko)
-        lan = data1['command_none']
+        yee = dataIO.load_json(self.setting)
+        try:
+            if yee[f'{ctx.guild.id}']['language'] == 'ko':
+                data = dataIO.load_json(self.ko)
+            else:
+                data = dataIO.load_json(self.en)
+        except:
+            data = dataIO.load_json(self.en)
         if isinstance(error, commands.CommandInvokeError):
             # A bit hacky, couldn't find a better way
             no_dms = "Cannot send messages to this user"
@@ -39,32 +45,21 @@ class error(commands.Cog):
             print(log)
             await ctx.send(embed=em)
         elif isinstance(error, commands.CommandNotFound):
+            lan = data['command_none']
             em = discord.Embed(colour=ctx.author.colour)
             em.add_field(name=lan['1'], value=lan['2'].format(ctx))
             em.set_footer(text=lan['3'])
-            await ctx.send(embed=em)
+            return await ctx.send(embed=em)
         elif isinstance(error, commands.CheckFailure):
+            lan = data['admin_command']
             em = discord.Embed(colour=ctx.author.colour)
             em.add_field(name=lan['1'], value=lan['2'].format(ctx))
             em.set_footer(text=lan['3'])
-            await ctx.send(embed=em)
+            return await ctx.send(embed=em)
 
     @commands.Cog.listener()
     async def on_message(self, message):
         if message.author.bot == True:
-            return
-        try:
-            for a in self.asdf['list']:
-                on = dataIO.load_json(self.setting)[f'{message.guild.id}']['dyr']
-                if on == 'a':
-                    if a in message.content:
-                        await message.delete()
-                        return await message.channel.send('욕 하시면 안되요!')
-                    else:
-                        return 
-                else:
-                    return
-        except KeyError:
             return
             
     

@@ -18,68 +18,33 @@ import aiohttp
 from bs4 import BeautifulSoup
 import requests
 from enum import Enum
+import lyrics_displayer
+import asyncio
 
-
-class RPS(Enum):
-    rock     = "\N{MOYAI}"
-    paper    = "\N{PAGE FACING UP}"
-    scissors = "\N{BLACK SCISSORS}"
-
-class RPSParser:
-    def __init__(self, argument):
-        argument = argument.lower()
-        if argument == "주먹":
-            self.choice = RPS.rock
-        elif argument == "보":
-            self.choice = RPS.paper
-        elif argument == "가위":
-            self.choice = RPS.scissors
-        else:
-            pass
 
 class general(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.client = dataIO.load_json('data/general/status.json')
         self.author = dataIO.load_json('data/general/author.json')
-        self.status = dataIO.load_json('data/general/stat.json')
-
-    @commands.command(pass_context=True)
-    async def 가위바위보(self, ctx, your_choice : RPSParser):
-        """봇 vs 당신"""
-        author = ctx.author
-        player_choice = your_choice.choice
-        red_choice = choice((RPS.rock, RPS.paper, RPS.scissors))
-        cond = {
-                (RPS.rock,     RPS.paper)    : False,
-                (RPS.rock,     RPS.scissors) : True,
-                (RPS.paper,    RPS.rock)     : True,
-                (RPS.paper,    RPS.scissors) : False,
-                (RPS.scissors, RPS.rock)     : False,
-                (RPS.scissors, RPS.paper)    : True
-               }
-        
-        if red_choice == player_choice:
-            outcome = None # Tie
-        else:
-            outcome = cond[(player_choice, red_choice)]
-        em = discord.Embed(colour=author.colour)
-        if outcome is True:
-            em.add_field(name='쳇 당신이 이겼어요!', value=f'당신: {your_choice}\n봇:{red_choice.value}')
-        elif outcome is False:
-            em.add_field(name='오예 제가 이겼어요!', value=f'당신: {your_choice}\n봇:{red_choice.value}')
-        else:
-            em.add_field(name='이런 비겼어요!', value=f'당신: {your_choice.choice}\n봇:{red_choice.value}')
-        if author.avatar_url:
-            em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
-        else:
-            em.set_footer(text=f'Request By {author}')
-        return await ctx.send(embed=em)
+        self.data = dataIO.load_json('data/general/stat.json')
+        self.setting = 'data/mod/settings.json'
+        self.ko = 'data/language/ko.json'
+        self.en = 'data/language/en.json'
 
 
     @commands.command()
     async def userinfo(self, ctx, user:discord.Member=None):
         author = ctx.author
+        server = ctx.guild.id
+        asdf = dataIO.load_json(self.setting)
+        try:
+            if asdf[f'{server}']['language'] == 'ko':
+                data = dataIO.load_json(self.ko)[ctx.command.name]
+            else:
+                data = dataIO.load_json(self.en)[ctx.command.name]
+        except:
+            data = dataIO.load_json(self.en)[ctx.command.name]
         self.author[f'{author.id}'] = []
         d = self.author[f'{author.id}']
         if not user:
@@ -94,45 +59,50 @@ class general(commands.Cog):
         else:
             lol = '없음'
         if self.client['{}'.format(a)] == 'ok':
-            d.append('웹 :globe_with_meridians:')
+            d.append(data["2"])
         else:
             pass
         if self.client['{}'.format(b)] == 'ok':
-            d.append('모바일 :iphone:')
+            d.append(data['3'])
         else:
             pass
         if self.client['{}'.format(c)] == 'ok':
-            d.append('데스크톱 :desktop:')
+            d.append(data["4"])
         else:
             pass
         if a == 'offline' and b == 'offline' and c == 'offline':
-            d.append('오프라인')
-        for hmm in d:
-            lll = ', '.join(d)
+            d.append(data["4"])
+        lll = ', '.join(d)
         for activity in user.activities:
             if isinstance(activity, Game):
-                yee = f'{str(activity.name)} 플레이 중'
+                yee = data["game"].format(str(activity.name))
             elif isinstance(activity, Spotify):
-                yee = f"Spotify에서 {str(activity.artist)}의  {str(activity.title)} 노래 듣는중"
-            else:
-                if user.activity.name == None:
-                    yee = self.status[str(user.status)]
-                else:
-                    yee = str(user.activity.name) + " 플레이 중"
+                yee = data["Spotify"].format(str(activity.artist), str(activity.title))
         try:
-            em = discord.Embed(colour=author.colour, title='USERINFO || 유저정보', timestamp=datetime.datetime.utcnow(), description=yee)
+            em = discord.Embed(colour=author.colour, title=data['6'], timestamp=datetime.datetime.utcnow(), description=yee)
         except:
-            em = discord.Embed(colour=author.colour, title='USERINFO || 유저정보', timestamp=datetime.datetime.utcnow(), description=self.status[str(user.status)])
-        em.add_field(name='**유저 이름**', value=str(user))
+            em = discord.Embed(colour=author.colour, title=data['6'], timestamp=datetime.datetime.utcnow(), description=self.data[f'{user.status}'])
+        em.add_field(name=data['7'], value=str(user))
         em.add_field(name='**ID**', value=f'{user.id}')
         if len(lol) > 1024:
-            em.add_field(name='역할', value='역할이 너무 많아 출력 할 수 없습니다!', inline=False)
+            em.add_field(name=data['14'], value=data['15'], inline=False)
         else:
-            em.add_field(name='역할', value=lol, inline=False)
-        em.add_field(name='계정 생성일', value=user.created_at.strftime("%Y년 %m월 %d일 %H시 %M분 (UTC)".encode('unicode-escape').decode()).encode().decode('unicode-escape'), inline=False)
-        em.add_field(name='서버 가입일', value=user.joined_at.strftime("%Y년 %m월 %d일 %H시 %M분 (UTC)".encode('unicode-escape').decode()).encode().decode('unicode-escape'), inline=False)
-        em.add_field(name='디스코드 클라이언트 상태', value=lll, inline=False)
+            em.add_field(name=data['14'], value=lol, inline=False)
+        em.add_field(name=data['10'], value=user.created_at.strftime(data['time'].encode('unicode-escape').decode()).encode().decode('unicode-escape'), inline=False)
+        em.add_field(name=data['13'], value=user.joined_at.strftime(data['time'].encode('unicode-escape').decode()).encode().decode('unicode-escape'), inline=False)
+        try:
+            status = user.activities[0].type
+            if status == 4:
+                em.add_field(name='Custom Status', value=user.activities[0].state)
+        except:
+            pass
+        if lll is None:
+            em.add_field(name=data['12'], value=data["1"], inline=False)
+        else:
+            em.add_field(name=data['12'], value=lll, inline=False)
+
         em.set_footer(text=f'Request By {author} | Helped by 매리#4633')
+        
         if user.avatar_url:
             em.set_thumbnail(url=user.avatar_url)
         if author.avatar_url:
@@ -144,6 +114,15 @@ class general(commands.Cog):
     @commands.command(pass_context=True)
     async def 멜론(self, ctx):
         """멜론 차트를 뽑는 명령어입니다!"""
+        server = ctx.guild.id
+        yee = dataIO.load_json(self.setting)
+        try:
+            if yee[f'{server}']['language'] == 'ko':
+                a = '멜론 차트'
+            else:
+                a = 'Melon Chart'
+        except:
+            a = 'Melon Chart'
         author = ctx.author
         RANK = 10
     
@@ -157,7 +136,7 @@ class general(commands.Cog):
     
         title = []
         song = []
-        em = discord.Embed(colour=author.colour, title=':melon: 멜론 차트')
+        em = discord.Embed(colour=author.colour, title=f':melon: {a}')
         if author.avatar_url:
             em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
         else:
@@ -170,15 +149,41 @@ class general(commands.Cog):
             song.append(s.find('span', {"class": "checkEllipsis"}).text)
     
         for i in range(RANK):
-            print('%3d위: %s - %s'%(i+1, title[i], song[i]))
-            em.add_field(name='%3d위'%(i+1), value='%s - %s'%(title[i], song[i]), inline=False)
+            c = int(i+1)
+            if int(1) == c:
+                if a == 'Melon Chart':
+                    b = '1st'
+                else:
+                    b = '1위'
+            if int(2) == c:
+                if a == 'Melon Chart':
+                    b = '2nd'
+            if int(3) == c:
+                if a == 'Melon Chart':
+                    b = '3rd'
+                else:
+                    b = '3등'
+            else:
+                if a == 'Melon Chart':
+                    b = f'{c}th'
+                else:
+                    b = f'{c}등'
+            em.add_field(name=f'{b}', value='%s - %s'%(title[i], song[i]), inline=False)
         return await ctx.send(embed=em)
 
     @commands.command(pass_context=True, no_pm=True)
     async def serverinfo(self, ctx):
         author = ctx.author
         server = ctx.author.guild
-        a = server.created_at.strftime("%Y년 %m월 %d일 %H시 %M분 (UTC)".encode('unicode-escape').decode()).encode().decode('unicode-escape')
+        asdf = dataIO.load_json(self.setting)
+        try:
+            if asdf[f'{server}']['language'] == 'ko':
+                data = dataIO.load_json(self.ko)[ctx.command.name]
+            else:
+                data = dataIO.load_json(self.en)[ctx.command.name]
+        except:
+            data = dataIO.load_json(self.en)[ctx.command.name]
+        a = server.created_at.strftime(data['time'].encode('unicode-escape').decode()).encode().decode('unicode-escape')
         level = dataIO.load_json('server_level/level.json')[f"{server.verification_level}"]
         region = dataIO.load_json('region/region.json')[f"{server.region}"]
         roles =  [role.mention for role in server.roles]

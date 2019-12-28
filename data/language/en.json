@@ -1,25 +1,30 @@
 {
     "userinfo": {
-        "1": "Listening to `{}` of `{}` in Spotify",
-        "2": ":globe_with_meridians: Web",
-        "3": ":iphone: Mobile",
-        "4": ":desktop: Desktop",
-        "5": "Offline",
-        "6": "Nope",
-        "7": "YES",
-        "8": "TAG",
-        "9": "**ID**",
-        "10": "Activity",
-        "11": "Resitered Date",
-        "12": "Is This user Bot?",
-        "13": "Client",
-        "14": "Joined Date",
-        "15": "Roles",
-        "16": "It's over 1024 characters, so i can't print any more!"
+        "1": "Offline",
+        "2": "Web :globe_with_meridians:",
+        "3": "Mobile :iphone:",
+        "4": "Desktop :desktop:",
+        "game": "Playing {}",
+        "Spotify": "Listening to `{}` of `{}` in Spotify",
+        "5": "Nope",
+        "6": "USERINFO",
+        "7": "USER TAG",
+        "9": "Activity",
+        "10": "Resitered Date",
+        "12": "Client",
+        "13": "Joined Date",
+        "14": "Roles",
+        "15": "It's over the role, so i can't print any more!",
+        "time": "%Y-%m-%d %H:%M (UTC)"
     },
     "command_none": {
         "1": "The command is not a command!",
         "2": "Check the command with `{0.prefix}help`!",
         "3": "Please check that you wrote it correctly and use it!"
+    },    
+    "admin_command": {
+        "1": "The command is only Administrator command!",
+        "2": "Check the command with `{0.prefix}help` to you can use command!",
+        "3": "Don't use Administrator without Administrator permission!"
     }
 }

@@ -18,7 +18,6 @@ import aiohttp
 from bs4 import BeautifulSoup
 import requests
 from enum import Enum
-import lyrics_displayer
 import asyncio
 
 

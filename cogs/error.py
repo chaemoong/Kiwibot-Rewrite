@@ -61,7 +61,8 @@ class error(commands.Cog):
     async def on_message(self, message):
         if message.author.bot == True:
             return
-            
+        
+          
     
 
 

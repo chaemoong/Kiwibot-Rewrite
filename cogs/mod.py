@@ -182,7 +182,7 @@ class Mod(commands.Cog):
         server = ctx.guild
         asdf = dataIO.load_json(self.setting)
         try:
-            if asdf[f'{guild.id}']['language'] == 'ko':
+            if asdf[f'{server.id}']['language'] == 'ko':
                 data = dataIO.load_json(self.ko)[ctx.command.name]
             else:
                 data = dataIO.load_json(self.en)[ctx.command.name]
@@ -246,20 +246,30 @@ class Mod(commands.Cog):
 
     @commands.command(pass_context=True)
     @commands.check(administrator)
-    async def unwarn(self, ctx, user:discord.Member=None):
+    async def unwarn(self, ctx, user:discord.Member=None, reason=None):
         """유저에게 경고 1개를 지우는 명령어에요!\nDeleting 1 warn to Member"""
         author = ctx.author
         server = ctx.guild
+        asdf = dataIO.load_json(self.setting)
+        try:
+            if asdf[f'{server.id}']['language'] == 'ko':
+                data = dataIO.load_json(self.ko)[ctx.command.name]
+            else:
+                data = dataIO.load_json(self.en)[ctx.command.name]
+        except:
+            data = dataIO.load_json(self.en)[ctx.command.name]
         if user == None:
-            return await ctx.send('> 경고를 지울 유저를 멘션해주세요!')
+            return await ctx.send(data['1'])
         if user.bot:
-            return await ctx.send('> 봇에게 경고 명령어를 사용할 수 없습니다!')
+            return await ctx.send(data['2'])
+        if reason==None:
+            reason = data['3']
         try:
             count = self.data2[f'{server.id}'][f'{user.id}']["count"]
         except KeyError:
-            return await ctx.send('> 그 유저에 대한 경고데이터가 없습니다!')
+            return await ctx.send(data['4'])
         count -= 1
-        if count < 0: return await ctx.send('> 그 유저에 대한 경고데이터가 없습니다!')
+        if count < 0: return await ctx.send(data['4'])
         self.data2[f'{server.id}'][f'{user.id}'].update({"count": int(count)})
         self.data2[f'{server.id}'][f'{user.id}']["reason"].pop()
         dataIO.save_json(self.warn, self.data2)
@@ -268,7 +278,7 @@ class Mod(commands.Cog):
             em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
         else:
             em.set_footer(text=f'Request By {author}')
-        em.add_field(name='성공!', value='그 유저의 경고를 1개 지웠습니다!')
+        em.add_field(name=data['5'], value=data['6'])
         await ctx.send(embed=em)
         return await self.logger(ctx, action='경고 삭제 | DELETED WARN', user=user, reason=reason)   
 
@@ -279,22 +289,30 @@ class Mod(commands.Cog):
         server = ctx.guild
         if user == None:
             user = author
+        asdf = dataIO.load_json(self.setting)
+        try:
+            if asdf[f'{server.id}']['language'] == 'ko':
+                data = dataIO.load_json(self.ko)[ctx.command.name]
+            else:
+                data = dataIO.load_json(self.en)[ctx.command.name]
+        except:
+            data = dataIO.load_json(self.en)[ctx.command.name]
         if user.bot:
-            return await ctx.send('> 봇에게 경고 명령어를 사용할 수 없습니다!')
+            return await ctx.send(data['2'])
         em = discord.Embed(colour=user.colour)
         try:
             count = self.data2[f'{server.id}'][f'{user.id}']["count"]
             if count == 0: 
-                em.add_field(name=f'경고 수', value=f'{user.mention} 님의 경고는 0개입니다!')
+                em.add_field(name=data['3'], value=data['5'].format(user.mention))
                 return await ctx.send(embed=em)
 
         except KeyError:
-            em.add_field(name=f'경고 수', value=f'{user.mention} 님의 경고는 0개입니다!')
+            em.add_field(name=data['3'], value=data['5'].format(user.mention))
             return await ctx.send(embed=em)
         a = self.data2[f'{server.id}'][f'{user.id}']["reason"]
-        em.add_field(name=f'경고 수', value=f'{user.mention} 님의 경고는 {count}개 이며 사유는 아래와 같습니다!')
+        em.add_field(name=data['3'], value=data['6'].format(user.mention, count))
         for reason in a:
-            em.add_field(name=f'사유 {reason[:1]}', value=reason[2:], inline=False)
+            em.add_field(name=data['7'].format(reason[:1]), value=reason[2:], inline=False)
         return await ctx.send(embed=em)
 
     @commands.command(pass_context=True)
@@ -302,45 +320,61 @@ class Mod(commands.Cog):
     async def clean(self, ctx, user:discord.Member=None, *, reason=None):
         author = ctx.author
         server = ctx.guild
+        asdf = dataIO.load_json(self.setting)
+        try:
+            if asdf[f'{server.id}']['language'] == 'ko':
+                data = dataIO.load_json(self.ko)[ctx.command.name]
+            else:
+                data = dataIO.load_json(self.en)[ctx.command.name]
+        except:
+            data = dataIO.load_json(self.en)[ctx.command.name]
         if user == None:
-            user = author
+            return await ctx.send(data['1'])
         if user.bot:
-            return await ctx.send('> 봇에게 경고 명령어를 사용할 수 없습니다!')
+            return await ctx.send(data['2'])
         if reason == None:
-            reason = '없음'
+            reason = data['3']
         try:
             count = self.data2[f'{server.id}'][f'{user.id}']["count"]
-            if count == 0: return await ctx.send('> 그 유저에 대한 경고데이터가 없습니다!')
+            if count == 0: return await ctx.send(data['4'])
         except KeyError:
-            return await ctx.send('> 그 유저에 대한 경고데이터가 없습니다!')
+            return await ctx.send(data['4'])
         a = self.data2[f'{server.id}'][f'{user.id}']["reason"]
         em = discord.Embed(colour=user.colour)
-        em.add_field(name=f'성공!', value=f'{user.mention} 님의 경고는 0개로 초기화 되었습니다!')
+        em.add_field(name=data['5'], value=data['6'].format(user.mention))
         for b in range(count):
             a.pop()
         self.data2[f'{server.id}'][f'{user.id}'].update({"count": 0})
         dataIO.save_json(self.warn, self.data2)
+        if author.avatar_url:
+            em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
+        else:
+            em.set_footer(text=f'Request By {author}')
         await ctx.send(embed=em)
         return await self.logger(ctx, action='경고 초기화 | RESET WARN', user=user, reason=reason)   
 
-
-    @commands.group()
-    @commands.check(administrator)
-    async def warnset(self, ctx):
-        if ctx.invoked_subcommand is None:
-            pass
-    
-    @warnset.command(pass_context=True)
+    @commands.command(pass_context=True)
     async def limit(self, ctx, limit:int=None):
+        """경고제한 하는 명령어입니다! | This command limits the warning!"""
+        author = ctx.author
+        server = ctx.guild
+        asdf = dataIO.load_json(self.setting)
+        try:
+            if asdf[f'{server.id}']['language'] == 'ko':
+                data = dataIO.load_json(self.ko)[ctx.command.name]
+            else:
+                data = dataIO.load_json(self.en)[ctx.command.name]
+        except:
+            data = dataIO.load_json(self.en)[ctx.command.name]
         if limit == None:
-            return await ctx.send('> 경고 제한 갯수를 적어주셔야 되요!')
+            return await ctx.send(data['2'])
         author = ctx.author
         server = ctx.guild
         try:
-            if limit < 1: return await ctx.send('> 경고 제한 갯수는 1 이상 혹은 정수 여야 되요!')
-            else: return await ctx.send('> 경고 제한 갯수는 1 이상 혹은 정수 여야 되요!')
+            if limit < 1: return await ctx.send(data['1'])
+            else: return await ctx.send(data['1'])
         except:
-            return await ctx.send('> 경고 제한 갯수는 1 이상 혹은 정수 여야 되요!')        
+            return await ctx.send(data['1'])        
         try:
             self.data2[f'{server.id}'].update({"all": limit})
         except:
@@ -352,7 +386,7 @@ class Mod(commands.Cog):
             em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
         else:
             em.set_footer(text=f'Request By {author}')
-        em.add_field(name='성공!', value=f'경고 제한을 {limit} 으로 설정했어요!')
+        em.add_field(name=data['5'], value='경고 제한을 {} 으로 설정했어요!'.format(limit))
         return await ctx.send(embed=em)
 
     @commands.group()
@@ -370,7 +404,7 @@ class Mod(commands.Cog):
                     if a:
                         admin = get(server.roles, id=a)
                 except:
-                    admin = '없음'
+                    admin = '없음 | None'
             except KeyError:
                 self.data[f'{server.id}'].update({"admin": '없음'})
                 admin = self.data[f'{server.id}']['admin']
@@ -380,7 +414,7 @@ class Mod(commands.Cog):
                     if b:
                         mod = get(server.roles, id=b)
                 except:
-                    mod = '없음'
+                    mod = '없음 | None'
             except KeyError:
                 self.data[f'{server.id}'].update({"mod": '없음'})
                 mod = self.data[f'{server.id}']['mod']
@@ -390,7 +424,7 @@ class Mod(commands.Cog):
                     if c:
                         log = server.get_channel(c)
                 except:
-                    log = '없음'
+                    log = '없음 | None'
             except KeyError:
                 self.data[f'{server.id}'].update({"log": '없음'})
                 log = self.data[f'{server.id}']['log']
@@ -406,12 +440,12 @@ class Mod(commands.Cog):
                 self.data[f'{server.id}'].update({"dyr": 'b'})
                 d = self.data[f'{server.id}']['dyr']
                 dataIO.save_json(self.warn, self.data2)
-            if admin == None: admin = '없음'
-            if mod == None: mod = '없음'
-            if log == None: log = '없음'
+            if admin == None: admin = '없음 | None'
+            if mod == None: mod = '없음 | None'
+            if log == None: log = '없음 | None'
             if d == False: d = '꺼짐'
-            await ctx.send(f"```fix\n> 관리자 역할: {admin}\n> 부관리자 역할: {mod}\n> 로그: {log}\n> 비속어 필터: {d}```\n")
-            return await ctx.send(f'```fix\n> 관리자 역할 설정: {ctx.prefix}{ctx.command} admin [역할]\n> 부관리자 역할 설정: {ctx.prefix}{ctx.command} mod [역할]\n> 로그 설정: {ctx.prefix}{ctx.command} log [채널]```')
+            await ctx.send(f"```fix\n> 관리자 역할 | Admin Role: {admin}\n> 부관리자 역할  | Moderator Role: {mod}\n> 로그 | Log Channel: {log}\n> 비속어 필터 | Bad Words Filtering: {d}```\n")
+            return await ctx.send(f'```fix\n> 관리자 역할 설정 | Settings to Administrator Role: {ctx.prefix}{ctx.command} admin [역할 | Role]\n> 부관리자 역할 설정 | Settings to Moderator Role: {ctx.prefix}{ctx.command} mod [역할 | Role]\n> 로그 설정 | Settings to Log Channel: {ctx.prefix}{ctx.command} log [채널 | Channel]```')
 
     @modset.command(pass_context=True)
     async def admin(self, ctx, role:discord.Role=None):

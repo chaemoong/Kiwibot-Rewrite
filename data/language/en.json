@@ -83,16 +83,44 @@
         "4": "> Either I don't have permission or have a problem with the Discord API.\nPlease add more rights and try again. If not, please try again later because it is API problem."
     },
     "경고": {
-        "1": "You were banned on server {server.name}",
+        "1": "You were banned on server {}",
         "2": "Reason: Ban due to over the warnings",
         "3": "If you have any complaints, please contact {author}({author.id})",
         "4": "Occurred Warnings!",
-        "5": "{user.mention} ({user.id}) was ban due to over-warnings",
-        "6": "{user.mention} received one warning!\n If the user has {all_warn} warnings, the user will be Ban!\n reason: {reason}\n Current number of alerts: {count}",
+        "5": "{} ({}) was ban due to over-warnings",
+        "6": "{} received one warning!\n If the user has {} warnings, the user will be Ban!\n reason: {}\n Current number of warnings: {}",
         "7": "> Please mention users give a warning",
-        "8": "> Alert command not available for bot!",
+        "8": "> Warn command not available for bot!",
         "9": "None",
         "10": "Ban due to over the warnings"
-
+    },
+    "unwarn": {
+        "1": "> Mention the user to clear a warning!",
+        "2": "> Warn command not available for bot!",
+        "3": "None",
+        "4": "> No warning data for that user!",
+        "5": "Success!",
+        "6": "I've removed a warning from the user!"
+    },
+    "check": {
+        "2": "> Warn command not available for bot!",
+        "3": "Warning Count",
+        "5": "{} has 0 warnings",
+        "6": "{} has {} warnings and the reasons are as follows!",
+        "7": "Reason"
+    },
+    "clean": {
+        "1": "> Mention the user to clear a warning!",
+        "2": "> Warn command not available for bot!",
+        "3": "None",
+        "4": "> No warning data for that user!",
+        "5": "Success!",
+        "6": "{}'s warnings has been initialized to 0!"
+    },
+    "limit":{
+        "1": "> The number of warning limits should be more than 1 or so!!",
+        "2": "You have to write down the warning limits!",
+        "5": "Success!",
+        "6": "Warn limit set to {limit}!"
     }
 }

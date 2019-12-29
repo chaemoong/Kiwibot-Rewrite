@@ -121,6 +121,37 @@
         "1": "> The number of warning limits should be more than 1 or so!!",
         "2": "You have to write down the warning limits!",
         "5": "Success!",
-        "6": "Warn limit set to {limit}!"
+        "6": "Warn limit set to {}!"
+    },
+    "modset": {
+        "admin": {
+            "1": "> Mention the role to setting a adminstrator role!",
+            "2": "Success!",
+            "3": "Role {} has been chosen as administrator role!"
+        },
+        "mod": {
+            "1": "> Mention the role to setting a moderator role!",
+            "2": "Success!",
+            "3": "Role {} has been chosen as moderator role!"
+        },
+        "log": {
+            "1": "> Mention the channel to setting a log channel!",
+            "2": "Success!",
+            "3": "Role {} has been chosen as log channel!"
+        },
+        "욕필터": {
+            "1": "on",
+            "2": "off",
+            "3": "Success!",
+            "4": "The bad words filter is now Turn {}!"
+        }
+    },
+    "log": {
+        "1": "None",
+        "2": "%Y-%m-%d %H:%M (UTC)",
+        "3": "Time of occurrence: {}",
+        "4": "USER(ID) | Administrator(ID)",
+        "5": "Reason",
+        "6": "Warning Count"
     }
 }

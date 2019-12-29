@@ -449,10 +449,18 @@ class Mod(commands.Cog):
 
     @modset.command(pass_context=True)
     async def admin(self, ctx, role:discord.Role=None):
-        if role == None:
-            return await ctx.send('역할을 멘션해주셔야 됩니다!')
-        author = ctx.author
         server = ctx.guild
+        asdf = dataIO.load_json(self.setting)
+        try:
+            if asdf[f'{server.id}']['language'] == 'ko':
+                data = dataIO.load_json(self.ko)[ctx.command.name[7:]]
+            else:
+                data = dataIO.load_json(self.en)[ctx.command.name[7:]]
+        except:
+            data = dataIO.load_json(self.en)[ctx.command.name[7:]]
+        if role == None:
+            return await ctx.send(data['1'])
+        author = ctx.author
         try:
             if self.data[f'{server.id}']: pass
         except:
@@ -468,37 +476,57 @@ class Mod(commands.Cog):
             em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
         else:
             em.set_footer(text=f'Request By {author}')
-        em.add_field(name='성공!', value=f'{role.name} 역할을 관리자 역할로 정했습니다!')
+        em.add_field(name=data['2'], value=data['3'].format(role.name))
         await ctx.send(embed=em)
         dataIO.save_json(self.ang, self.data)
 
     @modset.command(pass_context=True)
     async def mod(self, ctx, role:discord.Role=None):
-        if role == None:
-            return await ctx.send('역할을 멘션해주셔야 됩니다!')
-        author = ctx.author
         server = ctx.guild
+        asdf = dataIO.load_json(self.setting)
+        try:
+            if asdf[f'{server.id}']['language'] == 'ko':
+                data = dataIO.load_json(self.ko)[ctx.command.name[7:]]
+            else:
+                data = dataIO.load_json(self.en)[ctx.command.name[7:]]
+        except:
+            data = dataIO.load_json(self.en)[ctx.command.name[7:]]
+        if role == None:
+            return await ctx.send(data['1'])
+        author = ctx.author
+        try:
+            if self.data[f'{server.id}']: pass
+        except:
+            self.data[f'{server.id}'] = {}
         try:
             if self.data[f'{server.id}']['mod']:
                 del self.data[f'{server.id}']['mod']
-        except:
-            self.data[f'{server.id}'] = {}
-        self.data[f'{server.id}'].update({"mod": role.id})
+                self.data[f'{server.id}'].update({"mod": role.id})
+        except KeyError:
+            self.data[f'{server.id}'].update({"mod": role.id})
         em = discord.Embed(colour=author.colour)
         if author.avatar_url:
             em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
         else:
             em.set_footer(text=f'Request By {author}')
-        em.add_field(name='성공!', value=f'{role.name} 역할을 부관리자 역할로 정했습니다!')
+        em.add_field(name=data['2'], value=data['3'].format(role.name))
         await ctx.send(embed=em)
         dataIO.save_json(self.ang, self.data)
 
     @modset.command(pass_context=True)
     async def log(self, ctx, channel:discord.TextChannel=None):
-        if channel == None:
-            return await ctx.send('채널을 멘션해주셔야 됩니다!')
-        author = ctx.author
         server = ctx.guild
+        asdf = dataIO.load_json(self.setting)
+        try:
+            if asdf[f'{server.id}']['language'] == 'ko':
+                data = dataIO.load_json(self.ko)[ctx.command.name[7:]]
+            else:
+                data = dataIO.load_json(self.en)[ctx.command.name[7:]]
+        except:
+            data = dataIO.load_json(self.en)[ctx.command.name[7:]]
+        if channel == None:
+            return await ctx.send(data['1'])
+        author = ctx.author
         try:
             if self.data[f'{server.id}']: pass
         except:
@@ -509,19 +537,27 @@ class Mod(commands.Cog):
                 self.data[f'{server.id}'].update({"log": channel.id})
         except KeyError:
             self.data[f'{server.id}'].update({"log": channel.id})
-        dataIO.save_json(self.ang, self.data)
         em = discord.Embed(colour=author.colour)
         if author.avatar_url:
             em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
         else:
             em.set_footer(text=f'Request By {author}')
-        em.add_field(name='성공!', value=f'{channel.name} 채널을 로그로 정했습니다!')
+        em.add_field(name=data['2'], value=data['3'].format(channel.name))
         await ctx.send(embed=em)
+        dataIO.save_json(self.ang, self.data)
 
     @modset.command(pass_context=True)
     async def 욕필터(self, ctx):
         author = ctx.author
         server = ctx.guild
+        asdf = dataIO.load_json(self.setting)
+        try:
+            if asdf[f'{server.id}']['language'] == 'ko':
+                data = dataIO.load_json(self.en)[ctx.command.name[7:]]
+            else:
+                data = dataIO.load_json(self.en)[ctx.command.name[7:]]
+        except:
+            data = dataIO.load_json(self.en)[ctx.command.name[7:]]
         try:
             if self.data[f'{server.id}']: pass
         except:
@@ -541,21 +577,12 @@ class Mod(commands.Cog):
         else:
             em.set_footer(text=f'Request By {author}')
         if self.data[f'{server.id}']['dyr'] == 'a':
-            b = '켜'
+            b = data['1']
         else:
-            b = '꺼'
+            b = data['2']
         dataIO.save_json(self.ang, self.data)
-        em.add_field(name='성공!', value=f'욕필터를 {b}졌습니다!')
+        em.add_field(name=data['3'], value=data['4'].format(b))
         await ctx.send(embed=em)
-
-
-
-    async def send_cmd_help(self, ctx):
-        c = self.bot.get_channel(ctx.message.channel.id)
-        em = discord.Embed(colour=ctx.author.colour)
-        em.add_field(name='그 명령어는 없는 명령어입니다!', value='`{0.prefix}help` 으로 확인하세요!'.format(ctx))
-        em.set_footer(text='제대로 작성하였는지 확인해주시고 사용해주세요!')
-        return await c.send(embed=em)
 
     async def language_setting(self, ctx):
         author = ctx.author
@@ -571,22 +598,30 @@ class Mod(commands.Cog):
     async def logger(self, ctx, action, user, reason=None):
         server = ctx.guild
         author = ctx.author
+        asdf = dataIO.load_json(self.setting)
+        try:
+            if asdf[f'{server.id}']['language'] == 'ko':
+                data = dataIO.load_json(self.en)['log']
+            else:
+                data = dataIO.load_json(self.en)['log']
+        except:
+            data = dataIO.load_json(self.en)['log']
         try:
             log = dataIO.load_json('data/mod/settings.json')[f'{server.id}']['log']
         except KeyError: 
             return
         time = datetime.datetime.now()
         if reason == None:
-            reason = '없음'
-        time = time.strftime("%Y년 %m월 %d일 %H시 %M분 (UTC)".encode('unicode-escape').decode()).encode().decode('unicode-escape')
+            reason = data['1']
+        time = time.strftime(data['2'].encode('unicode-escape').decode()).encode().decode('unicode-escape')
         em = discord.Embed(colour=author.colour)
-        em.add_field(name=action, value=f'발생 시각: {time}', inline=False)
-        em.add_field(name='유저(ID) | 관리자(id)', value=f'{author.mention} | {user.mention}', inline=False)
-        em.add_field(name='사유', value=reason, inline=False)
+        em.add_field(name=action, value=data['3'].format(time), inline=False)
+        em.add_field(name=data['4'], value=f'{author.mention} ({author.id}) | {user.mention} ({user.id})', inline=False)
+        em.add_field(name=data['5'], value=reason, inline=False)
         if action == '경고 | WARN' or action == '경고 삭제 | DELETED WARN' or action == '경고 초기화 | RESET WARN':
             a = dataIO.load_json('data/mod/warning.json')[f'{server.id}'][f'{user.id}']['count']
             b = dataIO.load_json('data/mod/warning.json')[f'{server.id}']['all']
-            em.add_field(name='경고 개수', value=f'{a}/{b}')
+            em.add_field(name=data['6'], value=f'{a}/{b}')
         if author.avatar_url:
             em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
         else:

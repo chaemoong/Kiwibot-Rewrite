@@ -190,17 +190,17 @@ class general(commands.Cog):
             for page in roles:
                 lol = ', '.join(roles)     
         else:
-            lol = '없음'
-        em=discord.Embed(colour=author.colour, title='SERVERINFO || 서버정보', timestamp=datetime.datetime.utcnow(), description=level)
-        em.add_field(name='서버 이름', value=server.name, inline=False)
-        em.add_field(name="`ID`", value=server.id, inline=False)
-        em.add_field(name='서버 위치', value=region, inline=False)
-        em.add_field(name='서버 생성일', value=a, inline=False)
-        em.add_field(name='서버 주인', value=server.owner.mention)
+            lol = data['1']
+        em=discord.Embed(colour=author.colour, title=data['2'], timestamp=datetime.datetime.utcnow(), description=level)
+        em.add_field(name=data['3'], value=server.name, inline=False)
+        em.add_field(name=data['4'], value=server.id, inline=False)
+        em.add_field(name=data['5'], value=region, inline=False)
+        em.add_field(name=data['6'], value=a, inline=False)
+        em.add_field(name=data['7'], value=server.owner.mention)
         if len(lol) > 1024:
-            em.add_field(name='역할', value='1024자를 넘겨서 더이상 출력이 불가합니다!', inline=False)
+            em.add_field(name=data['9'], value=data['8'], inline=False)
         else:
-            em.add_field(name='역할', value=lol, inline=False)
+            em.add_field(name=data['9'], value=lol, inline=False)
         em.add_field(name='서버 인원', value="**{} 명**".format(len(server.members)))
         em.set_footer(text='Request By: {}'.format(author))
         if author.avatar_url:
@@ -209,20 +209,34 @@ class general(commands.Cog):
             pass
         await ctx.send(author.mention, embed=em)
 
-    @commands.command(pass_context=True, no_pm=True)
-    async def 화공(self, ctx):
-        """통화방에서 화면공유를 도와주는 명령어입니다!"""
+    @commands.command(pass_context=True, no_pm=True, aliases=['화공'])
+    async def live(self, ctx):
+        """Helping Another method Screen Share!\n화면공유를 할수 있게 도와주는 명령어에요!"""
         author = ctx.author
         server = author.guild
+        try:
+            if yee[f'{server.id}']['language'] == 'ko':
+                a = '화면 공유'
+                b = '**서버: {server.name}\n음성 채널: [{a.name}]({url})**'
+                c = 'First Join the Voice Channel'
+            else:
+                a = 'Screen Share'
+                b = '**Server: {server.name}\nVoice Channel: [{a.name}]({url})**'
+                c = 'First Join the Voice Channel'
+        except:
+            a = 'Screen Share'
+            b = '**Server: {}\nVoice Channel: [{}]({})**'
+            c = 'First Join the Voice Channel'
+
         em = discord.Embed(colour=author.colour, timestamp=datetime.datetime.utcnow())
         em.set_footer(text=f'Request By: {author}')
         try:
             a = author.voice.channel
             url = f"https://discordapp.com/channels/{server.id}/{a.id}"
-            em.add_field(name='화면 공유', value=f'**서버: {server.name}\n음성 채널: [{a.name}]({url})**')
+            em.add_field(name=a, value=b.format(server.name, a.name, url))
             await ctx.send(embed=em)
         except AttributeError:
-            await ctx.send('먼저 음성 채널에 접속해주세요!')
+            await ctx.send(c)
             
     @commands.command(pass_context=True, no_pm=True)
     async def ping(self, ctx):
@@ -239,8 +253,8 @@ class general(commands.Cog):
         before = time.monotonic()
         msg = await ctx.send(embed=em)
         msgping = round((time.monotonic() - before) * 1000)
-        em2 = discord.Embed(title='핑! 퐁!', colour=Color, timestamp=datetime.datetime.utcnow())
-        em2.add_field(name=f"**디스코드 API: `{ping}ms`**", value=f'메세지: `{msgping}ms`')
+        em2 = discord.Embed(title='PING! PONG!', colour=Color, timestamp=datetime.datetime.utcnow())
+        em2.add_field(name=f"**Discord API: `{ping}ms`**", value=f'Message: `{msgping}ms`')
         if author.avatar_url:
             em2.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
         else:
@@ -249,10 +263,17 @@ class general(commands.Cog):
 
     @commands.command(pass_context=True, no_pm=True)
     async def chinobot(self, ctx):
-        """ChinoBot의 API 정보를 불러와요!"""
+        """Loading ChinoBot's API info!\n치노봇 API를 불러와요!"""
+        try:
+            if asdf[f'{ctx.guild.id}']['language'] == 'ko':
+                data = dataIO.load_json(self.ko)[ctx.command.name]
+            else:
+                data = dataIO.load_json(self.en)[ctx.command.name]
+        except:
+            data = dataIO.load_json(self.en)[ctx.command.name]
         a = await ctx.send('잠시만 기달려주세요!')
         author = ctx.author
-        url = "http://siru.ga/api/main_module"
+        url = "http://59.3.95.69/api/main_module"
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as response:
                 Data = await response.json() 
@@ -268,10 +289,10 @@ class general(commands.Cog):
         if ping > 500: Color = 0xf09595
         if ping > 600: Color = 0xe86666
         em=discord.Embed(colour=Color)
-        em.add_field(name='치노봇의 핑', value=str(ping) + 'ms', inline=False)
-        em.add_field(name='치노봇의 유저수', value=str(user) + '명', inline=False)
-        em.add_field(name='치노봇의 서버수', value=str(server) + '개', inline=False)
-        em.add_field(name='치노봇의 업타임 시간', value=uptime)
+        em.add_field(name=data['1'], value=str(ping) + 'ms', inline=False)
+        em.add_field(name=data['2'], value=str(user) + data['3'], inline=False)
+        em.add_field(name=data['4'], value=str(server) + data['5'], inline=False)
+        em.add_field(name=data['6'], value=uptime)
         em.set_thumbnail(url=chino.avatar_url)
         if author.avatar_url:
             em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)

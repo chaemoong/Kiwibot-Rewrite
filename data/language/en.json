@@ -26,5 +26,73 @@
         "1": "The command is only Administrator command!",
         "2": "Check the command with `{0.prefix}help` to you can use command!",
         "3": "Don't use Administrator without Administrator permission!"
+    },
+    "serverinfo": {
+        "time": "%Y-%m-%d %H:%M (UTC)",
+        "1": "None",
+        "2": "Serverinfo",
+        "3": "Server Name",
+        "4": "Server ID",
+        "5": "Region",
+        "6": "Created at",
+        "7": "Server Owner",
+        "8": "It's over the role, so i can't print any more!",
+        "9": "roles",
+        "10": "Member Count (include bot)",
+        "11": "**{} persons**",
+        "none" : "**None (Unrestricted!)**",
+        "low": "**Low (Must have a verified email on their Diacord account!)**",
+        "medium":"**Medium (Must also be registered on Discord for longer than 5 minutes!)**",
+        "high": "**(╯°□°）╯︵ ┻━┻(high) (Must also be a member of  this server for longer than 10 minutes)**",
+        "extreme": "**┻━┻ ﾐヽ(ಠ益ಠ)ノ彡┻━┻(extreme) (Must have a verified phone on their Discord account!)**"
+    },
+    "chinobot": {
+        "1": "Chinobot's PING",
+        "2": "Chinobot's Member Count",
+        "3": " persons",
+        "4": "Chinobot's Server count",
+        "6": "Chinobot's Uptime",
+        "5": " servers"
+    },
+    "ban": {
+        "1": "> Mention user to Ban",
+        "2": "None",
+        "3": "> The user banned!\nReason: {}",
+        "4": "> Either I don't have permission or have a problem with the Discord API.\nPlease add more rights and try again. If not, please try again later because it is API problem."
+    },
+    "unban": {
+        "1": "> Wrote user ID to unban",
+        "2": "None",
+        "3": "> The user unbanned!\nReason: {}",
+        "4": "> Either I don't have permission or have a problem with the Discord API.\nPlease add more rights and try again. If not, please try again later because it is API problem.",
+        "5": "> I can't find the User",
+        "6": "This user is not banned"
+
+    },
+    "hackban": {
+        "1": "> Wrote user ID to hackban",
+        "2": "None",
+        "3": "> The user hackbanned!\nReason: {}",
+        "4": "> Either I don't have permission or have a problem with the Discord API.\nPlease add more rights and try again. If not, please try again later because it is API problem.",
+        "5": "Already This user is banned"
+    },
+    "kick": {
+        "1": "> Mention user to Kick",
+        "2": "None",
+        "3": "> The user Kicked!\nReason: {}",
+        "4": "> Either I don't have permission or have a problem with the Discord API.\nPlease add more rights and try again. If not, please try again later because it is API problem."
+    },
+    "경고": {
+        "1": "You were banned on server {server.name}",
+        "2": "Reason: Ban due to over the warnings",
+        "3": "If you have any complaints, please contact {author}({author.id})",
+        "4": "Occurred Warnings!",
+        "5": "{user.mention} ({user.id}) was ban due to over-warnings",
+        "6": "{user.mention} received one warning!\n If the user has {all_warn} warnings, the user will be Ban!\n reason: {reason}\n Current number of alerts: {count}",
+        "7": "> Please mention users give a warning",
+        "8": "> Alert command not available for bot!",
+        "9": "None",
+        "10": "Ban due to over the warnings"
+
     }
 }

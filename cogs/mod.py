@@ -15,6 +15,10 @@ class Mod(commands.Cog):
         self.data = dataIO.load_json(self.ang)
         self.warn = 'data/mod/warning.json'
         self.data2 = dataIO.load_json(self.warn)
+        self.setting = 'data/mod/settings.json'
+        self.ko = 'data/language/ko.json'
+        self.en = 'data/language/en.json'
+
 
     async def owner(ctx):
         return ctx.author.id == 431085681847042048
@@ -73,89 +77,123 @@ class Mod(commands.Cog):
     @commands.command(pass_context=True, no_pm=True)
     @commands.check(administrator)
     async def ban(self, ctx, user:discord.Member=None, *, reason=None):
-        """악성 유저를 벤 하는 명령어입니다!"""
+        """악성 유저를 벤 하는 명령어입니다!\nBanned The Person"""
+        server = ctx.guild
+        asdf = dataIO.load_json(self.setting)
+        try:
+            if asdf[f'{server.id}']['language'] == 'ko':
+                data = dataIO.load_json(self.ko)[ctx.command.name]
+            else:
+                data = dataIO.load_json(self.en)[ctx.command.name]
+        except:
+            data = dataIO.load_json(self.en)[ctx.command.name]
         if user == None:
-            return await ctx.send('> 벤할 유저를 멘션해주세요!')
+            return await ctx.send(data['1'])
         elif reason == None:
-            reason = '없음'
+            reason = data['2']
         else:
             pass
         try:
             await user.ban(reason=reason)
             await self.logger(ctx, action='벤 | BAN', user=user, reason=reason)   
-            return await ctx.send(f'> 벤이 정상적으로 진행되었어요!\n 사유: {reason}')
+            return await ctx.send(data['3'].format(reason))
         except:
-            await ctx.send("> 권한이 없거나 디스코드 API에 문제가 있는거 같습니다!\n> 권한을 추가 해 주시고 다시 시도 해주시기 바라며, 그래도 안될시 API 문제이니 잠시후에 다시 해주세요!")
+            await ctx.send(data['4'])
             return     
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.check(administrator)
     async def unban(self, ctx: commands.Context, user_id: int, *, reason: str = None):
-        """유저를 언벤 하는 명령어입니다!"""
+        """유저를 언벤 하는 명령어입니다!\nKicked The Person"""
         guild = ctx.guild
-        if id == None:
-            return await ctx.send('> 언벤할 유저의 ID를 적어주세요!')
+        asdf = dataIO.load_json(self.setting)
+        try:
+            if asdf[f'{guild.id}']['language'] == 'ko':
+                data = dataIO.load_json(self.ko)[ctx.command.name]
+            else:
+                data = dataIO.load_json(self.en)[ctx.command.name]
+        except:
+            data = dataIO.load_json(self.en)[ctx.command.name]
+        if user_id == None:
+            return await ctx.send(data['1'])
         elif reason == None:
-            reason = '없음'
+            reason = data['2']
         else:
             pass
         try:
             user = await self.bot.fetch_user(user_id)
         except discord.errors.NotFound:
-            await ctx.send("> 유저를 찾지 못했어요!")
+            await ctx.send(data['5'])
             return
         bans = await guild.bans()
         bans = [be.user for be in bans]
         if user not in bans:
-            await ctx.send("> 이 유저는 애초에 벤이 되있지 않습니다! 다시 한번 더 확인해주세요!")
+            await ctx.send(data['6'])
             return
         try:
-            await guild.unban(user, reason=reason)
+            await user.ban(reason=reason)
             await self.logger(ctx, action='언벤 | UNBAN', user=user, reason=reason)   
-            await ctx.send('> 완료하였습니다!')
-        except discord.HTTPException:
-            await ctx.send("> 권한이 없거나 혹은 디스코드 API에 문제가 있는거 같습니다!\n> 권한을 추가 해 주시고 다시 시도 해주시기 바라며, 그래도 안될시 API 문제이니 잠시후에 다시 해주세요!")
+            return await ctx.send(data['3'].format(reason))
+        except:
+            await ctx.send(data['4'])
             return     
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.check(administrator)
     async def hackban(self, ctx: commands.Context, user_id: int, *, reason: str = None):
-        """악성유저가 이 서버에 없을경우 대처를 하기 위해 벤하는 명령어입니다!"""
+        """악성유저가 이 서버에 없을경우 대처를 하기 위해 벤하는 명령어입니다!\nIf the Person is not in this server, ban to protecting"""
         guild = ctx.guild
-        if id == None:
-            return await ctx.send('> 핵벤할 유저의 ID를 적어주세요!')
+        asdf = dataIO.load_json(self.setting)
+        try:
+            if asdf[f'{guild.id}']['language'] == 'ko':
+                data = dataIO.load_json(self.ko)[ctx.command.name]
+            else:
+                data = dataIO.load_json(self.en)[ctx.command.name]
+        except:
+            data = dataIO.load_json(self.en)[ctx.command.name]
+        if user_id == None:
+            return await ctx.send(data['1'])
         elif reason == None:
-            reason = '없음'
+            reason = data['2']
         else:
             pass
         try:
             user = await self.bot.fetch_user(user_id)
         except discord.errors.NotFound:
-            await ctx.send("> 유저를 찾지 못했어요!")
+            await ctx.send(data['3'])
             return
         bans = await guild.bans()
         bans = [be.user for be in bans]
         if user in bans:
-            await ctx.send("> 이 유저는 애초에 벤이 되있습니다!")
+            await ctx.send(data['5'])
             return
         try:
             await guild.ban(user, reason=reason)
-            await ctx.send('> 완료하였습니다!')
+            await ctx.send(data['3'].format(reason))
             return await self.logger(ctx, action='핵벤 | HACKBAN', user=user, reason=reason)   
         except discord.HTTPException:
-            await ctx.send("> 권한이 없거나 혹은 디스코드 API에 문제가 있는거 같습니다!\n> 권한을 추가 해 주시고 다시 시도 해주시기 바라며, 그래도 안될시 API 문제이니 잠시후에 다시 해주세요!")
+            return await ctx.send(data['4'])
 
     @commands.command(pass_context=True, no_pm=True, aliases=['warn', 'rudrh', 'ㅈㅁ구'])
     @commands.check(administrator)
     async def 경고(self, ctx, user:discord.Member=None, *, reason=None):
+        """유저에게 경고를 주는 명령어에요!\nGiving warn to Member"""
         author = ctx.author
         server = ctx.guild
+        asdf = dataIO.load_json(self.setting)
+        try:
+            if asdf[f'{guild.id}']['language'] == 'ko':
+                data = dataIO.load_json(self.ko)[ctx.command.name]
+            else:
+                data = dataIO.load_json(self.en)[ctx.command.name]
+        except:
+            data = dataIO.load_json(self.en)[ctx.command.name]
         if user == None:
-            return await ctx.send('> 경고를 줄 유저를 멘션해주세요!')
+            return await ctx.send(data['7'])
         if user.bot:
-            return await ctx.send('> 봇에게 경고 명령어를 사용할 수 없습니다!')
+            return await ctx.send(data['8'])
         if reason == None:
-            reason = '없음'
+            reason = data['9']
         try:
             if 'all' in self.data2[f'{server.id}']: pass   
         except KeyError:
@@ -190,16 +228,16 @@ class Mod(commands.Cog):
             em.set_footer(text=f'Request By {author}')
         if all_warn == count or all_warn < count:
             em2 = discord.Embed(colour=author.colour)
-            em2.add_field(name=f'당신은 {server.name} 서버에서 벤 당하셨습니다!', value='사유: 경고 초과로 인한 벤')
-            em2.set_footer(text=f'만약 반박 하실 내용이 있으시면 {author}({author.id})님에게 문의하세요!')
+            em2.add_field(name=data['1'].format(server.name), value=data['2'])
+            em2.set_footer(text=data['3'].format(author, author.id))
             await user.send(embed=em2)
-            await server.ban(user, reason='경고 누적으로 인한 벤')
-            em.add_field(name='경고 발생!', value=f'{user.mention}({user.id})님은 경고 초과로 인하여 벤 되었습니다!')
+            await server.ban(user, reason=data['10'])
+            em.add_field(name=data['4'], value=data['5'].format(user.mention, user.id))
             self.data2[f'{server.id}'][f'{user.id}'].update({"count": 0})
             self.data2[f'{server.id}'][f'{user.id}']["reason"] = []
             dataIO.save_json(self.warn, self.data2)
         else:          
-            em.add_field(name='경고 발생!', value=f'{user.mention} 님은 경고 1회를 받으셨습니다!\n만약 그 유저의 경고가 {all_warn}개가 될경우 그 유저는 벤이 됩니다!\n사유: {reason}\n현재 경고 개수: {count}', inline=False)
+            em.add_field(name=data['4'], value=data['6'].format(user.mention, all_warn, reason, count), inline=False)
             self.data2[f'{server.id}'][f'{user.id}']["reason"].append(f'{count} ' + reason)
             dataIO.save_json(self.warn, self.data2)
         await ctx.send(embed=em)
@@ -209,6 +247,7 @@ class Mod(commands.Cog):
     @commands.command(pass_context=True)
     @commands.check(administrator)
     async def unwarn(self, ctx, user:discord.Member=None):
+        """유저에게 경고 1개를 지우는 명령어에요!\nDeleting 1 warn to Member"""
         author = ctx.author
         server = ctx.guild
         if user == None:
@@ -235,23 +274,28 @@ class Mod(commands.Cog):
 
     @commands.command(pass_context=True)
     async def check(self, ctx, user:discord.Member=None):
+        """유저의 경고를 확인하는 명령어에요!\nDeleting 1 warn to Member"""
         author = ctx.author
         server = ctx.guild
         if user == None:
             user = author
         if user.bot:
             return await ctx.send('> 봇에게 경고 명령어를 사용할 수 없습니다!')
+        em = discord.Embed(colour=user.colour)
         try:
             count = self.data2[f'{server.id}'][f'{user.id}']["count"]
-            if count == 0: return await ctx.send('> 그 유저에 대한 경고데이터가 없습니다!')
+            if count == 0: 
+                em.add_field(name=f'경고 수', value=f'{user.mention} 님의 경고는 0개입니다!')
+                return await ctx.send(embed=em)
+
         except KeyError:
-            return await ctx.send('> 그 유저에 대한 경고데이터가 없습니다!')
+            em.add_field(name=f'경고 수', value=f'{user.mention} 님의 경고는 0개입니다!')
+            return await ctx.send(embed=em)
         a = self.data2[f'{server.id}'][f'{user.id}']["reason"]
-        em = discord.Embed(colour=user.colour)
         em.add_field(name=f'경고 수', value=f'{user.mention} 님의 경고는 {count}개 이며 사유는 아래와 같습니다!')
         for reason in a:
             em.add_field(name=f'사유 {reason[:1]}', value=reason[2:], inline=False)
-        await ctx.send(embed=em)
+        return await ctx.send(embed=em)
 
     @commands.command(pass_context=True)
     @commands.check(administrator)

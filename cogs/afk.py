@@ -11,7 +11,11 @@ class Afk(commands.Cog):
         self.data = {}
         self.profile = "data/afk/afk.json"
         self.riceCog = dataIO.load_json(self.profile)
-        
+        self.setting = 'data/mod/settings.json'
+        self.ko = 'data/language/ko.json'
+        self.en = 'data/language/en.json'
+
+
     @commands.command(no_pm=True, pass_context=True)
     async def afk(self, ctx, *, reason=None):
         """잠수 명령어 입니다!"""
@@ -19,16 +23,23 @@ class Afk(commands.Cog):
         dt = datetime.datetime.now()
         dt = '{0.year}-{0.month}-{0.day} {0.hour}:{0.minute}:{0.second}'.format(dt)
         author = ctx.author
-        self.data[f'{author.id}'] = int(time.perf_counter())
-        em = discord.Embed(colour=author.colour, title='잠수 시작! | AFK START!', timestamp=utc)
-        em.add_field(name='{} 님의 잠수 상태가 시작되었습니다!'.format(author.name), value='잠수 상태를 해지 하시려면 아무 메시지나 작성해주세요!', inline=False)
+        asdf = dataIO.load_json(self.setting)
+        try:
+            if asdf[f'{ctx.guild.id}']['language'] == 'ko':
+                data = dataIO.load_json(self.ko)[ctx.command.name]
+            else:
+                data = dataIO.load_json(self.en)[ctx.command.name]
+        except:
+            data = dataIO.load_json(self.en)[ctx.command.name]
+        em = discord.Embed(colour=author.colour, title=data['1'], timestamp=utc)
+        em.add_field(name=data['2'].format(author.name), value=data['3'], inline=False)
         if author.avatar_url:
             em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
         else:
             em.set_footer(text=f'Request By {author}')
         self.riceCog[f'{author.id}'] = {}
         if reason:
-            em.add_field(name='사유', value=reason, inline=False)
+            em.add_field(name=data['4'], value=reason, inline=False)
             self.riceCog[f'{author.id}'].update({"reason": f"{reason}"})
         else:
             self.riceCog[f'{author.id}'].update({"reason": None})
@@ -41,22 +52,36 @@ class Afk(commands.Cog):
             return
         author = message.author
         utc = datetime.datetime.utcnow()
+        asdf = dataIO.load_json(self.setting)
+        try:
+            if asdf[f'{ctx.guild.id}']['language'] == 'ko':
+                data = dataIO.load_json(self.ko)['end']
+            else:
+                data = dataIO.load_json(self.en)['end']
+        except:
+            data = dataIO.load_json(self.en)['end']
         if f'{message.author.id}' in self.riceCog:
             if 'afk' in message.content:
                 return
             else:
-                b = self.riceCog[f'{author.id}']['reason']
+                try:
+                    b = self.riceCog[f'{author.id}']['reason']
+                except:
+                    return
                 if b:
-                    a = f'{author.name} 님의 잠수 상태가 끝났습니다!\n\n사유: {b}\n\n어디 다녀 오셨나요!?'
+                    a = data['1'].format(author.name, b)
                 else:
-                    a = f'{author.name} 님의 잠수 상태가 끝났습니다!\n\n어디 다녀 오셨나요!?'
+                    a = data['2'].format(author.name)
+                self.riceCog[f'{author.id}'] = {}
                 del self.riceCog[f'{author.id}']
                 em = discord.Embed(colour=message.author.colour, timestamp=utc)
                 try:
-                    em.add_field(name='잠수 끝! | AFK END!', value=a, inline=False)
+                    em.add_field(name=data['3'], value=a, inline=False)
                 except: return
                 em.set_footer(text=f'Request By: {author}', icon_url=author.avatar_url)
-                return await message.channel.send(embed=em)
+                await message.channel.send(embed=em)
+                dataIO.save_json(self.profile, self.riceCog)
+                return
         else:
             return
 

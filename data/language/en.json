@@ -153,5 +153,17 @@
         "4": "USER(ID) | Administrator(ID)",
         "5": "Reason",
         "6": "Warning Count"
+    },
+    "afk": {
+        "1": "잠수 시작! | AFK START!",
+        "2": "{}'s afk started!",
+        "3": "Please fill out any message to terminate the afk!",
+        "4": "Reason"
+    },
+    "end": {
+        "1": "{} has finished afk!\n\nReason: {}\n\nWhere have you been!?",
+        "2": "{} has finished afk!\n\nWhere have you been?",
+        "3": "잠수 끝! | AFK END!"
     }
+
 }

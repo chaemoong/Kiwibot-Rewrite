@@ -271,7 +271,7 @@ class general(commands.Cog):
                 data = dataIO.load_json(self.en)[ctx.command.name]
         except:
             data = dataIO.load_json(self.en)[ctx.command.name]
-        a = await ctx.send('잠시만 기달려주세요!')
+        a = await ctx.send('잠시만 기달려주세요! | Wait a Second!')
         author = ctx.author
         url = "http://59.3.95.69/api/main_module"
         async with aiohttp.ClientSession() as session:

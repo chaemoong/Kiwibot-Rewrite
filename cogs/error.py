@@ -32,12 +32,12 @@ class error(commands.Cog):
             is_help_cmd = ctx.command.qualified_name == "help"
             is_forbidden = isinstance(error.original, discord.Forbidden)
             if is_help_cmd and is_forbidden and error.original.text == no_dms:
-                msg = ("당신에게 DM으로 보내드리려고 했는데 전송이 안되요!\nDM차단을 풀어주시면 보내드리겠어요!")
+                msg = ("당신에게 DM으로 보내드리려고 했는데 전송이 안되요! DM차단을 풀어주시면 다시 시도 하시면 보내드리겠어요!\nI was going to send it to you by DM, but it's not! If you untie the DM block, I'll send it to you!")
                 await ctx.send(msg)
                 return
-            em = discord.Embed(title='에러발생!', colour=discord.Colour.red())
-            em.add_field(name='에러 발생한 명령어', value=ctx.command.qualified_name)
-            em.set_footer(text=f'에러가 지속적으로 발생할시 {self.bot.get_user(431085681847042048)}으로 문의 바랍니다!')
+            em = discord.Embed(title='에러! | ERROR!', colour=discord.Colour.red())
+            em.add_field(name='에러 발생한 명령어 | Error generated command', value=ctx.command.qualified_name)
+            em.set_footer(text=f'에러가 지속적으로 발생할시 {self.bot.get_user(431085681847042048)}으로 문의 바랍니다!\nIf that command Error generated again contact {self.bot.get_user(431085681847042048)} ({self.bot.get_user(431085681847042048).id})')
             log = ("Exception in command '{}'\n"
                    "".format(ctx.command.qualified_name))
             log += "".join(traceback.format_exception(type(error), error,

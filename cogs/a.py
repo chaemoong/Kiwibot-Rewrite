@@ -26,7 +26,7 @@ class owner(commands.Cog):
 
     async def is_owner(ctx):
         return ctx.author.id == 431085681847042048
-    
+
     @commands.command(pass_context=True)
     @commands.check(is_owner)
     async def cmd(self, ctx, *, code=None):

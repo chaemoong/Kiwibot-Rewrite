@@ -1,0 +1,5 @@
+{
+    "400": "Unissued image (이미지 발급을 하지 않음)",
+    "403": "Invalid key. (키가 만료되거나 없는 키)",
+    "500": "System error. (시스템 오류)"
+}

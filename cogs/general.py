@@ -309,9 +309,6 @@ class general(commands.Cog):
         if ctx.invoked_subcommand is None:
             await ctx.send('```\n지원하는 언어:\n한국어 : ko\n영어 : en\n일본어 : ja\n중국어: zh-CN\n```')
 
-    @translate.command(pass_context=True)
-    async def ko(self, ctx, role:discord.Role=None):
-
     
 def setup(bot):
     bot.add_cog(general(bot))

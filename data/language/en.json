@@ -137,13 +137,23 @@
         "log": {
             "1": "> Mention the channel to setting a log channel!",
             "2": "Success!",
-            "3": "Role {} has been chosen as log channel!"
+            "3": "Channel {} has been chosen as log channel!"
         },
         "욕필터": {
             "1": "on",
             "2": "off",
             "3": "Success!",
             "4": "The bad words filter is now Turn {}!"
+        },
+        "role": {
+            "1": "> Mention the role to setting a captcha role!",
+            "2": "Success!",
+            "3": "Role {} has been chosen as captcha role!"
+        },
+        "channel": {
+            "1": "> Mention the channel to setting a captcha channel!",
+            "2": "Success!",
+            "3": "Channel {} has been chosen as captcha channel!"
         }
     },
     "log": {

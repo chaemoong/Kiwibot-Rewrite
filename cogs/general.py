@@ -87,8 +87,10 @@ class general(commands.Cog):
             em.add_field(name=data['14'], value=data['15'], inline=False)
         else:
             em.add_field(name=data['14'], value=lol, inline=False)
-        em.add_field(name=data['10'], value=user.created_at.strftime(data['time'].encode('unicode-escape').decode()).encode().decode('unicode-escape'), inline=False)
-        em.add_field(name=data['13'], value=user.joined_at.strftime(data['time'].encode('unicode-escape').decode()).encode().decode('unicode-escape'), inline=False)
+        gf = user.created_at + datetime.timedelta(hours=9)
+        fg = user.joined_at + datetime.timedelta(hours=9)
+        em.add_field(name=data['10'], value=str(gf) + ' (UTC+9)', inline=False)
+        em.add_field(name=data['13'], value=str(fg) + ' (UTC+9)', inline=False)
         try:
             status = user.activities[0].type
             if status == 4:
@@ -183,7 +185,7 @@ class general(commands.Cog):
         except:
             data = dataIO.load_json(self.en)[ctx.command.name]
         a = server.created_at.strftime(data['time'].encode('unicode-escape').decode()).encode().decode('unicode-escape')
-        level = dataIO.load_json('server_level/level.json')[f"{server.verification_level}"]
+        level = data[f"{server.verification_level}"]
         region = dataIO.load_json('region/region.json')[f"{server.region}"]
         roles =  [role.mention for role in server.roles]
         if roles:
@@ -300,6 +302,15 @@ class general(commands.Cog):
             em.set_footer(text=f'Request By {author}')
         await a.delete()
         await ctx.send(embed=em)
+
+    @commands.group(pass_context=True, aliases=['번역'])
+    async def translate(self, ctx):
+        """번역 명령어입니다!"""
+        if ctx.invoked_subcommand is None:
+            await ctx.send('```\n지원하는 언어:\n한국어 : ko\n영어 : en\n일본어 : ja\n중국어: zh-CN\n```')
+
+    @translate.command(pass_context=True)
+    async def ko(self, ctx, role:discord.Role=None):
 
     
 def setup(bot):

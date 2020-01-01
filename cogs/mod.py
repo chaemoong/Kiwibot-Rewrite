@@ -404,7 +404,7 @@ class Mod(commands.Cog):
                     if a:
                         admin = get(server.roles, id=a)
                 except:
-                    admin = '없음 | None'
+                    admin = None
             except KeyError:
                 self.data[f'{server.id}'].update({"admin": '없음'})
                 admin = self.data[f'{server.id}']['admin']
@@ -414,7 +414,7 @@ class Mod(commands.Cog):
                     if b:
                         mod = get(server.roles, id=b)
                 except:
-                    mod = '없음 | None'
+                    mod = None
             except KeyError:
                 self.data[f'{server.id}'].update({"mod": '없음'})
                 mod = self.data[f'{server.id}']['mod']
@@ -424,7 +424,7 @@ class Mod(commands.Cog):
                     if c:
                         log = server.get_channel(c)
                 except:
-                    log = '없음 | None'
+                    log = None
             except KeyError:
                 self.data[f'{server.id}'].update({"log": '없음'})
                 log = self.data[f'{server.id}']['log']
@@ -445,17 +445,17 @@ class Mod(commands.Cog):
                     if e:
                         rold = get(server.roles, id=e)
                 except:
-                    rold = '없음 | None'
+                    rold = None
             except KeyError:
                 self.data[f'{server.id}'].update({"rold": '없음'})
                 rold = self.data[f'{server.id}']['rold']
             try:
                 pls = self.data[f'{server.id}']['channel']
                 try:
-                    if c:
+                    if pls:
                         asdf = server.get_channel(pls)
                 except:
-                    asdf = '없음 | None'
+                    asdf = None
             except KeyError:
                 self.data[f'{server.id}'].update({"channel": '없음'})
                 log = self.data[f'{server.id}']['channel']
@@ -464,7 +464,10 @@ class Mod(commands.Cog):
             if mod == None: mod = '없음 | None'
             if log == None: log = '없음 | None'
             if rold == None: rold = '없음 | None'
-            if asdf == None: asdf = '없음 | None'
+            try:
+                if asdf == None: asdf = '없음 | None'
+            except:
+                asdf = '없음 | None'
             if d == False: d = '꺼짐'
             await ctx.send(f"```fix\n> 관리자 역할 | Admin Role: {admin}\n> 부관리자 역할  | Moderator Role: {mod}\n> 로그 | Log Channel: {log}\n> 비속어 필터 | Bad Words Filtering: {d}\n인증 역할: {rold}\n인증 채널: {asdf}```\n")
             return await ctx.send(f'```fix\n> 관리자 역할 설정 | Settings to Administrator Role: {ctx.prefix}{ctx.command} admin [역할 | Role]\n> 부관리자 역할 설정 | Settings to Moderator Role: {ctx.prefix}{ctx.command} mod [역할 | Role]\n> 로그 설정 | Settings to Log Channel: {ctx.prefix}{ctx.command} log [채널 | Channel]```')

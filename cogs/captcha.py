@@ -20,14 +20,11 @@ class captcha(commands.Cog):
         channel = ctx.channel
         server = ctx.guild
         author = ctx.author
-        try:
-            log = self.first[f'{server.id}']['channel']
-            if log:
-                pass
-            else:
-                return await ctx.send('> 설정된 캡챠(인증) 채널이 없습니다! 관리자 에게 문의해보세요!\nNo CAPTCHA channel is set! Ask the administrator!')
-        except KeyError:
-            return await ctx.send('> 설정된 캡챠(인증) 채널이 없습니다! 관리자 에게 문의해보세요!\nNo CAPTCHA channel is set! Ask the administrator!')            
+        log = self.first[f'{server.id}']
+        if 'channel' in log:
+            pass
+        else:
+            return await ctx.send('> 설정된 캡챠(인증) 채널이 없습니다! 관리자 에게 문의해보세요!\nNo CAPTCHA channel is set! Ask the administrator!')
         try:
             role = self.first[f'{server.id}']['captcha_role']
             if role:
@@ -36,9 +33,9 @@ class captcha(commands.Cog):
                 return await ctx.send('> 설정된 캡챠(인증) 역할이 없습니다! 관리자 에게 문의해보세요!\nNo CAPTCHA channel is set! Ask the administrator!')
         except KeyError:
             return await ctx.send('> 설정된 캡챠(인증) 역할이 없습니다! 관리자 에게 문의해보세요!\nNo CAPTCHA channel is set! Ask the administrator!')      
-        if not channel.id == log:
+        if not channel.id == log['channel']:
             return await ctx.send('> 인증 명령어는 인증 채널에서 사용해주세요!')
-        if get(server.roles, id=self.first[f'{server.id}']['captcha_role']) in author.roles:
+        if get(server.roles, id=role) in author.roles:
             return await ctx.send('> 이미 인증되셨습니다!')
         client_id = "3VuiEnBYyTLIRMOHWDLq"
         client_secret = "LFF_fdqvUL"

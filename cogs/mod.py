@@ -475,11 +475,11 @@ class Mod(commands.Cog):
         asdf = dataIO.load_json(self.setting)
         try:
             if asdf[f'{server.id}']['language'] == 'ko':
-                data = dataIO.load_json(self.ko)['modset'][ctx.command.name[7:]]
+                data = dataIO.load_json(self.ko)['modset']['admin']
             else:
-                data = dataIO.load_json(self.en)['modset'][ctx.command.name[7:]]
+                data = dataIO.load_json(self.en)['modset']['admin']
         except:
-            data = dataIO.load_json(self.en)['modset'][ctx.command.name[7:]]
+            data = dataIO.load_json(self.en)['modset']['admin']
         if role == None:
             return await ctx.send(data['1'])
         author = ctx.author
@@ -508,11 +508,11 @@ class Mod(commands.Cog):
         asdf = dataIO.load_json(self.setting)
         try:
             if asdf[f'{server.id}']['language'] == 'ko':
-                data = dataIO.load_json(self.ko)['modset'][ctx.command.name[7:]]
+                data = dataIO.load_json(self.ko)['modset']['mod']
             else:
-                data = dataIO.load_json(self.en)['modset'][ctx.command.name[7:]]
+                data = dataIO.load_json(self.en)['modset']['mod']
         except:
-            data = dataIO.load_json(self.en)['modset'][ctx.command.name[7:]]
+            data = dataIO.load_json(self.en)['modset']['mod']
         if role == None:
             return await ctx.send(data['1'])
         author = ctx.author
@@ -541,11 +541,11 @@ class Mod(commands.Cog):
         asdf = dataIO.load_json(self.setting)
         try:
             if asdf[f'{server.id}']['language'] == 'ko':
-                data = dataIO.load_json(self.ko)['modset'][ctx.command.name[7:]]
+                data = dataIO.load_json(self.ko)['modset']['log']
             else:
-                data = dataIO.load_json(self.en)['modset'][ctx.command.name[7:]]
+                data = dataIO.load_json(self.en)['modset']['log']
         except:
-            data = dataIO.load_json(self.en)['modset'][ctx.command.name[7:]]
+            data = dataIO.load_json(self.en)['modset']['admin']
         if channel == None:
             return await ctx.send(data['1'])
         author = ctx.author
@@ -612,11 +612,11 @@ class Mod(commands.Cog):
         asdf = dataIO.load_json(self.setting)
         try:
             if asdf[f'{server.id}']['language'] == 'ko':
-                data = dataIO.load_json(self.ko)['modset'][ctx.command.name[7:]]
+                data = dataIO.load_json(self.ko)['modset']['role']
             else:
-                data = dataIO.load_json(self.en)['modset'][ctx.command.name[7:]]
+                data = dataIO.load_json(self.en)['modset']['role']
         except:
-            data = dataIO.load_json(self.en)['modset'][ctx.command.name[7:]]
+            data = dataIO.load_json(self.en)['modset']['role']
         if role == None:
             return await ctx.send(data['1'])
         author = ctx.author
@@ -645,11 +645,11 @@ class Mod(commands.Cog):
         asdf = dataIO.load_json(self.setting)
         try:
             if asdf[f'{server.id}']['language'] == 'ko':
-                data = dataIO.load_json(self.ko)['modset'][ctx.command.name[7:]]
+                data = dataIO.load_json(self.ko)['modset']['channel']
             else:
-                data = dataIO.load_json(self.en)['modset'][ctx.command.name[7:]]
+                data = dataIO.load_json(self.en)['modset']['channel']
         except:
-            data = dataIO.load_json(self.en)['modset'][ctx.command.name[7:]]
+            data = dataIO.load_json(self.en)['modset']['channel']
         if channel == None:
             return await ctx.send(data['1'])
         author = ctx.author

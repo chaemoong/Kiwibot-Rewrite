@@ -18,9 +18,9 @@ class error(commands.Cog):
    
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
-        yee = dataIO.load_json(self.setting)
+        asdf = dataIO.load_json(self.setting)
         try:
-            if yee[f'{ctx.guild.id}']['language'] == 'ko':
+            if asdf[f'{ctx.guild.id}']['language'] == 'ko':
                 data = dataIO.load_json(self.ko)
             else:
                 data = dataIO.load_json(self.en)

@@ -32,7 +32,7 @@ class general(commands.Cog):
         self.en = 'data/language/en.json'
 
 
-    @commands.command()
+    @commands.command(no_pm=True, name='userinfo', description='The userinfo command! | 유저정보 명령어입니다!', aliases=['유저정보', 'ㅕㄴㄷ갸ㅜ래', 'dbwjwjdqh'])
     async def userinfo(self, ctx, user:discord.Member=None):
         author = ctx.author
         server = ctx.guild.id
@@ -112,7 +112,7 @@ class general(commands.Cog):
             em.set_footer(text=f'Request By {author}')
         await ctx.send(author.mention, embed=em)
 
-    @commands.command(pass_context=True)
+    @commands.command(no_pm=True, name='melon', description='The melon chart TOP10 command! | 멜론 차트 TOP10 명령어입니다!', aliases=['ㅡ디ㅐㅜ', 'apffhs'])
     async def 멜론(self, ctx):
         """멜론 차트를 뽑는 명령어입니다!"""
         server = ctx.guild.id
@@ -172,7 +172,7 @@ class general(commands.Cog):
             em.add_field(name=f'{b}', value='%s - %s'%(title[i], song[i]), inline=False)
         return await ctx.send(embed=em)
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(no_pm=True, name='serverinfo', description='The serverinfo command! | 서버정보 명령어입니다!', aliases=['서버정보', 'ㄴㄷㄱㅍㄷ갸ㅜ래', 'tjqjwjdqh'])
     async def serverinfo(self, ctx):
         author = ctx.author
         server = ctx.author.guild
@@ -211,8 +211,8 @@ class general(commands.Cog):
             pass
         await ctx.send(author.mention, embed=em)
 
-    @commands.command(pass_context=True, no_pm=True, aliases=['화공'])
-    async def live(self, ctx):
+    @commands.command(no_pm=True, name='screenshare', description='The screenshare command! | 화면공유 명령어입니다!', aliases=['화공', 'ghkrhd', 'ㄴㅊㄱㄷ두놈ㄱㄷ', '화광', 'ghkrhkd'])
+    async def screenshare(self, ctx):
         """Helping Another method Screen Share!\n화면공유를 할수 있게 도와주는 명령어에요!"""
         author = ctx.author
         server = author.guild
@@ -231,7 +231,10 @@ class general(commands.Cog):
             c = 'First Join the Voice Channel'
 
         em = discord.Embed(colour=author.colour, timestamp=datetime.datetime.utcnow())
-        em.set_footer(text=f'Request By: {author}')
+        if author.avatar_url:
+            em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
+        else:
+            em.set_footer(text=f'Request By {author}')
         try:
             a = author.voice.channel
             url = f"https://discordapp.com/channels/{server.id}/{a.id}"
@@ -240,7 +243,7 @@ class general(commands.Cog):
         except AttributeError:
             await ctx.send(c)
             
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(no_pm=True, name='ping', description='The ping command! | 핑 명령어입니다!', aliases=['핑', 'vld', 'ㅔㅑㅜㅎ'])
     async def ping(self, ctx):
         author = ctx.author
         em = discord.Embed(colour=author.colour, title='PING! || 핑!', timestamp=datetime.datetime.utcnow())
@@ -263,7 +266,7 @@ class general(commands.Cog):
             em2.set_footer(text=f'Request By {author}')
         await msg.edit(embed=em2)
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(no_pm=True, name='chinobot', description='The chinobot API command! | 치노봇에 대한 정보 명령어입니다!', aliases=['치노봇', '초ㅑㅜㅐㅠㅐㅅ', 'clshqht'])
     async def chinobot(self, ctx):
         """Loading ChinoBot's API info!\n치노봇 API를 불러와요!"""
         try:
@@ -303,7 +306,7 @@ class general(commands.Cog):
         await a.delete()
         await ctx.send(embed=em)
 
-    @commands.group(pass_context=True, aliases=['번역'])
+    @commands.group(no_pm=True, name='translate', description='The translate(papago) API command! | 파파고 명령어입니다!', aliases=['ㅅㄱ무님ㅅㄷ', '파파고', 'papago', 'vkvkrh', 'ㅔ멤해'])
     async def translate(self, ctx):
         """번역 명령어입니다!"""
         if ctx.invoked_subcommand is None:

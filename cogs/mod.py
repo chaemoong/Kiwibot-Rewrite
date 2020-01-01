@@ -48,7 +48,7 @@ class Mod(commands.Cog):
                     return False
                         
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(no_pm=True, name='language', description='The language setting command! | 언어를 선택하는 명령어입니다!', aliases=['ㅣ무혐ㅎㄷ', '언어', 'djsdj'])
     @commands.check(administrator)
     async def language(self, ctx, language=None):
         """봇의 언어를 설정하는 명령어 입니다!"""
@@ -74,7 +74,7 @@ class Mod(commands.Cog):
         else:
             return await self.language_setting(ctx)
             
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(no_pm=True, name='ban', description='It is a user-banning command. | 유저를 벤하는 명령어입니다!', aliases=['ㅠ무', '벤', 'qps', '차단', 'ckeks'])
     @commands.check(administrator)
     async def ban(self, ctx, user:discord.Member=None, *, reason=None):
         """악성 유저를 벤 하는 명령어입니다!\nBanned The Person"""
@@ -101,7 +101,7 @@ class Mod(commands.Cog):
             await ctx.send(data['4'])
             return     
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(no_pm=True, name='unban', description='It is a user-unbanning command. | 유저를 언벤하는 명령어입니다!', aliases=['ㅕㅜㅠ무', '언벤', 'djsqps', '차단해제', 'ckeksgowp'])
     @commands.check(administrator)
     async def unban(self, ctx: commands.Context, user_id: int, *, reason: str = None):
         """유저를 언벤 하는 명령어입니다!\nKicked The Person"""
@@ -138,7 +138,7 @@ class Mod(commands.Cog):
             await ctx.send(data['4'])
             return     
 
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(no_pm=True, name='hackban', description='It is a user-hackbanning command. | 유저를 핵벤하는 명령어입니다!', aliases=['ㅗㅁ차ㅠ무', '핵벤', 'gorqps', '강제차단', 'rkdwpckeks'])
     @commands.check(administrator)
     async def hackban(self, ctx: commands.Context, user_id: int, *, reason: str = None):
         """악성유저가 이 서버에 없을경우 대처를 하기 위해 벤하는 명령어입니다!\nIf the Person is not in this server, ban to protecting"""
@@ -174,7 +174,7 @@ class Mod(commands.Cog):
         except discord.HTTPException:
             return await ctx.send(data['4'])
 
-    @commands.command(pass_context=True, no_pm=True, aliases=['warn', 'rudrh', 'ㅈㅁ구'])
+    @commands.command(no_pm=True, name='warn', description='It is a user-warnning command. | 유저를 경고하는 명령어입니다!', aliases=['ㅈㅁ구', 'rudrh'])
     @commands.check(administrator)
     async def 경고(self, ctx, user:discord.Member=None, *, reason=None):
         """유저에게 경고를 주는 명령어에요!\nGiving warn to Member"""
@@ -244,7 +244,7 @@ class Mod(commands.Cog):
         return await self.logger(ctx, action='경고 | WARN', user=user, reason=reason)   
 
 
-    @commands.command(pass_context=True)
+    @commands.command(no_pm=True, name='unwarn', description='It is a user-unwarnning command. | 유저를 경고한개를 삭제하는 명령어입니다!', aliases=['ㅕㅜㅈㅁ구', '경고지우기', 'rudrhwldnrl'])
     @commands.check(administrator)
     async def unwarn(self, ctx, user:discord.Member=None, reason=None):
         """유저에게 경고 1개를 지우는 명령어에요!\nDeleting 1 warn to Member"""
@@ -282,7 +282,7 @@ class Mod(commands.Cog):
         await ctx.send(embed=em)
         return await self.logger(ctx, action='경고 삭제 | DELETED WARN', user=user, reason=reason)   
 
-    @commands.command(pass_context=True)
+    @commands.command(no_pm=True, name='check', description='It is a user-warnning check command. | 유저의 경고를 확인하는 명령어입니다!', aliases=['경고확인', '촏차', 'rudrhghkrdls'])
     async def check(self, ctx, user:discord.Member=None):
         """유저의 경고를 확인하는 명령어에요!\nDeleting 1 warn to Member"""
         author = ctx.author
@@ -315,7 +315,7 @@ class Mod(commands.Cog):
             em.add_field(name=data['7'].format(reason[:1]), value=reason[2:], inline=False)
         return await ctx.send(embed=em)
 
-    @commands.command(pass_context=True)
+    @commands.command(no_pm=True, name='clean', description='It is a user-warnning cleaning command. | 유저의 경고를 삭제하는 명령어입니다!', aliases=['칟무', '경고삭제', 'rudrhtkrwp'])
     @commands.check(administrator)
     async def clean(self, ctx, user:discord.Member=None, *, reason=None):
         author = ctx.author
@@ -353,7 +353,7 @@ class Mod(commands.Cog):
         await ctx.send(embed=em)
         return await self.logger(ctx, action='경고 초기화 | RESET WARN', user=user, reason=reason)   
 
-    @commands.command(pass_context=True)
+    @commands.command(no_pm=True, name='limit', description='limit command that limits the number of warnings on the server. | 서버의 경고수를 제한하는 명령어입니다!', aliases=['ㅣㅑㅡㅑㅅ', '경고제한', 'rudrhwpgks'])
     async def limit(self, ctx, limit:int=None):
         """경고제한 하는 명령어입니다! | This command limits the warning!"""
         author = ctx.author
@@ -389,7 +389,7 @@ class Mod(commands.Cog):
         em.add_field(name=data['5'], value='경고 제한을 {} 으로 설정했어요!'.format(limit))
         return await ctx.send(embed=em)
 
-    @commands.group()
+    @commands.group(no_pm=True, name='modset', description='Commands to set administrator functions! | 관리자 기능들을 설정하는 명령어입니다!', aliases=['ㅡㅐㅇㄴㄷㅅ', '관리자기능설정', 'rhksflwkrlsmdtjfwjd'])
     @commands.check(administrator)
     async def modset(self, ctx):
         if ctx.invoked_subcommand is None:

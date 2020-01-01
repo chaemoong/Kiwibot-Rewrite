@@ -8,11 +8,14 @@ class post(commands.Cog):
         self.bot = bot
         self.company = dataIO.load_json('data/post/company_name.json')
 
-    @commands.command(pass_context=True, no_pm=True)
-    async def 택배(self, ctx, company_name, tb_number:str):
-        if not company_name or not self.company.get(company_name): return await ctx.send('택배회사 적어 시발룐아')
-        if not tb_number: return await ctx.send('송장번호도 제대로 적으세여^^')
-        
+    @commands.command(no_pm=True, name='택배', description='The order to inquire parcels! | 택배를 조회하는 명령어입니다!', aliases=['xorqo', 'post', 'ㅔㅐㄴㅅ'])
+    async def 택배(self, ctx, company_name=None, tb_number:str=None):
+        if company_name == None or not self.company.get(company_name):
+            await ctx.send('택배회사를 적어주셔야 되요!')
+            return
+        if tb_number == None:
+            await ctx.send('송장번호를 적어주셔야 되요!')
+            return
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.get(f"https://apis.tracker.delivery/carriers/{self.company.get(company_name)}/tracks/{tb_number}") as response:

@@ -16,7 +16,7 @@ class Afk(commands.Cog):
         self.en = 'data/language/en.json'
 
 
-    @commands.command(no_pm=True, pass_context=True)
+    @commands.command(name='afk', description='The afk command! | 잠수 명령어입니다!', aliases=['ㅁ라', '잠수', 'wkatn'])
     async def afk(self, ctx, *, reason=None):
         """잠수 명령어 입니다!"""
         utc = datetime.datetime.utcnow()
@@ -54,12 +54,12 @@ class Afk(commands.Cog):
         utc = datetime.datetime.utcnow()
         asdf = dataIO.load_json(self.setting)
         try:
-            if asdf[f'{ctx.guild.id}']['language'] == 'ko':
-                data = dataIO.load_json(self.ko)['end']
+            if asdf[f'{message.guild.id}']['language'] == 'ko':
+                data = dataIO.load_json(self.ko)["end"]
             else:
-                data = dataIO.load_json(self.en)['end']
+                data = dataIO.load_json(self.en)["end"]
         except:
-            data = dataIO.load_json(self.en)['end']
+            data = dataIO.load_json(self.en)["end"]
         if f'{message.author.id}' in self.riceCog:
             if 'afk' in message.content:
                 return

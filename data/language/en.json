@@ -174,5 +174,19 @@
         "1": "{} has finished afk!\n\nReason: {}\n\nWhere have you been!?",
         "2": "{} has finished afk!\n\nWhere have you been?",
         "3": "잠수 끝! | AFK END!"
+    },
+    "verify": {
+        "1": "> No CAPTCHA {} is set! Ask the administrator!",
+        "channel": "channel",
+        "role": "role",
+        "2": "> Please use the authentication command on the authentication channel!",
+        "3": "> You've already been verified!",
+        "4": "{} error has occurred! Error content: {}",
+        "5": "Please watch the DM!",
+        "6": "Welcome to {}!",
+        "7": "This feature is designed to protect the server and prevent the self-bot from becoming a Captcha function!\nPlease write down the code on the image.!",
+        "8": "> Cancel the Captcha!",
+        "9": "> Complete!",
+        "10": "The CAPTCHA key is invalid! Please try again!"
     }
 }

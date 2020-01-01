@@ -16,7 +16,7 @@ class Afk(commands.Cog):
         self.en = 'data/language/en.json'
 
 
-    @commands.command(name='afk', description='The afk command! | 잠수 명령어입니다!', aliases=['ㅁ라', '잠수', 'wkatn'])
+    @commands.command(no_pm=True, name='afk', description='The afk command! | 잠수 명령어입니다!', aliases=['ㅁ라', '잠수', 'wkatn'])
     async def afk(self, ctx, *, reason=None):
         """잠수 명령어 입니다!"""
         utc = datetime.datetime.utcnow()

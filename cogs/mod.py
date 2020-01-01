@@ -464,9 +464,9 @@ class Mod(commands.Cog):
             if mod == None: mod = '없음 | None'
             if log == None: log = '없음 | None'
             if captcha_role == None: captcha_role = '없음 | None'
-            if asdf == None: captcha_log = '없음 | None'
+            if asdf == None: asdf = '없음 | None'
             if d == False: d = '꺼짐'
-            await ctx.send(f"```fix\n> 관리자 역할 | Admin Role: {admin}\n> 부관리자 역할  | Moderator Role: {mod}\n> 로그 | Log Channel: {log}\n> 비속어 필터 | Bad Words Filtering: {d}\n인증 역할: {captcha_role}\n인증 채널: {captcha_log}```\n")
+            await ctx.send(f"```fix\n> 관리자 역할 | Admin Role: {admin}\n> 부관리자 역할  | Moderator Role: {mod}\n> 로그 | Log Channel: {log}\n> 비속어 필터 | Bad Words Filtering: {d}\n인증 역할: {captcha_role}\n인증 채널: {asdf}```\n")
             return await ctx.send(f'```fix\n> 관리자 역할 설정 | Settings to Administrator Role: {ctx.prefix}{ctx.command} admin [역할 | Role]\n> 부관리자 역할 설정 | Settings to Moderator Role: {ctx.prefix}{ctx.command} mod [역할 | Role]\n> 로그 설정 | Settings to Log Channel: {ctx.prefix}{ctx.command} log [채널 | Channel]```')
 
     @modset.command(pass_context=True)

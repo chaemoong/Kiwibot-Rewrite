@@ -440,7 +440,7 @@ class Mod(commands.Cog):
                 self.data[f'{server.id}'].update({"dyr": 'b'})
                 d = self.data[f'{server.id}']['dyr']
             try:
-                e = self.data[f'{server.id}']['mod']
+                e = self.data[f'{server.id}']['captcha_role']
                 try:
                     if e:
                         captcha_role = get(server.roles, id=e)

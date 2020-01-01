@@ -446,24 +446,14 @@ class Mod(commands.Cog):
             except KeyError:
                 self.data[f'{server.id}'].update({"rold": '없음'})
                 rold = self.data[f'{server.id}']['rold']
-            try:
-                pls = self.data[f'{server.id}']['channel']
-                try:
-                    if pls:
-                        asdf = server.get_channel(pls)
-                except:
-                    asdf = None
-            except KeyError:
-                asdf = '없음 | None'
             dataIO.save_json(self.warn, self.data2)
             if admin == None: admin = '없음 | None'
             if mod == None: mod = '없음 | None'
             if log == None: log = '없음 | None'
             if rold == None: rold = '없음 | None'
-            if asdf == None: asdf = '없음 | None'
             if d == False: d = '꺼짐'
             await ctx.send(f"```fix\n> 관리자 역할 | Admin Role: {admin}\n> 부관리자 역할  | Moderator Role: {mod}\n> 로그 | Log Channel: {log}\n> 비속어 필터 | Bad Words Filtering: {d}\n인증 역할: {rold}\n인증 채널: {asdf}```\n")
-            return await ctx.send(f'```fix\n> 관리자 역할 설정 | Settings to Administrator Role: {ctx.prefix}{ctx.command} admin [역할 | Role]\n> 부관리자 역할 설정 | Settings to Moderator Role: {ctx.prefix}{ctx.command} mod [역할 | Role]\n> 로그 설정 | Settings to Log Channel: {ctx.prefix}{ctx.command} log [채널 | Channel]\nSettings to Captcha role: {ctx.prefix}{ctx.command} role [역할 멘션 혹은 ID | Role Mention Or ID]\nSettings to Captcha role: {ctx.prefix}{ctx.command} channel [채널 멘션 혹은 ID | Channel Mention Or ID]```')
+            return await ctx.send(f'```fix\n> 관리자 역할 설정 | Settings to Administrator Role: {ctx.prefix}{ctx.command} admin [역할 | Role]\n> 부관리자 역할 설정 | Settings to Moderator Role: {ctx.prefix}{ctx.command} mod [역할 | Role]\n> 로그 설정 | Settings to Log Channel: {ctx.prefix}{ctx.command} log [채널 | Channel]\nSettings to Captcha role: {ctx.prefix}{ctx.command} role [역할 멘션 혹은 ID | Role Mention Or ID]```')
 
     @modset.command(pass_context=True)
     async def admin(self, ctx, role:discord.Role=None):

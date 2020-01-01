@@ -34,13 +34,6 @@ class captcha(commands.Cog):
         except:
             data = dataIO.load_json(self.en)[ctx.command.name]
         if f'{server.id}' in log:
-            if 'channel' in log[f'{server.id}']:
-                pass
-            else:
-                return await ctx.send(data['1'].format(data['channel']))
-        else:
-            return await ctx.send(data['1'].format(data['channel']))
-        if f'{server.id}' in log:
             if 'rold' in log[f'{server.id}']:
                 role = get(server.roles, id=log[f'{server.id}']['rold'])
             else:

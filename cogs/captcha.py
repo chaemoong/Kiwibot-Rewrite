@@ -103,7 +103,10 @@ class captcha(commands.Cog):
         a = json.loads(thinking)
         if a['result']:
             await author.send(data['9'])
-            return await author.add_roles(get(server.roles, id=self.first[f'{server.id}']['rold']))
+            try:
+                return await author.add_roles(get(server.roles, id=self.first[f'{server.id}']['rold']))
+            except:
+                return await ctx.send('> No Permission')  
         else:
             return await author.send(data['10'])
                 

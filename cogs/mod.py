@@ -440,15 +440,15 @@ class Mod(commands.Cog):
                 self.data[f'{server.id}'].update({"dyr": 'b'})
                 d = self.data[f'{server.id}']['dyr']
             try:
-                e = self.data[f'{server.id}']['captcha_role']
+                e = self.data[f'{server.id}']['rold']
                 try:
                     if e:
-                        captcha_role = get(server.roles, id=e)
+                        rold = get(server.roles, id=e)
                 except:
-                    captcha_role = '없음 | None'
+                    rold = '없음 | None'
             except KeyError:
-                self.data[f'{server.id}'].update({"captcha_role": '없음'})
-                captcha_role = self.data[f'{server.id}']['captcha_role']
+                self.data[f'{server.id}'].update({"rold": '없음'})
+                rold = self.data[f'{server.id}']['rold']
             try:
                 pls = self.data[f'{server.id}']['channel']
                 try:
@@ -463,10 +463,10 @@ class Mod(commands.Cog):
             if admin == None: admin = '없음 | None'
             if mod == None: mod = '없음 | None'
             if log == None: log = '없음 | None'
-            if captcha_role == None: captcha_role = '없음 | None'
+            if rold == None: rold = '없음 | None'
             if asdf == None: asdf = '없음 | None'
             if d == False: d = '꺼짐'
-            await ctx.send(f"```fix\n> 관리자 역할 | Admin Role: {admin}\n> 부관리자 역할  | Moderator Role: {mod}\n> 로그 | Log Channel: {log}\n> 비속어 필터 | Bad Words Filtering: {d}\n인증 역할: {captcha_role}\n인증 채널: {asdf}```\n")
+            await ctx.send(f"```fix\n> 관리자 역할 | Admin Role: {admin}\n> 부관리자 역할  | Moderator Role: {mod}\n> 로그 | Log Channel: {log}\n> 비속어 필터 | Bad Words Filtering: {d}\n인증 역할: {rold}\n인증 채널: {asdf}```\n")
             return await ctx.send(f'```fix\n> 관리자 역할 설정 | Settings to Administrator Role: {ctx.prefix}{ctx.command} admin [역할 | Role]\n> 부관리자 역할 설정 | Settings to Moderator Role: {ctx.prefix}{ctx.command} mod [역할 | Role]\n> 로그 설정 | Settings to Log Channel: {ctx.prefix}{ctx.command} log [채널 | Channel]```')
 
     @modset.command(pass_context=True)
@@ -607,7 +607,7 @@ class Mod(commands.Cog):
         await ctx.send(embed=em)
 
     @modset.command(pass_context=True)
-    async def verify_role(self, ctx, role:discord.Role=None):
+    async def role(self, ctx, role:discord.Role=None):
         server = ctx.guild
         asdf = dataIO.load_json(self.setting)
         try:
@@ -625,11 +625,11 @@ class Mod(commands.Cog):
         except:
             self.data[f'{server.id}'] = {}
         try:
-            if self.data[f'{server.id}']['captcha_role']:
-                del self.data[f'{server.id}']['captcha_role']
-                self.data[f'{server.id}'].update({"captcha_role": role.id})
+            if self.data[f'{server.id}']['rold']:
+                del self.data[f'{server.id}']['rold']
+                self.data[f'{server.id}'].update({"rold": role.id})
         except KeyError:
-            self.data[f'{server.id}'].update({"captcha_role": role.id})
+            self.data[f'{server.id}'].update({"rold": role.id})
         em = discord.Embed(colour=author.colour)
         if author.avatar_url:
             em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
@@ -640,16 +640,16 @@ class Mod(commands.Cog):
         dataIO.save_json(self.ang, self.data)
 
     @modset.command(pass_context=True)
-    async def verify_channel(self, ctx, channel:discord.TextChannel=None):
+    async def channel(self, ctx, channel:discord.TextChannel=None):
         server = ctx.guild
         asdf = dataIO.load_json(self.setting)
         try:
             if asdf[f'{server.id}']['language'] == 'ko':
-                data = dataIO.load_json(self.ko)['modset']['channel']
+                data = dataIO.load_json(self.ko)['modset']['log']
             else:
-                data = dataIO.load_json(self.en)['modset']['channel']
+                data = dataIO.load_json(self.en)['modset']['log']
         except:
-            data = dataIO.load_json(self.en)['modset']['channel']
+            data = dataIO.load_json(self.en)['modset']['log']
         if channel == None:
             return await ctx.send(data['1'])
         author = ctx.author
@@ -658,11 +658,11 @@ class Mod(commands.Cog):
         except:
             self.data[f'{server.id}'] = {}
         try:
-            if self.data[f'{server.id}']['channel']:
-                del self.data[f'{server.id}']['channel']
-                self.data[f'{server.id}'].update({"channel": channel.id})
+            if self.data[f'{server.id}']['log']:
+                del self.data[f'{server.id}']['log']
+                self.data[f'{server.id}'].update({"log": channel.id})
         except KeyError:
-            self.data[f'{server.id}'].update({"channel": channel.id})
+            self.data[f'{server.id}'].update({"log": channel.id})
         em = discord.Embed(colour=author.colour)
         if author.avatar_url:
             em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)

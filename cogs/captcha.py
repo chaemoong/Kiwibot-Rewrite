@@ -20,20 +20,22 @@ class captcha(commands.Cog):
         channel = ctx.channel
         server = ctx.guild
         author = ctx.author
-        log = self.first[f'{server.id}']
-        if 'channel' in log:
-            pass
-        else:
-            return await ctx.send('> 설정된 캡챠(인증) 채널이 없습니다! 관리자 에게 문의해보세요!\nNo CAPTCHA channel is set! Ask the administrator!')
-        try:
-            role = self.first[f'{server.id}']['captcha_role']
-            if role:
+        log = self.first
+        if f'{server.id}' in log:
+            if 'channel' in log[f'{server.id}']:
                 pass
             else:
+                return await ctx.send('> 설정된 캡챠(인증) 채널이 없습니다! 관리자 에게 문의해보세요!\nNo CAPTCHA channel is set! Ask the administrator!')
+        else:
+            return await ctx.send('> 설정된 캡챠(인증) 채널이 없습니다! 관리자 에게 문의해보세요!\nNo CAPTCHA channel is set! Ask the administrator!')
+        if f'{server.id}' in log:
+            if 'rold' in log[f'{server.id}']:
+                role = get(server.roles, id=log[f'{server.id}']['rold'])
+            else:
                 return await ctx.send('> 설정된 캡챠(인증) 역할이 없습니다! 관리자 에게 문의해보세요!\nNo CAPTCHA channel is set! Ask the administrator!')
-        except KeyError:
+        else:
             return await ctx.send('> 설정된 캡챠(인증) 역할이 없습니다! 관리자 에게 문의해보세요!\nNo CAPTCHA channel is set! Ask the administrator!')      
-        if not channel.id == log['channel']:
+        if not channel.id == log[f'{server.id}']['channel']:
             return await ctx.send('> 인증 명령어는 인증 채널에서 사용해주세요!')
         if get(server.roles, id=role) in author.roles:
             return await ctx.send('> 이미 인증되셨습니다!')
@@ -94,7 +96,7 @@ class captcha(commands.Cog):
         a = json.loads(thinking)
         if a['result']:
             await author.send('> 완료 되었습니다! | Complete!')
-            return await author.add_roles(get(server.roles, id=self.first[f'{server.id}']['captcha_role']))
+            return await author.add_roles(get(server.roles, id=self.first[f'{server.id}']['rold']))
         else:
             return await author.send('> 캡챠키가 올바르지 않습니다! 다시 시도 해주세요! | The CAPTCHA key is invalid! Please try again!')
                 

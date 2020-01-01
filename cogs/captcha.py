@@ -21,7 +21,7 @@ class captcha(commands.Cog):
         server = ctx.guild
         author = ctx.author
         try:
-            log = self.first[f'{server.id}']['captcha_log']
+            log = self.first[f'{server.id}']['channel']
             if log:
                 pass
             else:

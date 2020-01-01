@@ -450,21 +450,21 @@ class Mod(commands.Cog):
                 self.data[f'{server.id}'].update({"captcha_role": '없음'})
                 captcha_role = self.data[f'{server.id}']['captcha_role']
             try:
-                f = self.data[f'{server.id}']['captcha_log']
+                pls = self.data[f'{server.id}']['channel']
                 try:
-                    if f:
-                        captcha_log = server.get_channel(f)
+                    if c:
+                        asdf = server.get_channel(pls)
                 except:
-                    captcha_log = '없음 | None'
+                    asdf = '없음 | None'
             except KeyError:
-                self.data[f'{server.id}'].update({"captcha_log": '없음'})
-                captcha_log = self.data[f'{server.id}']['captcha_log']
+                self.data[f'{server.id}'].update({"channel": '없음'})
+                log = self.data[f'{server.id}']['channel']
             dataIO.save_json(self.warn, self.data2)
             if admin == None: admin = '없음 | None'
             if mod == None: mod = '없음 | None'
             if log == None: log = '없음 | None'
             if captcha_role == None: captcha_role = '없음 | None'
-            if captcha_log == None: captcha_log = '없음 | None'
+            if asdf == None: captcha_log = '없음 | None'
             if d == False: d = '꺼짐'
             await ctx.send(f"```fix\n> 관리자 역할 | Admin Role: {admin}\n> 부관리자 역할  | Moderator Role: {mod}\n> 로그 | Log Channel: {log}\n> 비속어 필터 | Bad Words Filtering: {d}\n인증 역할: {captcha_role}\n인증 채널: {captcha_log}```\n")
             return await ctx.send(f'```fix\n> 관리자 역할 설정 | Settings to Administrator Role: {ctx.prefix}{ctx.command} admin [역할 | Role]\n> 부관리자 역할 설정 | Settings to Moderator Role: {ctx.prefix}{ctx.command} mod [역할 | Role]\n> 로그 설정 | Settings to Log Channel: {ctx.prefix}{ctx.command} log [채널 | Channel]```')
@@ -545,7 +545,7 @@ class Mod(commands.Cog):
             else:
                 data = dataIO.load_json(self.en)['modset']['log']
         except:
-            data = dataIO.load_json(self.en)['modset']['admin']
+            data = dataIO.load_json(self.en)['modset']['log']
         if channel == None:
             return await ctx.send(data['1'])
         author = ctx.author
@@ -658,20 +658,19 @@ class Mod(commands.Cog):
         except:
             self.data[f'{server.id}'] = {}
         try:
-            if self.data[f'{server.id}']['captcha_log']:
-                del self.data[f'{server.id}']['captcha_log']
-                self.data[f'{server.id}'].update({"captcha_log": channel.id})
+            if self.data[f'{server.id}']['channel']:
+                del self.data[f'{server.id}']['channel']
+                self.data[f'{server.id}'].update({"channel": channel.id})
         except KeyError:
-            self.data[f'{server.id}'].update({"captcha_log": channel.id})
+            self.data[f'{server.id}'].update({"channel": channel.id})
         em = discord.Embed(colour=author.colour)
         if author.avatar_url:
             em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
         else:
             em.set_footer(text=f'Request By {author}')
-        em.add_field(name=data['2'], value=data['3'].format(channel.mention))
+        em.add_field(name=data['2'], value=data['3'].format(channel.name))
         await ctx.send(embed=em)
         dataIO.save_json(self.ang, self.data)
-
 
     async def language_setting(self, ctx):
         author = ctx.author

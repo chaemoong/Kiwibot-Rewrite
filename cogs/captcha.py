@@ -64,6 +64,8 @@ class captcha(commands.Cog):
         rescode = response.getcode()
         if(rescode==200):
             response_body = response.read()
+            with open('captcha.jpg', 'wb') as f:
+                f.write(response_body)
         else:
             print("Error Code:" + rescode)
             return await author.send(f'{rescode} 오류가 발생했습니다! 오류 내용: {self.error[int(rescode)]}')
@@ -73,7 +75,7 @@ class captcha(commands.Cog):
         await ctx.send(embed=em)
         em2 = discord.Embed(colour=author.colour)
         em2.add_field(name=f'{ctx.guild.name} 서버에 오신것을 환영합니다!', value='이 기능은 서버의 보안을 위함, 봇 방지로 인하여 캡챠 기능이 생겼습니다!\n아래의 코드를 적어주세요!')
-        await author.send(file=discord.File(open(f"{author.id}.jpg", "rb")), embed=em2)
+        await author.send(file=discord.File(open("captcha.jpg", "rb")), embed=em2)
         def check(message):
             return message.channel.id == author.dm_channel.id
         try:
@@ -98,6 +100,6 @@ class captcha(commands.Cog):
             return await author.add_roles(get(server.roles, id=self.first[f'{server.id}']['captcha_role']))
         else:
             return await author.send('> 캡챠키가 올바르지 않습니다! 다시 시도 해주세요! | The CAPTCHA key is invalid! Please try again!')
-    
+                
 def setup(bot):
     bot.add_cog(captcha(bot))

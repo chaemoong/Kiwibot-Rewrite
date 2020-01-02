@@ -47,4 +47,4 @@ for extension in [f.replace('.py', '') for f in listdir(cogs_dir) if isfile(join
 
 bot.loop.create_task(playing())
 bot.loop.create_task(auto_restart())
-bot.run('NDcxOTAyMjExNjA2MTgzOTM2.Xez8OA.XRFBtwoA20ZJN-4vix8x0XQSYME')
+bot.run('NTM4NjU5NTgwODU1NDUxNjQ4.Xg1oFQ.Q8RD76uVGdSH7HpYiMGLXuE8USE')

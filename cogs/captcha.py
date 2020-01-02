@@ -24,7 +24,7 @@ class captcha(commands.Cog):
         channel = ctx.channel
         server = ctx.guild
         author = ctx.author
-        log = self.first
+        log = dataIO.load_json('data/mod/settings.json')
         asdf = dataIO.load_json(self.setting)
         try:
             if asdf[f'{server.id}']['language'] == 'ko':
@@ -34,16 +34,12 @@ class captcha(commands.Cog):
         except:
             data = dataIO.load_json(self.en)[ctx.command.name]
         if f'{server.id}' in log:
-            if 'rold' in log[f'{server.id}']:
+            try:
                 role = get(server.roles, id=log[f'{server.id}']['rold'])
-            else:
+            except KeyError:
                 return await ctx.send(data['1'].format(data['role']))
         else:
             return await ctx.send(data['1'].format(data['role']))
-        if channel.id == log[f'{server.id}']['channel']:
-            pass
-        else:
-            return await ctx.send(data['2'])
         if get(server.roles, id=role) in author.roles:
             return await ctx.send(data['3'])
         client_id = "3VuiEnBYyTLIRMOHWDLq"

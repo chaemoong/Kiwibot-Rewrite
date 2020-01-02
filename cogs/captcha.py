@@ -110,5 +110,33 @@ class captcha(commands.Cog):
         else:
             return await author.send(data['10'])
                 
+def check_folder():
+    if not os.path.exists('data/captcha'):
+        print('data/captcha 풀더생성을 완료하였습니다!')
+        os.makedirs('data/captcha')
+    if not os.path.exists('data/mod'):
+        print('data/mod 풀더생성을 완료하였습니다!')
+        os.makedirs('data/mod')
+
+def check_file():
+    data = {
+    "400": "Unissued image (이미지 발급을 하지 않음)",
+    "403": "Invalid key. (키가 만료되거나 없는 키)",
+    "500": "System error. (시스템 오류)"
+    }
+    f = "data/captcha/error.json"
+    dataasdf = {}
+    fg = "data/mod/settings.json"
+    if not dataIO.is_valid_json(fg):
+        print("data/mod/settings.json 파일생성을 완료하였습니다!")
+        dataIO.save_json(fg,
+                         dataasdf)
+    elif not dataIO.is_valid_json(f):
+        print("error.json 파일생성을 완료하였습니다!")
+        dataIO.save_json(f,
+                         data)
+
 def setup(bot):
+    check_folder()
+    check_file()
     bot.add_cog(captcha(bot))

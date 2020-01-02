@@ -1,5 +1,5 @@
 {
-    "400": "Unissued image (이미지 발급을 하지 않음)",
-    "403": "Invalid key. (키가 만료되거나 없는 키)",
-    "500": "System error. (시스템 오류)"
+    "400" : "Unissued image (\uc774\ubbf8\uc9c0 \ubc1c\uae09\uc744 \ud558\uc9c0 \uc54a\uc74c)",
+    "403" : "Invalid key. (\ud0a4\uac00 \ub9cc\ub8cc\ub418\uac70\ub098 \uc5c6\ub294 \ud0a4)",
+    "500" : "System error. (\uc2dc\uc2a4\ud15c \uc624\ub958)"
 }

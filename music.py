@@ -22,6 +22,9 @@ import subprocess
 import sys
 import time
 import json
+import requests
+import asyncio
+from bs4 import BeautifulSoup
 
 
 url_rx = re.compile('https?:\\/\\/(?:www\\.)?.+')  # noqa: W605
@@ -35,7 +38,7 @@ class Music(commands.Cog):
 
         if not hasattr(bot, 'lavalink'):  # This ensures the client isn't overwritten during cog reloads.
             bot.lavalink = lavalink.Client(bot.user.id)
-            bot.lavalink.add_node('siru.ga', 5000, 'youshallnotpass', 'eu', 'default-node')  # Host, Port, Password, Region, Name            
+            bot.lavalink.add_node('59.3.95.69', 5000, 'youshallnotpass', 'eu', 'default-node')  # Host, Port, Password, Region, Name            
             bot.add_listener(bot.lavalink.voice_update_handler, 'on_socket_response')
 
         bot.lavalink.add_event_hook(self.track_hook)
@@ -77,40 +80,56 @@ class Music(commands.Cog):
 
 
     @commands.command(aliases=['p'])
-    async def play(self, ctx, *, query: str):
+    async def play(self, ctx, *, query):
         """노래를 검색해서 노래를 틀어줘!"""
         player = self.bot.lavalink.players.get(ctx.guild.id)
 
-        query = query.strip('<>')
-
         if query.startswith == 'scsearch:':
+            query = query.strip('<>')
             query = f'scsearch:{query}'
 
+        query = query.strip('<>')
+                    
         if not url_rx.match(query):
             query = f'ytsearch:{query}'
+            
 
         results = await player.node.get_tracks(query)
 
         if not results or not results['tracks']:
             return await ctx.send('노래를 찾을 수 없어요!, 다른 검색어를 입력해주세요!')
 
-        embed = discord.Embed(color=discord.Color.blurple())
 
         if results['loadType'] == 'PLAYLIST_LOADED':           
             tracks = results['tracks']
-            a = await ctx.send(f'이 플레이 리스트에는 총 {len(tracks)} 개의 노래(혹은 영상)들이 담겨 있습니다!\n재생 하시려면 `재생` 안하시려면 `취소` 아니면 30초동안 기달려주세요!')
-            msg = await self.bot.wait_for('message', timeout=30)
-            b = int(msg.content)
-            if b == '재생':
+            a = await ctx.send(f'이 플레이 리스트에는 총 {len(tracks)} 개의 노래(혹은 영상)들이 담겨 있습니다!\n재생 하시려면 ⭕ 안하시려면 ❌에 반응해주세요!')
+            await a.add_reaction('⭕')
+            await a.add_reaction('❌')
+            def check(reaction, user):
+                if user == ctx.author and str(reaction.emoji) == '⭕': 
+                    return True 
+                elif user == ctx.author and str(reaction.emoji) == '❌':
+                    return False
+                else:
+                    return False
+            try:
+                await self.bot.wait_for('reaction_add', timeout=30.0, check=check)
+            except asyncio.TimeoutError:
+                return await a.edit(content='> 정상적으로 취소되었습니다!')
+            if True:
                 for track in tracks:
                     player.add(requester=ctx.author.id, track=track)
-
+                embed = discord.Embed(color=discord.Color.blurple())
                 embed.title = '재생목록에 추가된 노래!'
                 embed.description = f'{results["playlistInfo"]["name"]} - {len(tracks)} 곡들을 추가했습니다!'
-            elif b == '취소':
-                await a.edit('정상적으로 취소되었습니다!')               
+            elif False:
+                return await a.edit(content='> 정상적으로 취소되었습니다!')
+            else:
+                return await a.edit(content='> 다른 이모지를 추가하시면 안되요!')
+
         else:
             track = results['tracks'][0]
+            embed = discord.Embed(color=discord.Color.blurple())
             embed.title = '재생목록에 추가된 노래'
             embed.description = f'[{track["info"]["title"]}]({track["info"]["uri"]})를 재생목록에 추가했어요!'
             player.add(requester=ctx.author.id, track=track)
@@ -307,13 +326,13 @@ class Music(commands.Cog):
         await ctx.send('*⃣ | 재생목록을 초기화 하고 보이스채널에서 나왔어!')
 
     @commands.command()
-    async def stop_disconnecting(self, ctx):
+    async def leave(self, ctx):
         """봇이 강제로 끊겼을때, 재접속할수 있게 됩니다!"""
         player = self.bot.lavalink.players.get(ctx.guild.id)
         player.queue.clear()
         await player.stop()
         await self.connect_to(ctx.guild.id, None)
-        await ctx.send('*⃣ | 재생목록을 초기화 완료!!')
+        await ctx.send('*⃣ | 재생목록을 초기화 하였습니다!')
 
 
     async def ensure_voice(self, ctx):
@@ -338,5 +357,20 @@ class Music(commands.Cog):
                 return await ctx.send('당신은 저랑 같은 보이스 채널이 있지 않아요!')
 
 
+def check_folder():
+    if not os.path.exists('data/music'):
+        print('data/music 풀더생성을 완료하였습니다!')
+        os.makedirs('data/music')
+
+def check_file():
+    data = {}
+    f = "data/music/settings.json"
+    if not dataIO.is_valid_json(f):
+        print("settings.json 파일생성을 완료하였습니다!")
+        dataIO.save_json(f,
+                         data)
+
 def setup(bot):
+    check_folder()
+    check_file()
     bot.add_cog(Music(bot))

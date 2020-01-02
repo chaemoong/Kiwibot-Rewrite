@@ -1,5 +1,0 @@
-{
-    "general": ["**userinfo", "serverinfo", "ping**"],
-    "mod": ["**language**"],
-    "afk": ["**afk**"]
-}

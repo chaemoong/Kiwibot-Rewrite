@@ -17,6 +17,7 @@ import json
 import lavalink
 import asyncio
 import random
+import zipfile
 
 
 
@@ -64,8 +65,24 @@ class owner(commands.Cog):
     @commands.check(is_owner)
     async def restart(self, ctx):
         """봇을 재시작 시킵니다!"""
-        await ctx.send('봇이 쥬급니다')
+        await ctx.send('봇이 재시작됩니다!')
         await self.bot.logout()
+        
+    @commands.command()
+    @commands.check(is_owner)
+    async def shutdown(self, ctx):
+        """봇을 재시작 시킵니다!"""
+        fantasy_zip = zipfile.ZipFile('data.zip', 'w')
+         
+        for folder, subfolders, files in os.walk('data'):      
+            for file in files:
+                fantasy_zip.write(os.path.join(folder, file), os.path.relpath(os.path.join(folder,file), 'data'), compress_type = zipfile.ZIP_DEFLATED)
+         
+        fantasy_zip.close()
+        with open('data.zip', 'rb') as f:
+            await self.bot.get_user(431085681847042048).send(file=discord.File('data.zip'))
+        await ctx.send('봇이 종료됩니다!')
+        os.system('pm2 stop kiwibot')
     
     @commands.command()
     @commands.check(is_owner)

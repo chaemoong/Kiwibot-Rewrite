@@ -6,6 +6,8 @@ import json
 import asyncio
 import datetime
 from discord.utils import get
+import os
+
 original = 10
 
 class Mod(commands.Cog):
@@ -698,5 +700,25 @@ class Mod(commands.Cog):
             em.set_footer(text=f'Request By {author}')
         return await ctx.guild.get_channel(int(log)).send(embed=em)
 
+def check_folder():
+    if not os.path.exists('data/mod'):
+        print('data/mod 풀더생성을 완료하였습니다!')
+        os.makedirs('data/mod')
+
+def check_file():
+    data = {}
+    f = "data/mod/settings.json"
+    g = 'data/mod/warning.json'
+    if not dataIO.is_valid_json(f):
+        print("data/mod/settings.json 파일생성을 완료하였습니다!")
+        dataIO.save_json(f,
+                         data)
+    if not dataIO.is_valid_json(g):
+        print("data/mod/warning.json 파일생성을 완료하였습니다!")
+        dataIO.save_json(g,
+                         data)
+
 def setup(bot):
+    check_folder()
+    check_file()
     bot.add_cog(Mod(bot))

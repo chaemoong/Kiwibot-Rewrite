@@ -111,7 +111,7 @@ class general(commands.Cog):
         else:
             em.set_footer(text=f'Request By {author}')
         await ctx.send(author.mention, embed=em)
-
+        
     @commands.command(no_pm=True, name='melon', description='The melon chart TOP10 command! | 멜론 차트 TOP10 명령어입니다!', aliases=['ㅡ디ㅐㅜ', 'apffhs'])
     async def 멜론(self, ctx):
         """멜론 차트를 뽑는 명령어입니다!"""
@@ -313,5 +313,42 @@ class general(commands.Cog):
             await ctx.send('```\n지원하는 언어:\n한국어 : ko\n영어 : en\n일본어 : ja\n중국어: zh-CN\n```')
 
     
+def check_folder():
+    if not os.path.exists('data/general'):
+        print('data/general 풀더생성을 완료하였습니다!')
+        os.makedirs('data/general')
+
+def check_file():
+    data = {}
+    data2 = {
+    "online": "온라인 | ONLINE",
+    "dnd": "바쁨 | DND",
+    "idle": "자리 비움 | IDLE",
+    "offline": "오프라인 | OFFLINE"
+    }
+    data3 = {
+    "online": "ok",
+    "dnd": "ok",
+    "idle": "ok",
+    "offline": "no"
+    }
+    f = 'data/general/author.json'
+    fff = 'data/general/stat.json'
+    ddd = 'data/general/status.json'
+    if not dataIO.is_valid_json(f):
+        print("author.json 파일생성을 완료하였습니다!")
+        dataIO.save_json(f,
+                         data)
+    elif not dataIO.is_valid_json(fff):
+        print("stat.json 파일생성을 완료하였습니다!")
+        dataIO.save_json(fff,
+                         data2)
+    elif not dataIO.is_valid_json(ddd):
+        print("status.json 파일생성을 완료하였습니다!")
+        dataIO.save_json(ddd,
+                         data3)
+
 def setup(bot):
+    check_folder()
+    check_file()
     bot.add_cog(general(bot))

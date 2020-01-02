@@ -1,6 +1,6 @@
 {
-    "online": "ok",
-    "dnd": "ok",
-    "idle": "ok",
-    "offline": "no"
+    "dnd" : "ok",
+    "idle" : "ok",
+    "offline" : "no",
+    "online" : "ok"
 }

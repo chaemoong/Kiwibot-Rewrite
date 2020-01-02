@@ -1,192 +1,191 @@
 {
-    "userinfo": {
-        "1": "Offline",
-        "2": "Web :globe_with_meridians:",
-        "3": "Mobile :iphone:",
-        "4": "Desktop :desktop:",
-        "game": "Playing {}",
-        "Spotify": "Listening to `{}` of `{}` in Spotify",
-        "5": "Nope",
-        "6": "USERINFO",
-        "7": "USER TAG",
-        "9": "Activity",
-        "10": "Resitered Date",
-        "12": "Client",
-        "13": "Joined Date",
-        "14": "Roles",
-        "15": "It's over the role, so i can't print any more!",
-        "time": "%Y-%m-%d %H:%M (UTC)"
+    "admin_command" : {
+        "1" : "The command is only Administrator command!",
+        "2" : "Check the command with `{0.prefix}help` to you can use command!",
+        "3" : "Don't use Administrator without Administrator permission!"
     },
-    "command_none": {
-        "1": "The command is not a command!",
-        "2": "Check the command with `{0.prefix}help`!",
-        "3": "Please check that you wrote it correctly and use it!"
-    },    
-    "admin_command": {
-        "1": "The command is only Administrator command!",
-        "2": "Check the command with `{0.prefix}help` to you can use command!",
-        "3": "Don't use Administrator without Administrator permission!"
+    "afk" : {
+        "1" : "\uc7a0\uc218 \uc2dc\uc791! | AFK START!",
+        "2" : "{}'s afk started!",
+        "3" : "Please fill out any message to terminate the afk!",
+        "4" : "Reason"
     },
-    "serverinfo": {
-        "time": "%Y-%m-%d %H:%M (UTC)",
-        "1": "None",
-        "2": "Serverinfo",
-        "3": "Server Name",
-        "4": "Server ID",
-        "5": "Region",
-        "6": "Created at",
-        "7": "Server Owner",
-        "8": "It's over the role, so i can't print any more!",
-        "9": "roles",
-        "10": "Member Count (include bot)",
-        "11": "**{} persons**",
-        "none" : "**None (Unrestricted!)**",
-        "low": "**Low (Must have a verified email on their Diacord account!)**",
-        "medium":"**Medium (Must also be registered on Discord for longer than 5 minutes!)**",
-        "high": "**(╯°□°）╯︵ ┻━┻(high) (Must also be a member of  this server for longer than 10 minutes)**",
-        "extreme": "**┻━┻ ﾐヽ(ಠ益ಠ)ノ彡┻━┻(extreme) (Must have a verified phone on their Discord account!)**"
+    "ban" : {
+        "1" : "> Mention user to Ban",
+        "2" : "None",
+        "3" : "> The user banned!\nReason: {}",
+        "4" : "> Either I don't have permission or have a problem with the Discord API.\nPlease add more rights and try again. If not, please try again later because it is API problem."
     },
-    "chinobot": {
-        "1": "Chinobot's PING",
-        "2": "Chinobot's Member Count",
-        "3": " persons",
-        "4": "Chinobot's Server count",
-        "6": "Chinobot's Uptime",
-        "5": " servers"
+    "check" : {
+        "2" : "> Warn command not available for bot!",
+        "3" : "Warning Count",
+        "5" : "{} has 0 warnings",
+        "6" : "{} has {} warnings and the reasons are as follows!",
+        "7" : "Reason"
     },
-    "ban": {
-        "1": "> Mention user to Ban",
-        "2": "None",
-        "3": "> The user banned!\nReason: {}",
-        "4": "> Either I don't have permission or have a problem with the Discord API.\nPlease add more rights and try again. If not, please try again later because it is API problem."
+    "chinobot" : {
+        "1" : "Chinobot's PING",
+        "2" : "Chinobot's Member Count",
+        "3" : " persons",
+        "4" : "Chinobot's Server count",
+        "5" : " servers",
+        "6" : "Chinobot's Uptime"
     },
-    "unban": {
-        "1": "> Wrote user ID to unban",
-        "2": "None",
-        "3": "> The user unbanned!\nReason: {}",
-        "4": "> Either I don't have permission or have a problem with the Discord API.\nPlease add more rights and try again. If not, please try again later because it is API problem.",
-        "5": "> I can't find the User",
-        "6": "This user is not banned"
-
+    "clean" : {
+        "1" : "> Mention the user to clear a warning!",
+        "2" : "> Warn command not available for bot!",
+        "3" : "None",
+        "4" : "> No warning data for that user!",
+        "5" : "Success!",
+        "6" : "{}'s warnings has been initialized to 0!"
     },
-    "hackban": {
-        "1": "> Wrote user ID to hackban",
-        "2": "None",
-        "3": "> The user hackbanned!\nReason: {}",
-        "4": "> Either I don't have permission or have a problem with the Discord API.\nPlease add more rights and try again. If not, please try again later because it is API problem.",
-        "5": "Already This user is banned"
+    "command_none" : {
+        "1" : "The command is not a command!",
+        "2" : "Check the command with `{0.prefix}help`!",
+        "3" : "Please check that you wrote it correctly and use it!"
     },
-    "kick": {
-        "1": "> Mention user to Kick",
-        "2": "None",
-        "3": "> The user Kicked!\nReason: {}",
-        "4": "> Either I don't have permission or have a problem with the Discord API.\nPlease add more rights and try again. If not, please try again later because it is API problem."
+    "end" : {
+        "1" : "{} has finished afk!\n\nReason: {}\n\nWhere have you been!?",
+        "2" : "{} has finished afk!\n\nWhere have you been?",
+        "3" : "\uc7a0\uc218 \ub05d! | AFK END!"
     },
-    "경고": {
-        "1": "You were banned on server {}",
-        "2": "Reason: Ban due to over the warnings",
-        "3": "If you have any complaints, please contact {author}({author.id})",
-        "4": "Occurred Warnings!",
-        "5": "{} ({}) was ban due to over-warnings",
-        "6": "{} received one warning!\n If the user has {} warnings, the user will be Ban!\n reason: {}\n Current number of warnings: {}",
-        "7": "> Please mention users give a warning",
-        "8": "> Warn command not available for bot!",
-        "9": "None",
-        "10": "Ban due to over the warnings"
+    "hackban" : {
+        "1" : "> Wrote user ID to hackban",
+        "2" : "None",
+        "3" : "> The user hackbanned!\nReason: {}",
+        "4" : "> Either I don't have permission or have a problem with the Discord API.\nPlease add more rights and try again. If not, please try again later because it is API problem.",
+        "5" : "Already This user is banned"
     },
-    "unwarn": {
-        "1": "> Mention the user to clear a warning!",
-        "2": "> Warn command not available for bot!",
-        "3": "None",
-        "4": "> No warning data for that user!",
-        "5": "Success!",
-        "6": "I've removed a warning from the user!"
+    "kick" : {
+        "1" : "> Mention user to Kick",
+        "2" : "None",
+        "3" : "> The user Kicked!\nReason: {}",
+        "4" : "> Either I don't have permission or have a problem with the Discord API.\nPlease add more rights and try again. If not, please try again later because it is API problem."
     },
-    "check": {
-        "2": "> Warn command not available for bot!",
-        "3": "Warning Count",
-        "5": "{} has 0 warnings",
-        "6": "{} has {} warnings and the reasons are as follows!",
-        "7": "Reason"
+    "limit" : {
+        "1" : "> The number of warning limits should be more than 1 or so!!",
+        "2" : "You have to write down the warning limits!",
+        "5" : "Success!",
+        "6" : "Warn limit set to {}!"
     },
-    "clean": {
-        "1": "> Mention the user to clear a warning!",
-        "2": "> Warn command not available for bot!",
-        "3": "None",
-        "4": "> No warning data for that user!",
-        "5": "Success!",
-        "6": "{}'s warnings has been initialized to 0!"
+    "log" : {
+        "1" : "None",
+        "2" : "%Y-%m-%d %H:%M (UTC)",
+        "3" : "Time of occurrence: {}",
+        "4" : "USER(ID) | Administrator(ID)",
+        "5" : "Reason",
+        "6" : "Warning Count"
     },
-    "limit":{
-        "1": "> The number of warning limits should be more than 1 or so!!",
-        "2": "You have to write down the warning limits!",
-        "5": "Success!",
-        "6": "Warn limit set to {}!"
-    },
-    "modset": {
-        "admin": {
-            "1": "> Mention the role to setting a adminstrator role!",
-            "2": "Success!",
-            "3": "Role {} has been chosen as administrator role!"
+    "modset" : {
+        "admin" : {
+            "1" : "> Mention the role to setting a adminstrator role!",
+            "2" : "Success!",
+            "3" : "Role {} has been chosen as administrator role!"
         },
-        "mod": {
-            "1": "> Mention the role to setting a moderator role!",
-            "2": "Success!",
-            "3": "Role {} has been chosen as moderator role!"
+        "channel" : {
+            "1" : "> Mention the channel to setting a captcha channel!",
+            "2" : "Success!",
+            "3" : "Channel {} has been chosen as captcha channel!"
         },
-        "log": {
-            "1": "> Mention the channel to setting a log channel!",
-            "2": "Success!",
-            "3": "Channel {} has been chosen as log channel!"
+        "filter" : {
+            "1" : "on",
+            "2" : "off",
+            "3" : "Success!",
+            "4" : "The bad words filter is now Turn {}!"
         },
-        "filter": {
-            "1": "on",
-            "2": "off",
-            "3": "Success!",
-            "4": "The bad words filter is now Turn {}!"
+        "log" : {
+            "1" : "> Mention the channel to setting a log channel!",
+            "2" : "Success!",
+            "3" : "Channel {} has been chosen as log channel!"
         },
-        "role": {
-            "1": "> Mention the role to setting a captcha role!",
-            "2": "Success!",
-            "3": "Role {} has been chosen as captcha role!"
+        "mod" : {
+            "1" : "> Mention the role to setting a moderator role!",
+            "2" : "Success!",
+            "3" : "Role {} has been chosen as moderator role!"
         },
-        "channel": {
-            "1": "> Mention the channel to setting a captcha channel!",
-            "2": "Success!",
-            "3": "Channel {} has been chosen as captcha channel!"
+        "role" : {
+            "1" : "> Mention the role to setting a captcha role!",
+            "2" : "Success!",
+            "3" : "Role {} has been chosen as captcha role!"
         }
     },
-    "log": {
-        "1": "None",
-        "2": "%Y-%m-%d %H:%M (UTC)",
-        "3": "Time of occurrence: {}",
-        "4": "USER(ID) | Administrator(ID)",
-        "5": "Reason",
-        "6": "Warning Count"
+    "serverinfo" : {
+        "1" : "None",
+        "10" : "Member Count (include bot)",
+        "11" : "**{} persons**",
+        "2" : "Serverinfo",
+        "3" : "Server Name",
+        "4" : "Server ID",
+        "5" : "Region",
+        "6" : "Created at",
+        "7" : "Server Owner",
+        "8" : "It's over the role, so i can't print any more!",
+        "9" : "roles",
+        "extreme" : "**\u253b\u2501\u253b \uff90\u30fd(\u0ca0\u76ca\u0ca0)\u30ce\u5f61\u253b\u2501\u253b(extreme) (Must have a verified phone on their Discord account!)**",
+        "high" : "**(\u256f\u00b0\u25a1\u00b0\uff09\u256f\ufe35 \u253b\u2501\u253b(high) (Must also be a member of  this server for longer than 10 minutes)**",
+        "low" : "**Low (Must have a verified email on their Diacord account!)**",
+        "medium" : "**Medium (Must also be registered on Discord for longer than 5 minutes!)**",
+        "none" : "**None (Unrestricted!)**",
+        "time" : "%Y-%m-%d %H:%M (UTC)"
     },
-    "afk": {
-        "1": "잠수 시작! | AFK START!",
-        "2": "{}'s afk started!",
-        "3": "Please fill out any message to terminate the afk!",
-        "4": "Reason"
+    "unban" : {
+        "1" : "> Wrote user ID to unban",
+        "2" : "None",
+        "3" : "> The user unbanned!\nReason: {}",
+        "4" : "> Either I don't have permission or have a problem with the Discord API.\nPlease add more rights and try again. If not, please try again later because it is API problem.",
+        "5" : "> I can't find the User",
+        "6" : "This user is not banned"
     },
-    "end": {
-        "1": "{} has finished afk!\n\nReason: {}\n\nWhere have you been!?",
-        "2": "{} has finished afk!\n\nWhere have you been?",
-        "3": "잠수 끝! | AFK END!"
+    "unwarn" : {
+        "1" : "> Mention the user to clear a warning!",
+        "2" : "> Warn command not available for bot!",
+        "3" : "None",
+        "4" : "> No warning data for that user!",
+        "5" : "Success!",
+        "6" : "I've removed a warning from the user!"
     },
-    "verify": {
-        "1": "> No CAPTCHA {} is set! Ask the administrator!",
-        "channel": "channel",
-        "role": "role",
-        "2": "> Please use the authentication command on the authentication channel!",
-        "3": "> You've already been verified!",
-        "4": "{} error has occurred! Error content: {}",
-        "5": "Please watch the DM!",
-        "6": "Welcome to {}!",
-        "7": "This feature is designed to protect the server and prevent the self-bot from becoming a Captcha function!\nPlease write down the code on the image.!",
-        "8": "> Cancel the Captcha!",
-        "9": "> Complete!",
-        "10": "The CAPTCHA key is invalid! Please try again!"
+    "userinfo" : {
+        "1" : "Offline",
+        "10" : "Resitered Date",
+        "12" : "Client",
+        "13" : "Joined Date",
+        "14" : "Roles",
+        "15" : "It's over the role, so i can't print any more!",
+        "2" : "Web :globe_with_meridians:",
+        "3" : "Mobile :iphone:",
+        "4" : "Desktop :desktop:",
+        "5" : "Nope",
+        "6" : "USERINFO",
+        "7" : "USER TAG",
+        "9" : "Activity",
+        "Spotify" : "Listening to `{}` of `{}` in Spotify",
+        "game" : "Playing {}",
+        "time" : "%Y-%m-%d %H:%M (UTC)"
+    },
+    "verify" : {
+        "1" : "> No CAPTCHA {} is set! Ask the administrator!",
+        "10" : "The CAPTCHA key is invalid! Please try again!",
+        "2" : "> Please use the authentication command on the authentication channel!",
+        "3" : "> You've already been verified!",
+        "4" : "{} error has occurred! Error content: {}",
+        "5" : "Please watch the DM!",
+        "6" : "Welcome to {}!",
+        "7" : "This feature is designed to protect the server and prevent the self-bot from becoming a Captcha function!\nPlease write down the code on the image.!",
+        "8" : "> Cancel the Captcha!",
+        "9" : "> Complete!",
+        "channel" : "channel",
+        "role" : "role"
+    },
+    "\uacbd\uace0" : {
+        "1" : "You were banned on server {}",
+        "10" : "Ban due to over the warnings",
+        "2" : "Reason: Ban due to over the warnings",
+        "3" : "If you have any complaints, please contact {author}({author.id})",
+        "4" : "Occurred Warnings!",
+        "5" : "{} ({}) was ban due to over-warnings",
+        "6" : "{} received one warning!\n If the user has {} warnings, the user will be Ban!\n reason: {}\n Current number of warnings: {}",
+        "7" : "> Please mention users give a warning",
+        "8" : "> Warn command not available for bot!",
+        "9" : "None"
     }
 }

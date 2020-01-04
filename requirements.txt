@@ -3,6 +3,5 @@ git+git://github.com/Rapptz/discord.py.git#egg=discord.py[voice]
 pytz
 aiohttp
 bs4
-enum
 lavalink
 zipfile

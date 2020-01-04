@@ -1,6 +1,5 @@
 pip
 git+git://github.com/Rapptz/discord.py.git#egg=discord.py[voice]
-random
 pytz
 sys
 time

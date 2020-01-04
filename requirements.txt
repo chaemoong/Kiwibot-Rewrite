@@ -1,0 +1,13 @@
+os
+pip
+git+git://github.com/Rapptz/discord.py.git#egg=discord.py[voice]
+random
+pytz
+subprocess
+sys
+time
+aiohttp
+bs4
+enum
+lavalink
+zipfile

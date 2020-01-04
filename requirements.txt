@@ -1,7 +1,6 @@
 pip
 git+git://github.com/Rapptz/discord.py.git#egg=discord.py[voice]
 pytz
-time
 aiohttp
 bs4
 enum

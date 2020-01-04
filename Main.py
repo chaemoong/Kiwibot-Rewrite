@@ -13,6 +13,7 @@ from discord.ext.commands import AutoShardedBot as a
 from os import listdir
 from os.path import isfile, join
 import traceback
+from cogs.utils.dataIO import dataIO
 default_prefixes = ['c!']
 
 async def determine_prefix(bot, message):

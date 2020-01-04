@@ -13,8 +13,22 @@ from discord.ext.commands import AutoShardedBot as a
 from os import listdir
 from os.path import isfile, join
 import traceback
-bot = a(command_prefix='c!')
+default_prefixes = ['c!']
 
+async def determine_prefix(bot, message):
+    custom_prefixes = dataIO.load_json('prefix.json')
+    guild = message.guild
+    #Only allow custom prefixs in guild
+    if guild:
+        try:
+            asdf = custom_prefixes.get(str(guild.id))['prefix']
+        except:
+            asdf = default_prefixes
+        return asdf
+    else:
+        return default_prefixes
+
+bot = a(command_prefix=determine_prefix)
 
 
 @bot.event

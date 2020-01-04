@@ -20,6 +20,8 @@ class Mod(commands.Cog):
         self.setting = 'data/mod/settings.json'
         self.ko = 'data/language/ko.json'
         self.en = 'data/language/en.json'
+        self.asdfasdf = 'prefix.json'
+        self.prefix = dataIO.load_json(self.asdfasdf)
 
 
     async def owner(ctx):
@@ -390,6 +392,16 @@ class Mod(commands.Cog):
             em.set_footer(text=f'Request By {author}')
         em.add_field(name=data['5'], value=data['6'].format(limit))
         return await ctx.send(embed=em)
+    
+    @commands.command(no_pm=True)
+    @commands.check(administrator)
+    async def setprefix(self, ctx, *, prefixes=None):
+        if prefixes == None:
+            return await ctx.send('접두사를 적어주세요! | Write Down Prefix')
+        self.prefix[str(ctx.guild.id)] = {}
+        self.prefix[str(ctx.guild.id)].update({"prefix": prefixes or 'c!'})
+        await ctx.send("Prefixes set!")
+        dataIO.save_json(self.asdfasdf, self.prefix)
 
     @commands.group(no_pm=True, name='modset', description='Commands to set administrator functions! | 관리자 기능들을 설정하는 명령어입니다!', aliases=['ㅡㅐㅇㄴㄷㅅ', '관리자기능설정', 'rhksflwkrlsmdtjfwjd'])
     @commands.check(administrator)

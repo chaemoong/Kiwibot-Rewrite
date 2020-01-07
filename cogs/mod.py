@@ -233,8 +233,9 @@ class Mod(commands.Cog):
         else:
             em.set_footer(text=f'Request By {author}')
         if all_warn == count or all_warn < count:
-            em2 = discord.Embed(colour=author.colour)
-            em2.add_field(name=data['1'].format(server.name), value=data['2'])
+            asdf = self.data2[f'{server.id}'][f'{user.id}'].get('count')
+            em2 = discord.Embed(colour=author.colour, title=server.name)
+            em2.add_field(name='Administrator', value='ㅁㄴㅇㄹ')
             em2.set_footer(text=data['3'].format(author, author.id))
             await user.send(embed=em2)
             await server.ban(user, reason=data['10'])

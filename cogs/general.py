@@ -32,6 +32,12 @@ class general(commands.Cog):
         self.en = 'data/language/en.json'
 
 
+    @commands.command(no_pm=True, name='돈', description='The money command! | 돈 명령어입니다!', aliases=['money', 'ㅡㅐㅜ됴', 'ehs'])
+    async def 돈(self, ctx, user:discord.Member=None):
+        author = ctx.author
+        if user is None:
+            user == author
+
     @commands.command(no_pm=True, name='userinfo', description='The userinfo command! | 유저정보 명령어입니다!', aliases=['유저정보', 'ㅕㄴㄷ갸ㅜ래', 'dbwjwjdqh'])
     async def userinfo(self, ctx, user:discord.Member=None):
         author = ctx.author

@@ -4,13 +4,11 @@ import traceback
 import json
 from discord.utils import get
 from cogs.utils.dataIO import dataIO
-from cogs.utils import tunabot_embed
 import asyncio
 import random
 import os
 
 class Blacklisted(commands.CheckFailure): pass
-
 
 class error(commands.Cog):
     def __init__(self, bot):
@@ -18,6 +16,14 @@ class error(commands.Cog):
         self.setting = 'data/mod/settings.json'
         self.ko = 'data/language/ko.json'
         self.en = 'data/language/en.json'
+        self.welcome = 'data/mod/welcome.json'
+
+    def __global_check_once(self, ctx):
+        blacklist = dataIO.load_json('blacklist.json')
+        if str(ctx.author.id) in blacklist:
+            raise Blacklisted()
+        else:
+            return True
    
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
@@ -64,6 +70,28 @@ class error(commands.Cog):
     async def on_message(self, message):
         if message.author.bot == True:
             return
+    
+    @commands.Cog.listener()
+    async def on_member_join(self, member):
+        data = dataIO.load_json(self.welcome)
+        a = data.get(str(member.guild.id))
+        if a == None:
+            return
+        if a.get('message1') == None:     
+            await self.bot.get_channel(a.get('channel')).send(f'{member.mention}님! {member.guild}서버에 오신것을 환영합니다!')
+        else:
+            await self.bot.get_channel(a.get('channel')).send(a.get('message1'))
+
+    @commands.Cog.listener()
+    async def on_member_remove(self, member):
+        data = dataIO.load_json(self.welcome)
+        a = data.get(str(member.guild.id))
+        if a == None:
+            return
+        if a.get('message2') == None:     
+            await self.bot.get_channel(a.get('channel')).send(f'{member}님아 {member.guild}서버에서 나가셨습니다')
+        else:
+            await self.bot.get_channel(a.get('channel')).send(a.get('message2'))
 
 def check_folder():
     if not os.path.exists('data/language'):
@@ -454,9 +482,10 @@ def check_file():
             "10": "> 캡챠키가 올바르지 않습니다! 다시 시도 해주세요!"
         }
     }
-
+    blacklist = {'blacklist': []}
     f = "data/language/en.json"
     fg = "data/language/ko.json"
+    thinking = 'blacklist.json'
     if not dataIO.is_valid_json(f):
         print("data/mod/settings.json 파일생성을 완료하였습니다!")
         dataIO.save_json(f,
@@ -465,6 +494,10 @@ def check_file():
         print("error.json 파일생성을 완료하였습니다!")
         dataIO.save_json(fg,
                          data2)
+    if not dataIO.is_valid_json(thinking):
+        print("error.json 파일생성을 완료하였습니다!")
+        dataIO.save_json(thinking,
+                         blacklist)
 
 def setup(bot):
     check_folder()

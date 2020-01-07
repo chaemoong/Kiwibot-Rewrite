@@ -22,7 +22,7 @@ class Mod(commands.Cog):
         self.en = 'data/language/en.json'
         self.asdfasdf = 'prefix.json'
         self.prefix = dataIO.load_json(self.asdfasdf)
-
+        self.welcome = 'data/mod/welcome.json'
 
     async def owner(ctx):
         return ctx.author.id == 431085681847042048
@@ -187,13 +187,15 @@ class Mod(commands.Cog):
         asdf = dataIO.load_json(self.setting)
         try:
             if asdf[f'{server.id}']['language'] == 'ko':
-                data = dataIO.load_json(self.ko)[ctx.command.name]
+                data = dataIO.load_json(self.ko)['경고']
             else:
-                data = dataIO.load_json(self.en)[ctx.command.name]
+                data = dataIO.load_json(self.en)['경고']
         except:
-            data = dataIO.load_json(self.en)[ctx.command.name]
+            data = dataIO.load_json(self.en)['경고']
         if user == None:
             return await ctx.send(data['7'])
+        if user == author:
+            return await ctx.send(data['me'])
         if user.bot:
             return await ctx.send(data['8'])
         if reason == None:
@@ -406,6 +408,7 @@ class Mod(commands.Cog):
     @commands.group(no_pm=True, name='modset', description='Commands to set administrator functions! | 관리자 기능들을 설정하는 명령어입니다!', aliases=['ㅡㅐㅇㄴㄷㅅ', '관리자기능설정', 'rhksflwkrlsmdtjfwjd'])
     @commands.check(administrator)
     async def modset(self, ctx):
+        author =  ctx.author
         if ctx.invoked_subcommand is None:
             server = ctx.guild
             try:
@@ -466,7 +469,19 @@ class Mod(commands.Cog):
             if log == None: log = '없음 | None'
             if rold == None: rold = '없음 | None'
             if d == False: d = '꺼짐'
-            await ctx.send(f"```fix\n> 관리자 역할 | Admin Role: {admin}\n> 부관리자 역할  | Moderator Role: {mod}\n> 로그 | Log Channel: {log}\n> 비속어 필터 | Bad Words Filtering: {d}\n인증 역할: {rold}```\n")
+            asdfasdf = self.bot.get_cog('Music').setting.get(str(server.id)).get('volume')
+            if asdfasdf == None:
+                volume = '100'
+            else:
+                volume = asdfasdf
+            em = discord.Embed(colour=ctx.author.colour)
+            em.add_field(name=':passport_control: 역할 관련 설정', value=f'```fix\n> 관리자 역할 | Admin Role: {admin}\n> 부관리자 역할  | Moderator Role: {mod}\n> 인증 역할 | Captcha Role: {rold}```')
+            em.add_field(name=':musical_note: 뮤직 기능 설정', value=f'볼륨: **{volume}%**\nDJ 역할: **개발중**')
+            if author.avatar_url:
+                em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
+            else:
+                em.set_footer(text=f'Request By {author}')
+            await ctx.send(embed=em)
             return await ctx.send(f'```fix\n> 관리자 역할 설정 | Settings to Administrator Role: {ctx.prefix}{ctx.command} admin [역할 | Role]\n> 부관리자 역할 설정 | Settings to Moderator Role: {ctx.prefix}{ctx.command} mod [역할 | Role]\n> 로그 설정 | Settings to Log Channel: {ctx.prefix}{ctx.command} log [채널 | Channel]\nSettings to Captcha role: {ctx.prefix}{ctx.command} role [역할 멘션 혹은 ID | Role Mention Or ID]```')
 
     @modset.command(pass_context=True)
@@ -721,6 +736,7 @@ def check_file():
     data = {}
     f = "data/mod/settings.json"
     g = 'data/mod/warning.json'
+    h = 'data/mod/welcome.json'
     if not dataIO.is_valid_json(f):
         print("data/mod/settings.json 파일생성을 완료하였습니다!")
         dataIO.save_json(f,
@@ -729,6 +745,11 @@ def check_file():
         print("data/mod/warning.json 파일생성을 완료하였습니다!")
         dataIO.save_json(g,
                          data)
+    if not dataIO.is_valid_json(h):
+        print("data/mod/welcome.json 파일생성을 완료하였습니다!")
+        dataIO.save_json(h,
+                         data)
+
 
 def setup(bot):
     check_folder()

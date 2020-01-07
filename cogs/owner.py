@@ -77,7 +77,6 @@ class owner(commands.Cog):
         for folder, subfolders, files in os.walk('data'):      
             for file in files:
                 fantasy_zip.write(os.path.join(folder, file), os.path.relpath(os.path.join(folder,file), 'data'), compress_type = zipfile.ZIP_DEFLATED)
-         
         fantasy_zip.close()
         with open('data.zip', 'rb') as f:
             await self.bot.get_user(431085681847042048).send(file=discord.File('data.zip'))
@@ -116,6 +115,8 @@ class owner(commands.Cog):
                 self.bot.load_extension('cogs.' + cogs)
             await ctx.send('그 기능이 리로드 되었습니다!')
         except discord.ext.commands.errors.ExtensionNotFound:
+            await ctx.send('그 기능을 찾을수 없습니다!')
+        except discord.ext.commands.errors.CommandInvokeError:
             await ctx.send('그 기능을 찾을수 없습니다!')
         except Exception as e:
             print(e)

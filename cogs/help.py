@@ -34,7 +34,7 @@ class Embed(commands.Cog):
                 cog_commands = self.bot.get_cog(cog).get_commands()
                 commands_list = ''
                 for comm in cog_commands:
-                    commands_list += f'`{comm.name}`, '                
+                    commands_list += f'`{comm.name}`, '             
                 if not cog == 'error':
                     help_embed.add_field(
                         name=cog,

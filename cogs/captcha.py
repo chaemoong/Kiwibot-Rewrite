@@ -21,7 +21,6 @@ class captcha(commands.Cog):
     @commands.command(no_pm=True, name='verify', description='The verify command! | 인증 명령어입니다!', aliases=['인증', 'ㅍㄷ갸료', 'dlswmd'])
     async def verify(self, ctx):
         """인증 명령어입니다!"""
-        channel = ctx.channel
         server = ctx.guild
         author = ctx.author
         log = dataIO.load_json('data/mod/settings.json')

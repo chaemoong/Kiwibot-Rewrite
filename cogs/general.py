@@ -27,16 +27,83 @@ class general(commands.Cog):
         self.client = dataIO.load_json('data/general/status.json')
         self.author = dataIO.load_json('data/general/author.json')
         self.data = dataIO.load_json('data/general/stat.json')
+        self.asdf = 'data/general/money.json'
         self.setting = 'data/mod/settings.json'
         self.ko = 'data/language/ko.json'
         self.en = 'data/language/en.json'
+        self.choice = [True, False]
 
 
     @commands.command(no_pm=True, name='돈', description='The money command! | 돈 명령어입니다!', aliases=['money', 'ㅡㅐㅜ됴', 'ehs'])
     async def 돈(self, ctx, user:discord.Member=None):
         author = ctx.author
         if user is None:
-            user == author
+            user = author
+        asdf = dataIO.load_json(self.asdf)
+        try:
+            a = asdf.get(str(user.id)).get('money')
+        except:
+            a = '0'
+        em = discord.Embed(colour=author.colour, title='돈', description=f'\n\n`{user.name}`님의 돈은 {a} 키위 있습니다!')
+        if author.avatar_url:
+            em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
+        else:
+            em.set_footer(text=f'Request By {author}')
+        return await ctx.send(author.mention, embed=em)
+
+    @commands.command(no_pm=True, name='돈받기', description='The money taking command! | 돈받는 명령어입니다!', aliases=['ehsqkerl'])
+    @commands.cooldown(1, 3600, commands.BucketType.user)
+    async def 돈받기(self, ctx):
+        author = ctx.author
+        asdf = dataIO.load_json(self.asdf)
+        a = asdf.get(str(author.id))
+        if a == None:
+            asdf[str(author.id)] = {}
+        if asdf[str(author.id)].get('money') == None:
+            asdf[str(author.id)].update({'money': 0})
+        bb = asdf[str(author.id)].get('money')
+        c = bb + 2000
+        asdf[str(author.id)].update({'money': c})
+        dataIO.save_json(self.asdf, asdf)
+        await ctx.send(f'당신의 돈은 {asdf[str(author.id)]["money"]} 키위가 되었습니다!')
+    
+    @commands.command(no_pm=True, name='올인', description='The allin command! | 올인 명령어입니다!', aliases=['dhfdls', 'allin', '미ㅣㅑㅜ'])
+    async def 올인(self, ctx):
+        author = ctx.author
+        asdf = dataIO.load_json(self.asdf)
+        try:
+            a = asdf.get(str(author.id))
+            b = a.get('money')
+        except:
+            return await ctx.send(f'> 당신은 돈이 없습니다! `{ctx.prefix}돈받기` 명령어로 돈을 받아보세요!')
+        if b == 0:
+            return await ctx.send(f'> 당신은 돈이 없습니다! `{ctx.prefix}돈받기` 명령어로 돈을 받아보세요!')
+        dfdf = await ctx.send('> 정말 올인을 하시겠습니까?\n> 올인을 하시려면 ⭕ 이모지에 반응해주세요!')
+        await dfdf.add_reaction('⭕')
+        def check(reaction, user):
+            if user == ctx.author and str(reaction.emoji) == "⭕": 
+                return True 
+        try:
+            await self.bot.wait_for('reaction_add', timeout=30.0, check=check)
+        except asyncio.TimeoutError:
+            return await dfdf.edit(content='> 반응을 안해주셔서 취소했어요!')
+        choice = random.choice(self.choice)
+        if choice == True:
+            chaemoong = '성공! '
+            c = b * 2
+        elif choice == False:
+            chaemoong = '실패'
+            c = b * 0
+        a.update({'money': c})
+        dataIO.save_json(self.asdf, asdf)
+        em = discord.Embed(colour=author.colour)
+        em.add_field(name=f'올인을 {chaemoong}하셨습니다', value=f'당신의 돈은 {c} 키위가 됩니다')
+        if author.avatar_url:
+            em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
+        else:
+            em.set_footer(text=f'Request By {author}')
+        return await dfdf.edit(content=author.mention, embed=em)
+
 
     @commands.command(no_pm=True, name='userinfo', description='The userinfo command! | 유저정보 명령어입니다!', aliases=['유저정보', 'ㅕㄴㄷ갸ㅜ래', 'dbwjwjdqh'])
     async def userinfo(self, ctx, user:discord.Member=None):
@@ -122,9 +189,9 @@ class general(commands.Cog):
     async def 멜론(self, ctx):
         """멜론 차트를 뽑는 명령어입니다!"""
         server = ctx.guild.id
-        yee = dataIO.load_json(self.setting)
+        asdf = dataIO.load_json(self.setting)
         try:
-            if yee[f'{server}']['language'] == 'ko':
+            if asdf[f'{server}']['language'] == 'ko':
                 a = '멜론 차트'
             else:
                 a = 'Melon Chart'
@@ -181,10 +248,10 @@ class general(commands.Cog):
     @commands.command(no_pm=True, name='serverinfo', description='The serverinfo command! | 서버정보 명령어입니다!', aliases=['서버정보', 'ㄴㄷㄱㅍㄷ갸ㅜ래', 'tjqjwjdqh'])
     async def serverinfo(self, ctx):
         author = ctx.author
-        server = ctx.author.guild
+        server = ctx.guild
         asdf = dataIO.load_json(self.setting)
         try:
-            if asdf[f'{server}']['language'] == 'ko':
+            if asdf[f'{server.id}']['language'] == 'ko':
                 data = dataIO.load_json(self.ko)[ctx.command.name]
             else:
                 data = dataIO.load_json(self.en)[ctx.command.name]
@@ -341,6 +408,7 @@ def check_file():
     f = 'data/general/author.json'
     fff = 'data/general/stat.json'
     ddd = 'data/general/status.json'
+    asdf = 'data/general/money.json'
     if not dataIO.is_valid_json(f):
         print("author.json 파일생성을 완료하였습니다!")
         dataIO.save_json(f,
@@ -353,6 +421,10 @@ def check_file():
         print("status.json 파일생성을 완료하였습니다!")
         dataIO.save_json(ddd,
                          data3)
+    elif not dataIO.is_valid_json(asdf):
+        print("status.json 파일생성을 완료하였습니다!")
+        dataIO.save_json(asdf,
+                         data)
 
 def setup(bot):
     check_folder()

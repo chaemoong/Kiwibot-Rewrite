@@ -7,6 +7,8 @@ from cogs.utils.dataIO import dataIO
 import asyncio
 import random
 import os
+import datetime
+import time
 
 class Blacklisted(commands.CheckFailure): pass
 
@@ -65,6 +67,12 @@ class error(commands.Cog):
             em.add_field(name=lan['1'], value=lan['2'].format(ctx))
             em.set_footer(text=lan['3'])
             return await ctx.send(embed=em)
+        elif isinstance(error, commands.CommandOnCooldown):
+            asdf = time.strftime("%M", time.gmtime(error.retry_after))
+            asss = time.strftime("%S", time.gmtime(error.retry_after))
+            em = discord.Embed(colour=ctx.author.colour)
+            em.add_field(name='쿨타임 발생!', value=f'이 명령어 에는 쿨타임이 걸려있습니다!\n`{asdf}분 {asss}초` 후에 다시 시도 해주세요!')
+            return await ctx.send(ctx.author.mention, embed=em)
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -331,6 +339,7 @@ def check_file():
             "6": "서버 생성일",
             "7": "서버 주인",
             "8": "역할이 너무 많이 출력 할 수 없습니다!",
+            "9": "역할",
             "none" : "**없음 (아무 제한도 없어요!)**",
             "low": "**낮음 (자신의 디스코드 계정이 이메일 인증을 받은적이 있어야 해요!)**",
             "medium":"**중간 (자신의 디스코드 계정이 이메일 인증을 받은적이 있어야 하고 가입한지 5분이 지나야 합니다!)**",

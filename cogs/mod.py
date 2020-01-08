@@ -54,29 +54,46 @@ class Mod(commands.Cog):
 
     @commands.command(no_pm=True, name='language', description='The language setting command! | 언어를 선택하는 명령어입니다!', aliases=['ㅣ무혐ㅎㄷ', '언어', 'djsdj'])
     @commands.check(administrator)
-    async def language(self, ctx, language=None):
+    async def language(self, ctx):
         """봇의 언어를 설정하는 명령어 입니다!"""
         server = ctx.guild
-        if language == None:
-            return await self.language_setting(ctx)
-        if language == 'ko_kr' or language == '한글' or language == 'ko':
-            try:
-                self.data[f'{server.id}'].update({"language": "ko"})
-            except KeyError:
-                self.data[f'{server.id}'] = {}
-                self.data[f'{server.id}'].update({"language": "ko"})
-            dataIO.save_json(self.ang, self.data)
-            return await ctx.send('> 언어가 성공적으로 `한글` 로 설정 되었습니다! | Success to language has been set!')
-        if language == 'en' or language == '영어' or language == 'en':
-            try:
-                self.data[f'{server.id}'].update({"language": "en"})
-            except KeyError:
-                self.data[f'{server.id}'] = {}
-                self.data[f'{server.id}'].update({"language": "en"})
-            dataIO.save_json(self.ang, self.data)
-            return await ctx.send('> 언어가 성공적으로 `영어` 로 설정 되었습니다! | Success to language has been set!')
+        author = ctx.author
+        em = discord.Embed(colour=author.colour, title='언어 설정 | LANGUAGE SETTINGS', timestamp=datetime.datetime.utcnow())
+        em.add_field(name='사용 가능한 언어 | AVAILABLE LANGUAGES', value=':arrow_right: 한국어 :flag_kr:, English :flag_us: :arrow_left:')
+        if author.avatar_url:
+            em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
         else:
-            return await self.language_setting(ctx)
+            em.set_footer(text=f'Request By {author}')
+        a = await ctx.send(embed=em)
+        await a.add_reaction('🇰🇷')
+        await a.add_reaction('🇺🇸')
+        asdf = ['🇰🇷', '🇺🇸']
+        def check(reaction, user):
+            if user == ctx.author and str(reaction.emoji) in asdf: 
+                return True 
+        try:
+            reaction, user = await self.bot.wait_for('reaction_add', timeout=30.0, check=check)
+        except asyncio.TimeoutError:
+            return await a.edit(content='> 정상적으로 취소되었습니다!')
+        if True:
+            if str(reaction.emoji) == '🇰🇷':
+                try:
+                    self.data[f'{server.id}'].update({"language": "ko"})
+                except KeyError:
+                    self.data[f'{server.id}'] = {}
+                    self.data[f'{server.id}'].update({"language": "ko"})
+                dataIO.save_json(self.ang, self.data)
+                return await ctx.send('> 언어가 성공적으로 `한글` 로 설정 되었습니다!')
+            if str(reaction.emoji) == '🇺🇸':
+                try:
+                    self.data[f'{server.id}'].update({"language": "en"})
+                except KeyError:
+                    self.data[f'{server.id}'] = {}
+                    self.data[f'{server.id}'].update({"language": "en"})
+                dataIO.save_json(self.ang, self.data)
+                return await ctx.send('> Language has been successfully set as `English`')
+        else:
+            return await ctx.send("> 다른 이모지를 추가하지 마세요! | Please don't add another emoji")
             
     @commands.command(no_pm=True, name='ban', description='It is a user-banning command. | 유저를 벤하는 명령어입니다!', aliases=['ㅠ무', '벤', 'qps', '차단', 'ckeks'])
     @commands.check(administrator)
@@ -135,9 +152,9 @@ class Mod(commands.Cog):
             await ctx.send(data['6'])
             return
         try:
-            await user.ban(reason=reason)
+            await user.unban(reason=reason)
             await self.logger(ctx, action='언벤 | UNBAN', user=user, reason=reason)   
-            return await ctx.send(data['3'].format(reason))
+            return await ctx.send('> 완료했습니다!')
         except:
             await ctx.send(data['4'])
             return     
@@ -201,7 +218,7 @@ class Mod(commands.Cog):
         if reason == None:
             reason = data['9']
         try:
-            if 'all' in self.data2[f'{server.id}']: pass   
+            if not 'all' in self.data2[f'{server.id}']: self.data2[f'{server.id}'].update({"all": original})   
         except KeyError:
             try:
                 self.data2[f'{server.id}'].update({"all": original})
@@ -209,8 +226,9 @@ class Mod(commands.Cog):
                 self.data2[f'{server.id}'] = {}
                 self.data2[f'{server.id}'].update({"all": original})
         try:
-            if 'count' in self.data2[f'{server.id}'][f'{user.id}']:
-                pass
+            if not 'count' in self.data2[f'{server.id}'][f'{user.id}']:
+                self.data2[f'{server.id}'][f'{user.id}'] = {}
+                self.data2[f'{server.id}'][f'{user.id}'].update({"count": 0})
         except KeyError:
             try:
                 self.data2[f'{server.id}'][f'{user.id}'].update({"count": 0})
@@ -227,24 +245,41 @@ class Mod(commands.Cog):
         count += 1
         self.data2[f'{server.id}'][f'{user.id}'].update({"count": int(count)})
         dataIO.save_json(self.warn, self.data2)
-        em = discord.Embed(colour=author.colour)
+        em = discord.Embed(colour=author.colour, title=server.name, timestamp=datetime.datetime.utcnow())
+        dkdk = self.data2[f'{server.id}']["all"]
         if author.avatar_url:
             em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
         else:
             em.set_footer(text=f'Request By {author}')
         if all_warn == count or all_warn < count:
             asdf = self.data2[f'{server.id}'][f'{user.id}'].get('count')
-            em2 = discord.Embed(colour=author.colour, title=server.name)
-            em2.add_field(name='Administrator', value='ㅁㄴㅇㄹ')
-            em2.set_footer(text=data['3'].format(author, author.id))
-            await user.send(embed=em2)
-            await server.ban(user, reason=data['10'])
+            em2 = discord.Embed(colour=author.colour, title=server.name, timestamp=datetime.datetime.utcnow())
+            em2.add_field(name='Administrator', value=author)
+            em2.add_field(name='USER', value=user, inline=False)
+            em2.add_field(name='사유', value='경고 초과로 인한 벤', inline=False)
+            em2.add_field(name='경고 갯수', value=f'{asdf} / {dkdk}', inline=False)
+            if author.avatar_url:
+                em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
+            else:
+                em.set_footer(text=f'Request By {author}')
+            try:
+                await server.ban(user, reason=data['10'])
+                await user.send(embed=em2)
+            except:
+                self.data2[f'{server.id}'][f'{user.id}']["reason"].append(f'{count} ' + reason)
+                dataIO.save_json(self.warn, self.data2)
+                return await ctx.send('권한이 없거나 그 유저가 봇보다 권한이 높습니다!\n봇에 권한을 추가 해주시거나 권한을 높여주세요!')
             em.add_field(name=data['4'], value=data['5'].format(user.mention, user.id))
             self.data2[f'{server.id}'][f'{user.id}'].update({"count": 0})
             self.data2[f'{server.id}'][f'{user.id}']["reason"] = []
             dataIO.save_json(self.warn, self.data2)
-        else:          
-            em.add_field(name=data['4'], value=data['6'].format(user.mention, all_warn, reason, count), inline=False)
+        else:
+            really = self.data2[f'{server.id}'][f'{user.id}'].get('count')
+            em.add_field(name='Administrator', value=author)
+            em.add_field(name='USER', value=user, inline=False)
+            em.add_field(name='사유', value=reason, inline=False)
+            em.add_field(name='경고 갯수 / 경고 제한', value=f'{really} / {dkdk}', inline=False)
+            em.set_thumbnail(url=server.icon_url)
             self.data2[f'{server.id}'][f'{user.id}']["reason"].append(f'{count} ' + reason)
             dataIO.save_json(self.warn, self.data2)
         await ctx.send(embed=em)
@@ -346,12 +381,9 @@ class Mod(commands.Cog):
             if count == 0: return await ctx.send(data['4'])
         except KeyError:
             return await ctx.send(data['4'])
-        a = self.data2[f'{server.id}'][f'{user.id}']["reason"]
         em = discord.Embed(colour=user.colour)
         em.add_field(name=data['5'], value=data['6'].format(user.mention))
-        for b in range(count):
-            a.pop()
-        self.data2[f'{server.id}'][f'{user.id}'].update({"count": 0})
+        self.data2[f'{server.id}'][f'{user.id}'] = {}
         dataIO.save_json(self.warn, self.data2)
         if author.avatar_url:
             em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
@@ -379,7 +411,6 @@ class Mod(commands.Cog):
         server = ctx.guild
         try:
             if limit < 1: return await ctx.send(data['1'])
-            else: return await ctx.send(data['1'])
         except:
             return await ctx.send(data['1'])        
         try:
@@ -476,7 +507,7 @@ class Mod(commands.Cog):
             else:
                 volume = asdfasdf
             em = discord.Embed(colour=ctx.author.colour)
-            em.add_field(name=':passport_control: 역할 관련 설정', value=f'```fix\n> 관리자 역할 | Admin Role: {admin}\n> 부관리자 역할  | Moderator Role: {mod}\n> 인증 역할 | Captcha Role: {rold}```')
+            em.add_field(name=':passport_control: 역할 관련 설정', value=f'관리자 역할 | Admin Role: {admin}\n부관리자 역할  | Moderator Role: {mod}\n인증 역할 | Captcha Role: {rold}```')
             em.add_field(name=':musical_note: 뮤직 기능 설정', value=f'볼륨: **{volume}%**\nDJ 역할: **개발중**')
             if author.avatar_url:
                 em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)

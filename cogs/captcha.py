@@ -83,12 +83,15 @@ class captcha(commands.Cog):
             wait = await self.bot.wait_for('message', timeout=30.0, check=check)
         except asyncio.TimeoutError:
             return await author.send(data['8'])
-        url = "https://openapi.naver.com/v1/captcha/nkey?code=" + code + "&key=" + key + "&value=" + wait.content
-        request = urllib.request.Request(url)
-        request.add_header("X-Naver-Client-Id",client_id)
-        request.add_header("X-Naver-Client-Secret",client_secret)
-        response = urllib.request.urlopen(request)
-        rescode = response.getcode()
+        try:
+            url = "https://openapi.naver.com/v1/captcha/nkey?code=" + code + "&key=" + key + "&value=" + wait.content
+            request = urllib.request.Request(url)
+            request.add_header("X-Naver-Client-Id",client_id)
+            request.add_header("X-Naver-Client-Secret",client_secret)
+            response = urllib.request.urlopen(request)
+            rescode = response.getcode()
+        except:
+            return await author.send(data['10'])
         if(rescode==200):
             response_body = response.read()
             thinking = response_body.decode('utf-8')
@@ -102,7 +105,7 @@ class captcha(commands.Cog):
             try:
                 return await author.add_roles(get(server.roles, id=roldeee))
             except:
-                return await ctx.send('> No Permission')  
+                return await ctx.send('> No Permission or No Find the Role Please contact to Administrator')  
         else:
             return await author.send(data['10'])
                 

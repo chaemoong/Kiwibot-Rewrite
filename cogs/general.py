@@ -62,10 +62,15 @@ class general(commands.Cog):
         if asdf[str(author.id)].get('money') == None:
             asdf[str(author.id)].update({'money': 0})
         bb = asdf[str(author.id)].get('money')
-        c = bb + 2000
+        choice = random.choice(self.choice)
+        if choice == True:
+            c = bb + 3000
+            await ctx.send(f'> 당신의 돈은 제가 기부니가 좋아져서 2000키위 에서 1000키위 더 얹어서 총 {asdf[str(author.id)]["money"]} 키위가 되었습니다!')
+        elif choice == False:
+            c = bb + 2000
+            await ctx.send(f'> 당신의 돈은 제가 기부니가 엄청 좋아지지 않아서 그냥 2000키위만 드려서 총 {asdf[str(author.id)]["money"]} 키위가 되었습니다!')
         asdf[str(author.id)].update({'money': c})
         dataIO.save_json(self.asdf, asdf)
-        await ctx.send(f'당신의 돈은 {asdf[str(author.id)]["money"]} 키위가 되었습니다!')
     
     @commands.command(no_pm=True, name='올인', description='The allin command! | 올인 명령어입니다!', aliases=['dhfdls', 'allin', '미ㅣㅑㅜ'])
     async def 올인(self, ctx):
@@ -78,7 +83,7 @@ class general(commands.Cog):
             return await ctx.send(f'> 당신은 돈이 없습니다! `{ctx.prefix}돈받기` 명령어로 돈을 받아보세요!')
         if b == 0:
             return await ctx.send(f'> 당신은 돈이 없습니다! `{ctx.prefix}돈받기` 명령어로 돈을 받아보세요!')
-        dfdf = await ctx.send('> 정말 올인을 하시겠습니까?\n> 올인을 하시려면 ⭕ 이모지에 반응해주세요!')
+        dfdf = await ctx.send('> 정말 올인을 하실꺼에요?\n~~탕진하다 다 잃으시면 배상 안해드립니다!~~\n> 올인을 하시려면 ⭕ 이모지에 반응해주세요!')
         await dfdf.add_reaction('⭕')
         def check(reaction, user):
             if user == ctx.author and str(reaction.emoji) == "⭕": 
@@ -293,15 +298,15 @@ class general(commands.Cog):
             if yee[f'{server.id}']['language'] == 'ko':
                 a = '화면 공유'
                 b = '**서버: {server.name}\n음성 채널: [{a.name}]({url})**'
-                c = 'First Join the Voice Channel'
+                c = '먼저 채팅방에 접속해주세요!'
             else:
                 a = 'Screen Share'
                 b = '**Server: {server.name}\nVoice Channel: [{a.name}]({url})**'
-                c = 'First Join the Voice Channel'
+                c = 'First Join the Voice Channel!'
         except:
             a = 'Screen Share'
             b = '**Server: {}\nVoice Channel: [{}]({})**'
-            c = 'First Join the Voice Channel'
+            c = 'First Join the Voice Channel!'
 
         em = discord.Embed(colour=author.colour, timestamp=datetime.datetime.utcnow())
         if author.avatar_url:

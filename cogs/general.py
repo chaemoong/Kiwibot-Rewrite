@@ -65,10 +65,10 @@ class general(commands.Cog):
         choice = random.choice(self.choice)
         if choice == True:
             c = bb + 3000
-            await ctx.send(f'> 당신의 돈은 제가 기부니가 좋아져서 2000키위 에서 1000키위 더 얹어서 총 {asdf[str(author.id)]["money"]} 키위가 되었습니다!')
+            await ctx.send(f'> 당신의 돈은 제가 기부니가 좋아져서 2000키위 에서 1000키위 더 얹어서 총 {c} 키위가 되었습니다!')
         elif choice == False:
             c = bb + 2000
-            await ctx.send(f'> 당신의 돈은 제가 기부니가 엄청 좋아지지 않아서 그냥 2000키위만 드려서 총 {asdf[str(author.id)]["money"]} 키위가 되었습니다!')
+            await ctx.send(f'> 당신의 돈은 제가 기부니가 엄청 좋아지지 않아서 그냥 2000키위만 드려서 총 {c} 키위가 되었습니다!')
         asdf[str(author.id)].update({'money': c})
         dataIO.save_json(self.asdf, asdf)
     

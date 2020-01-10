@@ -59,7 +59,17 @@ class owner(commands.Cog):
         embed.add_field(name=':inbox_tray: **INPUT**', value='```py\n' + str(code) + '\n```', inline=False)
         embed.add_field(name=':outbox_tray: **OUTPUT**', value=python.format(result), inline=False)
         await ctx.send(embed=embed)
-
+        
+    @commands.command()
+    @commands.check(is_owner)
+    async def 소개(self, ctx):
+        """"봇 홍보할때 쓰는 명령어입니다!"""
+        server = ctx.guild
+        owner = server.get_member(431085681847042048)
+        em = discord.Embed(colour=owner.colour)
+        em.add_field(name='키위봇 초대하기', value='장점: 어떤봇도 가지고 있지 않는 네이버 캡챠 기능(2019년 개발 완료), discord.py봇 중에서 최초로 이모지에 반응하면 역할 들어오게 하는 기능 생성\n아 참고로 위 발언들은 ~~모두 킹리적 갓심입니다 절대 확실하지 않는 자료입니다!~~\n\n[[ 키위봇 초대하기! ]](http://invite.kiwibot.kro.kr/)\n[[ 키위봇 홈페이지 바로가기 ]](https://chaemoong1234.wixsite.com/kiwibot)')
+        em.set_footer(text=f'Developed By {owner}', icon_url=owner.avatar_url)
+        return await ctx.send(embed=em)
 
     @commands.command()
     @commands.check(is_owner)

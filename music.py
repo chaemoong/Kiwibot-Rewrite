@@ -38,7 +38,7 @@ class Music(commands.Cog):
 
         if not hasattr(bot, 'lavalink'):  # This ensures the client isn't overwritten during cog reloads.
             bot.lavalink = lavalink.Client(bot.user.id)
-            bot.lavalink.add_node('59.3.95.69', 5000, 'youshallnotpass', 'eu', 'default-node')  # Host, Port, Password, Region, Name            
+            bot.lavalink.add_node('ssh.siru.ga', 5000, 'youshallnotpass', 'eu', 'default-node')  # Host, Port, Password, Region, Name            
             bot.add_listener(bot.lavalink.voice_update_handler, 'on_socket_response')
 
         bot.lavalink.add_event_hook(self.track_hook)
@@ -163,7 +163,7 @@ class Music(commands.Cog):
         if volume is None:
             em.add_field(name='현재 볼륨', value=f'🔈 | {player.volume}%')
         try:
-            if volume < 0 or volume > 150:
+            if volume == 0 or volume < 0 or volume > 150:
                 return await ctx.send('볼륨은 1~150% 로 맞춰야되요!')
         except:
             pass
@@ -296,9 +296,9 @@ class Music(commands.Cog):
         results = await player.node.get_tracks(query)
 
         if not results or not results['tracks']:
-            return await ctx.send('곡이 검색해서 찾을수 없어! 미안하지만 다른 곡으로 해주겠어?')
+            return await ctx.send('곡을 검색해도 찾을 수 없어요!')
 
-        tracks = results['tracks'][:10]  # First 10 results
+        tracks = results['tracks'][:5]  # First 10 results
 
         o = ''
         for index, track in enumerate(tracks, start=1):
@@ -307,7 +307,40 @@ class Music(commands.Cog):
             o += f'`{index}.` [{track_title}]({track_uri})\n'
 
         embed = discord.Embed(color=discord.Color.blurple(), description=o)
+        a = await ctx.send(embed=embed)
+        await a.add_reaction('1️⃣')
+        await a.add_reaction('2️⃣')
+        await a.add_reaction('3️⃣')
+        await a.add_reaction('4️⃣')
+        await a.add_reaction('5️⃣')
+        asdf = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣']
+        def check(reaction, user):
+            if user == ctx.author and str(reaction.emoji) in asdf: 
+                return True 
+        try:
+            reaction, user = await self.bot.wait_for('reaction_add', timeout=30.0, check=check)
+        except asyncio.TimeoutError:
+            return await a.edit(content='> 정상적으로 취소되었습니다!')
+        if True:
+            if str(reaction.emoji) == '1️⃣': track = results['tracks'][0]
+            if str(reaction.emoji) == '2️⃣': track = results['tracks'][1]
+            if str(reaction.emoji) == '3️⃣': track = results['tracks'][2]
+            if str(reaction.emoji) == '4️⃣': track = results['tracks'][3]
+            if str(reaction.emoji) == '5️⃣': track = results['tracks'][4]
+        embed = discord.Embed(color=discord.Color.blurple())
+        embed.title = '재생목록에 추가된 노래'
+        embed.description = f'[{track["info"]["title"]}]({track["info"]["uri"]})를 재생목록에 추가했어요!'
+        player.add(requester=ctx.author.id, track=track)
         await ctx.send(embed=embed)
+        if not player.is_playing:
+            await ctx.send(f'`[{track["info"]["title"]}]` 노래를 재생할게요!')
+            if not player.is_connected:
+                await self.connect_to(ctx.guild.id, str(ctx.author.voice.channel.id))
+            if f'{ctx.guild.id}' in self.setting:
+                await player.play()
+                await player.set_volume(self.setting[f'{ctx.guild.id}']['volume']) 
+            else:
+                await player.play()
 
     @commands.command()
     async def stop(self, ctx):
@@ -333,6 +366,16 @@ class Music(commands.Cog):
         await player.stop()
         await self.connect_to(ctx.guild.id, None)
         await ctx.send('*⃣ | 재생목록을 초기화 하였습니다!')
+
+    @commands.command()
+    async def join(self, ctx):
+        """봇이 음성채널에 들어오게 합니다!"""
+        try:
+            a = ctx.author.voice.channel.id
+        except AttributeError:
+            return await ctx.send('보이스 채널에 연결해주세요!')
+        await self.connect_to(ctx.guild.id, a)
+        await ctx.send('*⃣ | 다시 들어왔습니다!')
 
 
     async def ensure_voice(self, ctx):

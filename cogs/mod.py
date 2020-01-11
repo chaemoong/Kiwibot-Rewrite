@@ -445,69 +445,73 @@ class Mod(commands.Cog):
             server = ctx.guild
             try:
                 if self.data[f'{server.id}']: pass
+                try:
+                    a = self.data[f'{server.id}'].get('admin')
+                    try:
+                        if a == None:
+                            admin = '없어요!'
+                        if a:
+                            admin = get(server.roles, id=a)
+                            if admin == None:
+                                admin = '설정 되었으나 역할이 사라졌어용!'
+                    except:
+                        admin = '없어요!'
+                except KeyError:
+                    admin = '없어요!'
+                try:
+                    b = self.data[f'{server.id}'].get('mod')
+                    try:
+                        if b == None:
+                            mod = '없어요!'
+                        if b:
+                            mod = get(server.roles, id=a)
+                            if mod == None:
+                                mod = '설정 되었으나 역할이 사라졌어용!'
+                    except:
+                        mod = '설정 되었으나 역할이 사라졌어용!'
+                except KeyError:
+                    mod = '없어요!'
+                try:
+                    c = self.data[f'{server.id}'].get('log')
+                    try:
+                        if c == None: log = '없어요!'
+                        if c:
+                            log = server.get_channel(c)
+                    except:
+                        log = '설정 되었으나 채널이 사라졌어용!'
+                except KeyError:
+                    log = '없어요!'
+                try:
+                    e = self.data[f'{server.id}'].get('rold')
+                    try:
+                        if e:
+                            rold = get(server.roles, id=e)
+                            if rold == None:
+                                rold = '설정 되었으나 역할이 사라졌어용!'
+                        if e == None:
+                            rold = '없어요!'
+                    except:
+                        rold = '설정 되었으나 역할이 사라졌어용!'
+                except KeyError:
+                    rold = '없어요!'
             except:
                 self.data[f'{server.id}'] = {}
+                admin = '없어요!'
+                mod = '없어요!'
+                log = '없어요!'
+                rold = '없어요!'
             try:
-                a = self.data[f'{server.id}']['admin']
-                try:
-                    if a:
-                        admin = get(server.roles, id=a)
-                except:
-                    admin = None
-            except KeyError:
-                admin = '없음 | None'
-            try:
-                b = self.data[f'{server.id}']['mod']
-                try:
-                    if b:
-                        mod = get(server.roles, id=b)
-                except:
-                    mod = None
-            except KeyError:
-                mod = '없음 | None'
-            try:
-                c = self.data[f'{server.id}']['log']
-                try:
-                    if c:
-                        log = server.get_channel(c)
-                except:
-                    log = None
-            except KeyError:
-                log = '없음 | None'
-            try:
-                d = self.data[f'{server.id}']['dyr']
-                try:
-                    if d == 'a':
-                        d = '켜짐'
-                    else: d = '꺼짐'
-                except:
-                    d = '꺼짐'
-            except KeyError:
-                self.data[f'{server.id}'].update({"dyr": 'b'})
-                d = self.data[f'{server.id}']['dyr']
-            try:
-                e = self.data[f'{server.id}']['rold']
-                try:
-                    if e:
-                        rold = get(server.roles, id=e)
-                except:
-                    rold = None
-            except KeyError:
-                self.data[f'{server.id}'].update({"rold": '없음'})
-                rold = self.data[f'{server.id}']['rold']
-            dataIO.save_json(self.warn, self.data2)
-            if admin == None: admin = '없음 | None'
-            if mod == None: mod = '없음 | None'
-            if log == None: log = '없음 | None'
-            if rold == None: rold = '없음 | None'
-            if d == False: d = '꺼짐'
-            asdfasdf = self.bot.get_cog('Music').setting.get(str(server.id)).get('volume')
+                asdfasdf = self.bot.get_cog('Music').setting.get(str(server.id)).get('volume')
+            except:
+                asdfasdf = None
+            if not log: log = '없어요!'
             if asdfasdf == None:
                 volume = '100'
             else:
                 volume = asdfasdf
             em = discord.Embed(colour=ctx.author.colour)
-            em.add_field(name=':passport_control: 역할 관련 설정', value=f'관리자 역할 | Admin Role: {admin}\n부관리자 역할  | Moderator Role: {mod}\n인증 역할 | Captcha Role: {rold}```')
+            em.add_field(name=':passport_control: 역할 관련 설정', value=f'관리자 역할 | Admin Role: {admin}\n부관리자 역할  | Moderator Role: {mod}\n인증 역할 | Captcha Role: {rold}')
+            em.add_field(name=':newspaper: 로그 기능 설정', value=f'채널: {log}')
             em.add_field(name=':musical_note: 뮤직 기능 설정', value=f'볼륨: **{volume}%**\nDJ 역할: **개발중**')
             if author.avatar_url:
                 em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)

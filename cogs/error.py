@@ -78,6 +78,11 @@ class error(commands.Cog):
     async def on_message(self, message):
         if message.author.bot == True:
             return
+        if message.guild == None:
+            a = 'Direct Message'
+        else:
+            a = f"{message.guild}({message.guild.id})"
+        print(f'Server: {a}, Author: {message.author}({message.author.id}), Content: {message.content}')
     
     @commands.Cog.listener()
     async def on_member_join(self, member):

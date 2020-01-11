@@ -65,7 +65,7 @@ class post(commands.Cog):
             a = self.bot.get_user(431085681847042048)
             em = discord.Embed(colour=discord.Colour.red())
             em.add_field(name='404!', value='API가 이상이 있거나 어떠한 오류가 발생하였습니다!\n빠른 시일내로 고치도록 하겠습니다앗!')
-            await ctx.send(em)
+            await ctx.send(embed=em)
             await a.send(f'`{ctx.command}` 명령어에 오류가 발생하였습니다!\n```\n{e}\n```')
 
 

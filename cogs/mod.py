@@ -1,3 +1,4 @@
+"""coding: UTF-8, coding by: discordtag: chaemoong#9454"""
 import discord
 from discord.ext import commands
 from discord.ext.commands import has_permissions
@@ -7,6 +8,8 @@ import asyncio
 import datetime
 from discord.utils import get
 import os
+import pymongo
+from bson.objectid import ObjectId
 
 original = 10
 
@@ -15,9 +18,11 @@ class Mod(commands.Cog):
         self.bot = bot
         self.ang = 'data/mod/settings.json'
         self.data = dataIO.load_json(self.ang)
+        self.db = pymongo.MongoClient('localhost', 27017)
         self.warn = 'data/mod/warning.json'
         self.data2 = dataIO.load_json(self.warn)
         self.setting = 'data/mod/settings.json'
+        self.dbdata = 'data/db/id.json'
         self.ko = 'data/language/ko.json'
         self.en = 'data/language/en.json'
         self.asdfasdf = 'prefix.json'
@@ -50,7 +55,48 @@ class Mod(commands.Cog):
                         return True
                 except KeyError:
                     return False
-                        
+
+    @commands.command(no_pm=True, name='autorole', description='The autorole setting command! | 자동으로 역할이 들어오게 설정하는 명령어입니다!', aliases=['며새개ㅣㄷ', '자동역할', 'wkehddurgkf'])
+    @commands.check(administrator)
+    async def autorole(self, ctx, role:discord.Role=None, emoji=None, *, message=None):
+        author = ctx.author
+        server = ctx.guild
+        if role == None:
+            return await ctx.send('> 역할을 멘션 해주시거나 역할의 ID를 적어주셔야죠!')
+        if emoji == None:
+            return await ctx.send('> 이모지를 적어주셔야죠!')
+        if message == None:
+            return await ctx.send('> 메시지를 적어주셔야죠!')
+        em = discord.Embed(colour=author.colour)
+        if author.avatar_url:
+            em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
+        else:
+            em.set_footer(text=f'Request By {author}')
+        if message.startswith == '@everyone':
+            a = message[9:]
+            em.add_field(name='메시지', value=a)
+            asdf = await ctx.send('@everyone', embed=em)
+        else:
+            a = message
+            em.add_field(name='메시지', value=a)
+            asdf = await ctx.send(embed=em)
+        await asdf.add_reaction(emoji)
+        def check(reaction, user):
+            if user.bot == True:
+                return False
+            if server.id == user.guild.id and str(reaction.emoji) == emoji: 
+                return True
+        thinking = await self.bot.wait_for('reaction_add', check=check)
+        while True:
+            if True:
+                fffffff = thinking[1].id
+                try:
+                    await server.get_member(fffffff).add_roles(role)
+                    thinking = await self.bot.wait_for('reaction_add', check=check)
+                except:
+                    await ctx.send('> 역할이 삭제 되었거나 권한이 부족합니다! 메시지를 삭제하겠습니다!')
+                    await asdf.delete()
+                    break
 
     @commands.command(no_pm=True, name='language', description='The language setting command! | 언어를 선택하는 명령어입니다!', aliases=['ㅣ무혐ㅎㄷ', '언어', 'djsdj'])
     @commands.check(administrator)
@@ -76,22 +122,31 @@ class Mod(commands.Cog):
         except asyncio.TimeoutError:
             return await a.edit(content='> 정상적으로 취소되었습니다!')
         if True:
+            await a.delete()
             if str(reaction.emoji) == '🇰🇷':
-                try:
-                    self.data[f'{server.id}'].update({"language": "ko"})
-                except KeyError:
-                    self.data[f'{server.id}'] = {}
-                    self.data[f'{server.id}'].update({"language": "ko"})
-                dataIO.save_json(self.ang, self.data)
-                return await ctx.send('> 언어가 성공적으로 `한글` 로 설정 되었습니다!')
+                dbdata = dataIO.load_json(self.dbdata)
+                post = {"_id": str(server.id), f'{server.id}': {"language": "ko"}}
+                a = server.id
+                db = self.db.mod.language
+                await ctx.send('> 언어가 성공적으로 `한글` 로 설정 되었습니다!')
+                if not dbdata.get(str(server.id)) == None:
+                    db.update({ "_id" : f"{server.id}" }, post)
+                    return                          
+                asdf = db.insert(post)
+                await ctx.send('DB SAVE')
+                return
             if str(reaction.emoji) == '🇺🇸':
-                try:
-                    self.data[f'{server.id}'].update({"language": "en"})
-                except KeyError:
-                    self.data[f'{server.id}'] = {}
-                    self.data[f'{server.id}'].update({"language": "en"})
-                dataIO.save_json(self.ang, self.data)
-                return await ctx.send('> Language has been successfully set as `English`')
+                dbdata = dataIO.load_json(self.dbdata)
+                post = {"_id": str(server.id), f'{server.id}': {"language": "en"}}
+                a = server.id
+                db = self.db.mod.language
+                await ctx.send('> Language has been successfully set as `English`')
+                if not dbdata.get(str(server.id)) == None:
+                    db.update({ "_id" : f"{server.id}" }, post)
+                    return                          
+                asdf = db.insert(post)
+                await ctx.send('DB SAVE')
+                return
         else:
             return await ctx.send("> 다른 이모지를 추가하지 마세요! | Please don't add another emoji")
             
@@ -354,7 +409,7 @@ class Mod(commands.Cog):
         a = self.data2[f'{server.id}'][f'{user.id}']["reason"]
         em.add_field(name=data['3'], value=data['6'].format(user.mention, count))
         for reason in a:
-            em.add_field(name=data['7'].format(reason[:1]), value=reason[2:], inline=False)
+            em.add_field(name=data['7'].format(reason[:2]), value=reason[2:], inline=False)
         return await ctx.send(embed=em)
 
     @commands.command(no_pm=True, name='clean', description='It is a user-warnning cleaning command. | 유저의 경고를 삭제하는 명령어입니다!', aliases=['칟무', '경고삭제', 'rudrhtkrwp'])
@@ -736,7 +791,7 @@ class Mod(commands.Cog):
         asdf = dataIO.load_json(self.setting)
         try:
             if asdf[f'{server.id}']['language'] == 'ko':
-                data = dataIO.load_json(self.en)['log']
+                data = dataIO.load_json(self.ko)['log']
             else:
                 data = dataIO.load_json(self.en)['log']
         except:
@@ -767,12 +822,16 @@ def check_folder():
     if not os.path.exists('data/mod'):
         print('data/mod 풀더생성을 완료하였습니다!')
         os.makedirs('data/mod')
+    if not os.path.exists('data/db'):
+        print('data/db 풀더생성을 완료하였습니다!')
+        os.makedirs('data/db')
 
 def check_file():
     data = {}
     f = "data/mod/settings.json"
     g = 'data/mod/warning.json'
     h = 'data/mod/welcome.json'
+    i = 'data/db/id.json'
     if not dataIO.is_valid_json(f):
         print("data/mod/settings.json 파일생성을 완료하였습니다!")
         dataIO.save_json(f,
@@ -784,6 +843,10 @@ def check_file():
     if not dataIO.is_valid_json(h):
         print("data/mod/welcome.json 파일생성을 완료하였습니다!")
         dataIO.save_json(h,
+                         data)
+    if not dataIO.is_valid_json(i):
+        print("data/mod/id.json 파일생성을 완료하였습니다!")
+        dataIO.save_json(i,
                          data)
 
 

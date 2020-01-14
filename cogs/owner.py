@@ -1,3 +1,4 @@
+"""coding: UTF-8, coding by: discordtag: chaemoong#9454"""
 import discord
 import datetime
 import inspect
@@ -21,14 +22,94 @@ import zipfile
 
 
 
+
 class owner(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        
+
 
     async def is_owner(ctx):
         return ctx.author.id == 431085681847042048
 
+    @commands.group(pass_context=True)
+    @commands.check(is_owner)
+    async def blacklist(self, ctx):
+        if ctx.invoked_subcommand is None:
+            pass
+
+    @blacklist.command(pass_context=True)
+    async def add(self, ctx, user:discord.Member=None):
+        author = ctx.author
+        if user == None:
+            return await ctx.send('유저의 ID혹은 멘션을 똑바로 적어주세요!')
+        blacklist = dataIO.load_json('blacklist.json')
+        try:
+            if str(user.id) in blacklist['blacklist']:
+                em = discord.Embed(colour=discord.Colour.red())
+                if author.avatar_url:
+                    em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
+                else:
+                    em.set_footer(text=f'Request By {author}')
+                em.add_field(name='실패!', value='그 유저는 이미 블랙리스트입니다!')
+                return await ctx.send(embed=em)
+        except KeyError:
+            pass
+        if blacklist.get('blacklist') == None:
+            blacklist['blacklist'] = []
+        blacklist['blacklist'].append(str(user.id))
+        dataIO.save_json('blacklist.json', blacklist)
+        em = discord.Embed(colour=discord.Colour.blue())
+        if author.avatar_url:
+            em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
+        else:
+            em.set_footer(text=f'Request By {author}')
+        em.add_field(name='성공!', value='그 유저는 정상적으로 블랙리스트에 추가되었습니다!')
+        return await ctx.send(embed=em)
+
+    @blacklist.command(pass_context=True)
+    async def remove(self, ctx, user:discord.Member=None):
+        author = ctx.author
+        if user == None:
+            return await ctx.send('유저의 ID혹은 멘션을 똑바로 적어주세요!')
+        blacklist = dataIO.load_json('blacklist.json')
+        try:
+            if not str(user.id) in blacklist['blacklist']:
+                em = discord.Embed(colour=discord.Colour.red())
+                if author.avatar_url:
+                    em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
+                else:
+                    em.set_footer(text=f'Request By {author}')
+                em.add_field(name='실패!', value='그 유저는 블랙리스트 대상이 아닙니다!')
+                return await ctx.send(embed=em)
+        except KeyError:
+            pass
+        blacklist['blacklist'].remove(str(user.id))
+        dataIO.save_json('blacklist.json', blacklist)
+        em = discord.Embed(colour=discord.Colour.blue())
+        if author.avatar_url:
+            em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
+        else:
+            em.set_footer(text=f'Request By {author}')
+        em.add_field(name='성공!', value='그 유저는 정상적으로 블랙리스트에서 삭제되었습니다!')
+        return await ctx.send(embed=em)
+
+
+    @commands.command(pass_context=True)
+    @commands.check(is_owner)
+    async def servers(self, ctx):
+        server = self.bot.guilds
+        treeHit = -1
+        em = discord.Embed(colour=ctx.author.colour, title='서버 리스트')
+        em.set_thumbnail(url=self.bot.user.avatar_url)
+        adf = ""
+        while treeHit < len(self.bot.guilds):
+            treeHit = treeHit + 1
+            if treeHit == len(self.bot.guilds):
+                break
+            adf += f"{treeHit  + 1}. {server[treeHit].name}({server[treeHit].member_count}명)\n"
+        em.add_field(name='서버 목록', value=adf)
+        await ctx.send(embed=em)
+                    
     @commands.command(pass_context=True)
     @commands.check(is_owner)
     async def cmd(self, ctx, *, code=None):
@@ -51,7 +132,7 @@ class owner(commands.Cog):
                 result = res
         except Exception as e:
             embed = discord.Embed(title='Error', colour=0xef6767, timestamp=datetime.datetime.utcnow())
-            embed.add_field(name=':inbox_tray: **INPUT**', value='```py\n' + str(code) + '\n```', inline=False)
+            embed.add_field(name=':inbox_tray: **INPUT**', value='```py\n' + f'{code}' + '\n```', inline=False)
             embed.add_field(name=':outbox_tray: **OUTPUT**', value=python.format(type(e).__name__ + ': ' + str(e)), inline=False)
             return await ctx.send(embed=embed)
             
@@ -59,7 +140,7 @@ class owner(commands.Cog):
         embed.add_field(name=':inbox_tray: **INPUT**', value='```py\n' + str(code) + '\n```', inline=False)
         embed.add_field(name=':outbox_tray: **OUTPUT**', value=python.format(result), inline=False)
         await ctx.send(embed=embed)
-        
+
     @commands.command()
     @commands.check(is_owner)
     async def 소개(self, ctx):

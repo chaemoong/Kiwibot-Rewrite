@@ -1,3 +1,4 @@
+"""coding: UTF-8, coding by: discordtag: chaemoong#9454"""
 import discord
 import datetime
 import inspect
@@ -19,7 +20,7 @@ from bs4 import BeautifulSoup
 import requests
 from enum import Enum
 import asyncio
-
+from discord.utils import get
 
 class general(commands.Cog):
     def __init__(self, bot):
@@ -33,7 +34,6 @@ class general(commands.Cog):
         self.en = 'data/language/en.json'
         self.choice = [True, False]
 
-
     @commands.command(no_pm=True, name='돈', description='The money command! | 돈 명령어입니다!', aliases=['money', 'ㅡㅐㅜ됴', 'ehs'])
     async def 돈(self, ctx, user:discord.Member=None):
         author = ctx.author
@@ -45,6 +45,20 @@ class general(commands.Cog):
         except:
             a = '0'
         em = discord.Embed(colour=author.colour, title='돈', description=f'\n\n`{user.name}`님의 돈은 {a} 키위 있습니다!')
+        if author.avatar_url:
+            em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
+        else:
+            em.set_footer(text=f'Request By {author}')
+        return await ctx.send(author.mention, embed=em)
+
+    @commands.command(no_pm=True, name='level', description='It command is checking level! | 레벨을 확인하는 명령어입니다!', aliases=['fpqpf', '레벨', 'ㅣㄷㅍ디'])
+    async def level(self, ctx, user:discord.Member=None):
+        author = ctx.author
+        if user is None:
+            user = author
+        asdf = dataIO.load_json('level.json')
+        a = asdf.get(str(user.id)).get('level')
+        em = discord.Embed(colour=author.colour, title='레벨', description=f'\n\n`{user}`님의 레벨은 {a} 레벨입니당!')
         if author.avatar_url:
             em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
         else:
@@ -356,7 +370,7 @@ class general(commands.Cog):
             data = dataIO.load_json(self.en)[ctx.command.name]
         a = await ctx.send('잠시만 기달려주세요! | Wait a Second!')
         author = ctx.author
-        url = "http://59.3.95.69/api/main_module"
+        url = "http://ssh.siru.ga/api/main_module"
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as response:
                 Data = await response.json() 

@@ -1,3 +1,4 @@
+"""coding: UTF-8, coding by: discordtag: chaemoong#9454"""
 import discord
 from discord.ext import commands
 import traceback
@@ -20,16 +21,11 @@ class error(commands.Cog):
         self.en = 'data/language/en.json'
         self.welcome = 'data/mod/welcome.json'
 
-    def __global_check_once(self, ctx):
-        blacklist = dataIO.load_json('blacklist.json')
-        if str(ctx.author.id) in blacklist:
-            raise Blacklisted()
-        else:
-            return True
-   
+
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
         asdf = dataIO.load_json(self.setting)
+        dddd = self.bot.get_user(431085681847042048)
         try:
             if asdf[f'{ctx.guild.id}']['language'] == 'ko':
                 data = dataIO.load_json(self.ko)
@@ -48,7 +44,7 @@ class error(commands.Cog):
                 return
             em = discord.Embed(title='에러! | ERROR!', colour=discord.Colour.red())
             em.add_field(name='에러 발생한 명령어 | Error generated command', value=ctx.command.qualified_name)
-            em.set_footer(text=f'에러가 지속적으로 발생할시 {self.bot.get_user(431085681847042048)}으로 문의 바랍니다!\nIf that command Error generated again contact {self.bot.get_user(431085681847042048)} ({self.bot.get_user(431085681847042048).id})')
+            em.set_footer(text=f'에러가 지속적으로 발생할시 {dddd}으로 문의 바랍니다!\nIf that command Error generated again contact {dddd} ({dddd.id})')
             log = ("Exception in command '{}'\n"
                    "".format(ctx.command.qualified_name))
             log += "".join(traceback.format_exception(type(error), error,
@@ -56,6 +52,14 @@ class error(commands.Cog):
             print(log)
             await ctx.send(embed=em)
         elif isinstance(error, commands.CommandNotFound):
+            blacklist = dataIO.load_json('blacklist.json')
+            try:
+                if str(ctx.author.id) in blacklist['blacklist']:
+                    em = discord.Embed(colour=discord.Colour.green())
+                    em.add_field(name='당신은 키위봇 블랙리스트입니다!', value=f'당신은 키위봇 버그를 악용 혹은 악성 유저로 생각되어 키위봇 개발자에 의해 블랙리스트에 추가되었습니다!\n문의를 하시려면 {dddd} ({dddd.id}로 문의해주시기 바랍니다!)')
+                    return await ctx.send(embed=em)
+            except KeyError:
+                pass
             lan = data['command_none']
             em = discord.Embed(colour=ctx.author.colour)
             em.add_field(name=lan['1'], value=lan['2'].format(ctx))
@@ -74,6 +78,7 @@ class error(commands.Cog):
             em.add_field(name='쿨타임 발생!', value=f'이 명령어 에는 쿨타임이 걸려있습니다!\n`{asdf}분 {asss}초` 후에 다시 시도 해주세요!')
             return await ctx.send(ctx.author.mention, embed=em)
 
+
     @commands.Cog.listener()
     async def on_message(self, message):
         if message.author.bot == True:
@@ -83,28 +88,31 @@ class error(commands.Cog):
         else:
             a = f"{message.guild}({message.guild.id})"
         print(f'Server: {a}, Author: {message.author}({message.author.id}), Content: {message.content}')
-    
-    @commands.Cog.listener()
-    async def on_member_join(self, member):
-        data = dataIO.load_json(self.welcome)
-        a = data.get(str(member.guild.id))
-        if a == None:
-            return
-        if a.get('message1') == None:     
-            await self.bot.get_channel(a.get('channel')).send(f'{member.mention}님! {member.guild}서버에 오신것을 환영합니다!')
-        else:
-            await self.bot.get_channel(a.get('channel')).send(a.get('message1'))
+        author = message.author
+        blacklist = dataIO.load_json('blacklist.json')
+        level = 'level.json'
+        asdf = dataIO.load_json(level)
+        try:
+            if str(author.id) in blacklist['blacklist']:
+                return
+        except KeyError:
+            pass
+        if not str(author.id) in asdf:
+            asdf[str(author.id)] = {"exp": 0, "level": 1}
+        dddddd = asdf[str(author.id)]['level']
+        exp = asdf[str(author.id)]['exp'] + 1
+        asdf[str(author.id)] = {"exp": exp, "level": dddddd}
+        dataIO.save_json(level, asdf)
+        print('레벨데이터수정')
+        if exp == dddddd * 20:
+            dddddd = dddddd + 1
+            asdf[str(author.id)] = {"exp": 0, "level": dddddd}    
+            dataIO.save_json(level, asdf)
+            await message.channel.send(f'{author.mention}, 당신은 이제 {dddddd}레밸 입니다!')    
+            
 
-    @commands.Cog.listener()
-    async def on_member_remove(self, member):
-        data = dataIO.load_json(self.welcome)
-        a = data.get(str(member.guild.id))
-        if a == None:
-            return
-        if a.get('message2') == None:     
-            await self.bot.get_channel(a.get('channel')).send(f'{member}님아 {member.guild}서버에서 나가셨습니다')
-        else:
-            await self.bot.get_channel(a.get('channel')).send(a.get('message2'))
+
+
 
 def check_folder():
     if not os.path.exists('data/language'):
@@ -112,6 +120,7 @@ def check_folder():
         os.makedirs('data/language')
 
 def check_file():   
+    asdf = {}
     data = {
         "userinfo": {
             "1": "Offline",
@@ -502,18 +511,23 @@ def check_file():
     f = "data/language/en.json"
     fg = "data/language/ko.json"
     thinking = 'blacklist.json'
+    level = 'level.json'
     if not dataIO.is_valid_json(f):
-        print("data/mod/settings.json 파일생성을 완료하였습니다!")
+        print(f"{f} 파일생성을 완료하였습니다!")
         dataIO.save_json(f,
                          data)
     if not dataIO.is_valid_json(fg):
-        print("error.json 파일생성을 완료하였습니다!")
+        print(f"{fg} 파일생성을 완료하였습니다!")
         dataIO.save_json(fg,
                          data2)
     if not dataIO.is_valid_json(thinking):
-        print("error.json 파일생성을 완료하였습니다!")
+        print(f"{thinking} 파일생성을 완료하였습니다!")
         dataIO.save_json(thinking,
                          blacklist)
+    if not dataIO.is_valid_json(level):
+        print(f"{level} 파일생성을 완료하였습니다!")
+        dataIO.save_json(level,
+                         asdf)
 
 def setup(bot):
     check_folder()

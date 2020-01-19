@@ -66,7 +66,7 @@ class general(commands.Cog):
         return await ctx.send(author.mention, embed=em)
 
     @commands.command(no_pm=True, name='돈받기', description='The money taking command! | 돈받는 명령어입니다!', aliases=['ehsqkerl'])
-    @commands.cooldown(1, 3600, commands.BucketType.user)
+    @commands.cooldown(1, 1800, commands.BucketType.user)
     async def 돈받기(self, ctx):
         author = ctx.author
         asdf = dataIO.load_json(self.asdf)
@@ -76,13 +76,10 @@ class general(commands.Cog):
         if asdf[str(author.id)].get('money') == None:
             asdf[str(author.id)].update({'money': 0})
         bb = asdf[str(author.id)].get('money')
-        choice = random.choice(self.choice)
-        if choice == True:
-            c = bb + 3000
-            await ctx.send(f'> 당신의 돈은 제가 기부니가 좋아져서 2000키위 에서 1000키위 더 얹어서 총 {c} 키위가 되었습니다!')
-        elif choice == False:
-            c = bb + 2000
-            await ctx.send(f'> 당신의 돈은 제가 기부니가 엄청 좋아지지 않아서 그냥 2000키위만 드려서 총 {c} 키위가 되었습니다!')
+        c = bb + 1000
+        em = discord.Embed(colour=discord.Colour.green())
+        em.add_field(name='1000키위를 받으셨습니다!', value=f'현재 잔고 `{c}`')
+        await ctx.send(embed=em)
         asdf[str(author.id)].update({'money': c})
         dataIO.save_json(self.asdf, asdf)
     

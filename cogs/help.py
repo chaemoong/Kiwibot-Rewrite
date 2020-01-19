@@ -1,3 +1,4 @@
+"""coding: UTF-8, coding by: discordtag: chaemoong#9454"""
 from discord.ext import commands
 import discord
 from os import listdir
@@ -41,6 +42,8 @@ class Embed(commands.Cog):
                         value=commands_list,
                         inline=False
                     )
+                if cog == 'notice':
+                    pass
                 else:
                     pass
         else:

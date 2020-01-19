@@ -22,7 +22,6 @@ import zipfile
 
 
 
-
 class owner(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -114,6 +113,7 @@ class owner(commands.Cog):
     @commands.check(is_owner)
     async def cmd(self, ctx, *, code=None):
         """eval 시킵니다!"""
+        산군 = '멍청한 놈'
         result = None
         global_vars = globals().copy()
         global_vars['self'] = self
@@ -123,6 +123,10 @@ class owner(commands.Cog):
         global_vars['author'] = ctx.message.author
         global_vars['channel'] = ctx.message.channel
         global_vars['server'] = ctx.message.guild
+        global_vars['산군'] = 산군
+        global_vars['sangoon'] = 산군
+        global_vars['tksrns'] = 산군
+        global_vars['ㄴ무해ㅐㅜ'] = 산군
         try:
             python = '```py\n{}\n```'
             res = eval(code, global_vars)

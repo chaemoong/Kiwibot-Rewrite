@@ -38,7 +38,7 @@ class Music(commands.Cog):
 
         if not hasattr(bot, 'lavalink'):  # This ensures the client isn't overwritten during cog reloads.
             bot.lavalink = lavalink.Client(bot.user.id)
-            bot.lavalink.add_node('ssh.siru.ga', 5000, 'youshallnotpass', 'eu', 'default-node')  # Host, Port, Password, Region, Name            
+            bot.lavalink.add_node('cloud.siru.ga', 5000, 'youshallnotpass', 'eu', 'default-node')  # Host, Port, Password, Region, Name            
             bot.add_listener(bot.lavalink.voice_update_handler, 'on_socket_response')
 
         bot.lavalink.add_event_hook(self.track_hook)
@@ -83,14 +83,15 @@ class Music(commands.Cog):
     async def play(self, ctx, *, query):
         """노래를 검색해서 노래를 틀어줘!"""
         player = self.bot.lavalink.players.get(ctx.guild.id)
+        
 
         if query.startswith == 'scsearch:':
             query = query.strip('<>')
             query = f'scsearch:{query}'
 
-        query = query.strip('<>')
                     
         if not url_rx.match(query):
+            query = query.strip('<>')
             query = f'ytsearch:{query}'
             
 
@@ -386,6 +387,13 @@ class Music(commands.Cog):
         should_connect = ctx.command.name in ('play')
 
         if should_connect:
+            try:
+                blacklist = dataIO.load_json('blacklist.json')
+                dddd = self.bot.get_user(431085681847042048)
+                if str(ctx.author.id) in blacklist['blacklist']:
+                    raise commands.CommandNotFound
+            except KeyError:
+                pass
             await self.connect_to(ctx.guild.id, str(ctx.author.voice.channel.id))
 
         if not player.is_connected:

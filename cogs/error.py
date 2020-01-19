@@ -103,16 +103,61 @@ class error(commands.Cog):
         exp = asdf[str(author.id)]['exp'] + 1
         asdf[str(author.id)] = {"exp": exp, "level": dddddd}
         dataIO.save_json(level, asdf)
-        print('레벨데이터수정')
         if exp == dddddd * 20:
             dddddd = dddddd + 1
             asdf[str(author.id)] = {"exp": 0, "level": dddddd}    
             dataIO.save_json(level, asdf)
-            await message.channel.send(f'{author.mention}, 당신은 이제 {dddddd}레밸 입니다!')    
+            await message.channel.send(f'{author.mention}, 당신은 이제 {dddddd}레벨 입니다!')    
             
 
 
+    @commands.Cog.listener()
+    async def on_message_delete(self, message):
+        if message.author.bot == True:
+            return
+        data = dataIO.load_json(self.setting)
+        a = data.get(str(message.guild.id))         
+        if a == None:
+            return    
+        for attachment in message.attachments:
+            em = discord.Embed(colour=message.author.colour, image=attachment.url)
+            em.set_author(name='Eldzld', icon_url=message.author.avatar_url)
+            if attachment == []:
+                if message.content == None:
+                    em.add_field(name='삭제된 메시지 내용', value='메시지 내용 없음')
+            else:
+                em.add_field(name='삭제된 메시지 내용', value=message.content)
+            whiteList = ['bmp','jpeg','jpg','png']          
+            if attachment.filename.split('.')[-1] in whiteList:
+                add = '메시지 삭제가 감지되었습니다!'
+                URL = attachment.url
+                await self.bot.get_channel(664141135740141589).send(URL)
+                em.set_image(url=f'{URL}')
+            else:
+                add = f'삭제된 메시지의 파일: {attachment.url}\n바이러스가 있을수도 있습니다! 되도록이면 다운로드하지 않는것을 추천드립니다!'
+            await self.bot.get_channel(664141135740141589).send(add, embed=em)
 
+    @commands.Cog.listener()
+    async def on_member_join(self, member):
+        data = dataIO.load_json(self.welcome)
+        a = data.get(str(member.guild.id))
+        if a == None:
+            return
+        if a.get('message1') == None:     
+            await self.bot.get_channel(a.get('channel')).send(f'{member.mention}님! {member.guild}서버에 오신것을 환영합니다!')
+        else:
+            await self.bot.get_channel(a.get('channel')).send(a.get('message1'))
+
+    @commands.Cog.listener()
+    async def on_member_remove(self, member):
+        data = dataIO.load_json(self.welcome)
+        a = data.get(str(member.guild.id))
+        if a == None:
+            return
+        if a.get('message2') == None:     
+            await self.bot.get_channel(a.get('channel')).send(f'{member}님아 {member.guild}서버에서 나가셨습니다')
+        else:
+            await self.bot.get_channel(a.get('channel')).send(a.get('message2'))
 
 def check_folder():
     if not os.path.exists('data/language'):
@@ -278,6 +323,20 @@ def check_file():
                 "1": "> Mention the channel to setting a captcha channel!",
                 "2": "Success!",
                 "3": "Channel {} has been chosen as captcha channel!"
+            },
+            "None": "None!",
+            "first": "Role-related settings",
+            "second": "Logging Functions settings",
+            "third": "Music Functions settings",
+            "embed1": "Administrator Role: **{}**\nModerator Role: **{}**\nVerify(captcha) Role: **{}**",
+            "embed2": "Logging Channel: **{}**",
+            "embed3": "Music Volume: **{}%**\nDJ Role: **Now Developing**",
+            "basic": {
+                "admin": "Settings to Administrator Role: {}{} admin [Role Mention or ID]",
+                "mod": "Settings to Moderator Role: {}{} mod [Role Mention or ID]",
+                "log": "Settings to Logging Channel: {}{} log [Channel Mention or ID]",
+                "verify": "Settings to Captcha role: {}{} role [Role Mention Or ID]",
+                "a": "How to use it?"
             }
         },
         "log": {
@@ -470,8 +529,21 @@ def check_file():
                 "1": "`인증(캡챠) 로그`로 설정할 채널을 멘션해주셔야 됩니다!",
                 "2": "성공!",
                 "3": "{} 채널을 인증(캡챠) 채널로 정했습니다!"
+            },
+            "None": "없어요!",
+            "first": "역할 관련 설정",
+            "second": "로그 기능 설정",
+            "third": "뮤직 기능 설정",
+            "embed1": "관리자 역할: **{}**\n부관리자 역할: **{}**\n인증(캡챠) 역할: **{}**",
+            "embed2": "로그 채널: **{}**",
+            "embed3": "음악 볼륨: **{}%**\nDJ 역할: **개발중**",
+            "basic": {
+                "admin": "관리자 역할 설정: {}{} admin [역할 멘션 혹은 ID]",
+                "mod": "부관리자 역할 설정: {}{} mod [역할 멘션 혹은 ID]",
+                "log": "로그 채널 설정: {}{} log [채널 멘션 혹은 ID]",
+                "verify": "인증(캡챠) 역할 설정: {}{} role [역할 멘션 혹은 ID]",
+                "a": "사용법"
             }
-
         },
         "log": {
             "1": "없음",

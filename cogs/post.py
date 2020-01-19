@@ -1,3 +1,4 @@
+"""coding: UTF-8, coding by: discordtag: chaemoong#9454"""
 import discord
 import aiohttp
 from discord.ext import commands

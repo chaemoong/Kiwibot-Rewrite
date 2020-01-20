@@ -92,6 +92,7 @@ class error(commands.Cog):
         blacklist = dataIO.load_json('blacklist.json')
         level = 'level.json'
         asdf = dataIO.load_json(level)
+        data = dataIO.load_json(self.setting)
         try:
             if str(author.id) in blacklist['blacklist']:
                 return
@@ -107,6 +108,10 @@ class error(commands.Cog):
             dddddd = dddddd + 1
             asdf[str(author.id)] = {"exp": 0, "level": dddddd}    
             dataIO.save_json(level, asdf)
+            a = data.get(str(author.guild.id))
+            if not a == None:
+                if a.get('level') == 'off':
+                    return
             await message.channel.send(f'{author.mention}, 당신은 이제 {dddddd}레벨 입니다!')    
             
 

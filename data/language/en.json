@@ -107,6 +107,17 @@
             "1" : "> Mention the role to setting a captcha role!",
             "2" : "Success!",
             "3" : "Role {} has been chosen as captcha role!"
+        },
+        "None": "None!",
+        "first": "Role-related settings",
+        "second": "Logging Functions settings",
+        "third": "Music Functions settings",
+        "embed1": "Administrator Role: **{}**\nModerator Role: **{}**\nVerify(captcha) Role: **{}**",
+        "embed2": "Logging Channel: **{}**",
+        "embed3": "Music Volume: **{}%**\nDJ Role: **Now Developing**",
+        "basic": {
+            "admin": "Settings to Administrator Role: **{0.prefix}{0.command} admin [Role Mention or ID]**\nSettings to Moderator Role: **{0.prefix}{0.command} mod [Role Mention or ID]**\nSettings to Logging Channel: **{0.prefix}{0.command} log [Channel Mention or ID]**\nSettings to Captcha role: **{0.prefix}{0.command} role [Role Mention Or ID]**",
+            "a": "How to use it?"
         }
     },
     "serverinfo" : {
@@ -137,6 +148,14 @@
         "6" : "This user is not banned"
     },
     "unwarn" : {
+        "1" : "> Mention the user to clear a warning!",
+        "2" : "> Warn command not available for bot!",
+        "3" : "None",
+        "4" : "> No warning data for that user!",
+        "5" : "Success!",
+        "6" : "I've removed a warning from the user!"
+    },
+    "warn" : {
         "1" : "> Mention the user to clear a warning!",
         "2" : "> Warn command not available for bot!",
         "3" : "None",
@@ -183,9 +202,10 @@
         "3" : "If you have any complaints, please contact {author}({author.id})",
         "4" : "Occurred Warnings!",
         "5" : "{} ({}) was ban due to over-warnings",
-        "6" : "{} received one warning!\n If the user has {} warnings, the user will be Ban!\n reason: {}\n Current number of warnings: {}",
+        "6" : "{} received one warning!\n If the user has {} warnings, the user will be Ban!\n Reason: {}\n Current number of warnings: {}",
         "7" : "> Please mention users give a warning",
         "8" : "> Warn command not available for bot!",
-        "9" : "None"
+        "9" : "None",
+        "me": "> You can't warn yourself!"
     }
 }

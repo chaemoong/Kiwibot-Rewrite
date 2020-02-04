@@ -167,10 +167,7 @@ __Sending With DPNK__""")
     @commands.Cog.listener()
     async def on_message(self, message):
         if message.author.bot == True:
-            if not message.guild == None:
-                return
-            else:
-                
+            return
         if message.guild == None:
             a = 'Direct Message'
         else:

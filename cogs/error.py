@@ -10,6 +10,8 @@ import random
 import os
 import datetime
 import time
+from cogs.utils import option
+from cogs.utils.chat_formatting import pagify
 
 class Blacklisted(commands.CheckFailure): pass
 
@@ -20,7 +22,93 @@ class error(commands.Cog):
         self.ko = 'data/language/ko.json'
         self.en = 'data/language/en.json'
         self.welcome = 'data/mod/welcome.json'
+        self.text = ""
+        self.channels = []		
+        self.success = []
+        self.failed = []
+        self.channel_cant_make = []
 
+    async def get_announce_channel(self):
+        for guild in self.bot.guilds:
+            Allow = False
+            for channel in guild.channels:
+                if guild.id in [channel.guild.id for channel in self.channels]: break
+                
+                for Prefix in option.allowprefix:
+                    if Prefix in channel.name:                        
+                        Allow = True
+                        
+                for Prefix in option.disallowprefix:
+                    if Prefix in channel.name:
+                        Allows = False
+                        
+                if Allow and isinstance(channel, discord.TextChannel) and not channel in self.channels:
+                    self.channels.append(channel)
+                    break
+                    
+            if option.nfct and not guild.id in [channel.guild.id for channel in self.channels]:
+                channel = await self.create_announce_channel(guild)
+                if channel:
+                    self.channels.append(channel)
+        
+    async def create_announce_channel(self, guild):
+        try:
+            return await guild.create_text_channel(option.nfctname, reason="Because of DPNK")
+        except Exception as e:
+            self.channel_cant_make.append((guild, e))
+            return None
+            
+    def make_tasks(self):
+        return [self.send(channel) for channel in self.channels]
+            
+    async def send(self, channel):
+        try:
+            em = discord.Embed(colour=0xfcf794)
+            em.add_field(name="키위봇 공지", value=self.text + "\n\n[[ 키위봇 초대하기! ]](http://invite.kiwibot.kro.kr/)\n[[ 키위봇 공식서버! ]](https://discord.gg/wb5JgQt)")
+            self.success.append(await channel.send(embed=em))
+        except Exception as e:
+                self.failed.append((channel, e))
+            
+    async def announce(self, text):
+        self.text = text
+        await self.get_announce_channel()
+        await asyncio.wait(self.make_tasks())
+        
+
+            
+    async def process_command(self, message):
+        if message.content.startswith(option.command) and message.author.id in option.owner:
+            notice_text = message.content[len(option.command):]
+            
+            embed = discord.Embed(title="DPNK - StayCute", color=0xfcf794)
+            msg = await message.channel.send(message.author.mention, embed=embed)
+            
+            await self.get_announce_channel()
+            
+            embed = discord.Embed(title="DPNK - StayCute", color=0xb4fc94, description="발신중 입니다")
+            await msg.edit(embed=embed)
+            
+            await self.announce(notice_text)
+            await msg.delete()
+            
+            escape_drop = '\n'
+            
+            await message.channel.send(f"""**✅ 공지를 발신하였습니다
+
+공지 발신 성공 채널:
+`{len(self.success)}`개의 채널에 송신하였습니다.
+
+공지 발신 실패 채널:
+```
+{escape_drop.join([f'{channel.name} [{type(error)}]' for channel, error in self.failed])} 
+```
+
+공지 채널 생성 실패:
+```
+{escape_drop.join([f'{guild.name} [{type(error)}]' for guild, error in self.channel_cant_make])} 
+```**
+
+__Sending With DPNK__""")
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
@@ -42,15 +130,12 @@ class error(commands.Cog):
                 msg = ("당신에게 DM으로 보내드리려고 했는데 전송이 안되요! DM차단을 풀어주시면 다시 시도 하시면 보내드리겠어요!\nI was going to send it to you by DM, but it's not! If you untie the DM block, I'll send it to you!")
                 await ctx.send(msg)
                 return
-            em = discord.Embed(title='에러! | ERROR!', colour=discord.Colour.red())
-            em.add_field(name='에러 발생한 명령어 | Error generated command', value=ctx.command.qualified_name)
-            em.set_footer(text=f'에러가 지속적으로 발생할시 {dddd}으로 문의 바랍니다!\nIf that command Error generated again contact {dddd} ({dddd.id})')
-            log = ("Exception in command '{}'\n"
-                   "".format(ctx.command.qualified_name))
-            log += "".join(traceback.format_exception(type(error), error,
-                                                      error.__traceback__))
-            print(log)
-            await ctx.send(embed=em)
+            log = "".join(traceback.format_exception(type(error), error, error.__traceback__))
+            for page in pagify(log):
+                asdf = f'```py\n{log}\n```'
+            embed = discord.Embed(title=f'{ctx.command.qualified_name} 명령어에 에러가 발생하였습니다!', colour=discord.Colour.green())
+            await ctx.send('에러 내용을 봇 관리진에게 보냈습니다! 빠른 시일내에 고치도록 하겠습니다!\nI send Error code to Bot Administrator! I will fix that!')
+            await dddd.send(embed=embed, content=asdf)
         elif isinstance(error, commands.CommandNotFound):
             blacklist = dataIO.load_json('blacklist.json')
             try:
@@ -82,7 +167,10 @@ class error(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message):
         if message.author.bot == True:
-            return
+            if not message.guild == None:
+                return
+            else:
+                
         if message.guild == None:
             a = 'Direct Message'
         else:
@@ -113,34 +201,7 @@ class error(commands.Cog):
                 if a.get('level') == 'off':
                     return
             await message.channel.send(f'{author.mention}, 당신은 이제 {dddddd}레벨 입니다!')    
-            
-
-
-    @commands.Cog.listener()
-    async def on_message_delete(self, message):
-        if message.author.bot == True:
-            return
-        data = dataIO.load_json(self.setting)
-        a = data.get(str(message.guild.id))         
-        if a == None:
-            return    
-        for attachment in message.attachments:
-            em = discord.Embed(colour=message.author.colour, image=attachment.url)
-            em.set_author(name='Eldzld', icon_url=message.author.avatar_url)
-            if attachment == []:
-                if message.content == None:
-                    em.add_field(name='삭제된 메시지 내용', value='메시지 내용 없음')
-            else:
-                em.add_field(name='삭제된 메시지 내용', value=message.content)
-            whiteList = ['bmp','jpeg','jpg','png']          
-            if attachment.filename.split('.')[-1] in whiteList:
-                add = '메시지 삭제가 감지되었습니다!'
-                URL = attachment.url
-                await self.bot.get_channel(664141135740141589).send(URL)
-                em.set_image(url=f'{URL}')
-            else:
-                add = f'삭제된 메시지의 파일: {attachment.url}\n바이러스가 있을수도 있습니다! 되도록이면 다운로드하지 않는것을 추천드립니다!'
-            await self.bot.get_channel(664141135740141589).send(add, embed=em)
+        await self.process_command(message)
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
@@ -148,10 +209,23 @@ class error(commands.Cog):
         a = data.get(str(member.guild.id))
         if a == None:
             return
-        if a.get('message1') == None:     
-            await self.bot.get_channel(a.get('channel')).send(f'{member.mention}님! {member.guild}서버에 오신것을 환영합니다!')
+        if a.get('channel') == None:
+            return
+        if a.get('message1') == None:
+            try:   
+                await self.bot.get_channel(a.get('channel')).send(f'{member.mention}님! {member.guild}서버에 오신것을 환영합니다!')
+            except:
+                await member.guild.owner.send('{0.owner.name}님의 서버인 {0.name}서버에 설정하신 환영 기능에 오류가 생겨 환영 기능 데이터를 초기화 하겠습니다!\n이 메시지를 보시면 환영메시지/채널을 다시 설정해주세요!'.format(member.guild))
+                data[str(member.guild.id)] = {}
+                dataIO.save_json(self.welcome, data)
         else:
-            await self.bot.get_channel(a.get('channel')).send(a.get('message1'))
+            try:
+                await self.bot.get_channel(a.get('channel')).send(a.get('message1').format(member))
+            except:
+                await member.guild.owner.send('{0.owner.name}님의 서버인 {0.name}서버에 설정하신 환영 기능에 오류가 생겨 환영 기능 데이터를 초기화 하겠습니다!\n이 메시지를 보시면 환영메시지/채널을 다시 설정해주세요!'.format(member.guild))
+                data[str(member.guild.id)] = {}
+                dataIO.save_json(self.welcome, data)
+
 
     @commands.Cog.listener()
     async def on_member_remove(self, member):
@@ -159,10 +233,22 @@ class error(commands.Cog):
         a = data.get(str(member.guild.id))
         if a == None:
             return
-        if a.get('message2') == None:     
-            await self.bot.get_channel(a.get('channel')).send(f'{member}님아 {member.guild}서버에서 나가셨습니다')
+        if a.get('channel') == None:
+            return
+        if a.get('message2') == None:  
+            try:   
+                await self.bot.get_channel(a.get('channel')).send(f'{member}님이! {member.guild}서버에서 나가셨습니다')
+            except:
+                await member.guild.owner.send('{0.owner.name}님의 서버인 {0.name}서버에 설정하신 환영 기능에 오류가 생겨 환영 기능 데이터를 초기화 하겠습니다!\n이 메시지를 보시면 환영메시지/채널을 다시 설정해주세요!'.format(member.guild))
+                data[str(member.guild.id)] = {}
+                dataIO.save_json(self.welcome, data)
         else:
-            await self.bot.get_channel(a.get('channel')).send(a.get('message2'))
+            try:
+                await self.bot.get_channel(a.get('channel')).send(a.get('message2').format(member))
+            except:
+                await member.guild.owner.send('{0.owner.name}님의 서버인 {0.name}서버에 설정하신 환영 기능에 오류가 생겨 환영 기능 데이터를 초기화 하겠습니다!\n이 메시지를 보시면 환영메시지/채널을 다시 설정해주세요!'.format(member.guild))
+                data[str(member.guild.id)] = {}
+                dataIO.save_json(self.welcome, data)
 
 def check_folder():
     if not os.path.exists('data/language'):

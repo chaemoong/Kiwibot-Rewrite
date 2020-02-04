@@ -21,6 +21,7 @@ import requests
 from enum import Enum
 import asyncio
 from discord.utils import get
+import urllib.request
 
 class general(commands.Cog):
     def __init__(self, bot):
@@ -395,13 +396,179 @@ class general(commands.Cog):
         await a.delete()
         await ctx.send(embed=em)
 
-    @commands.group(no_pm=True, name='translate', description='The translate(papago) API command! | 파파고 명령어입니다!', aliases=['ㅅㄱ무님ㅅㄷ', '파파고', 'papago', 'vkvkrh', 'ㅔ멤해'])
+    @commands.group(no_pm=True, name='cutock', description="Cutock봇 API를 가져오는 명령어입니다! | Get Cutock Bot's API!", aliases=['쳐새차', '쿠톡', 'znxhr'])
+    async def cutock(self, ctx):
+        """Cutock봇 API를 가져오는 명령어입니다! | Get Cutock Bot's API!"""
+        if ctx.invoked_subcommand is None:
+            em = discord.Embed(colour=discord.Colour.orange(), title='레벨링 설정 | Leveling Funcion Settings', timestamp=datetime.datetime.utcnow())
+            em.add_field(name='아래에는 사용 가능한 명령어들입니다!', value='account - 계좌의 정보를 가져옵니다!')
+            return await ctx.send(ctx.author.mention, embed=em)
+
+    @cutock.command(no_pm=True, name='account', description="Cutock봇의 계좌 정보를 가져오는 명령어입니다! | Get Cutock Bot's Account API!", aliases=['ㅁㅊ채ㅕㅜㅅ', '계좌', 'rPwhk'])
+    async def account(self, ctx, account:int=None):
+        url = f"http://maryst.iptime.org:90/api/account/{account}"
+        try:
+            one = await ctx.send('> 조회 중 입니다! 잠시만 기달려주세요!')
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url) as response:
+                    Data = await response.json()
+        except:
+            return await one.edit(content='> Cutock API 접속에 실패하였습니다! 잠시후 에 시도 해주세요!')
+        if account == None or Data.get('status') == 404:
+            return await ctx.send(f'{ctx.author.mention}, 계좌가 존재하지 않습니다!')
+        a = {
+            "STOCK": "주식통장",
+            "SAVING": "저축통장",
+            "FREE": "자유입출금통장"
+        }
+        Type = a[Data['Type']]
+        Balance = Data['Balance']
+        History = Data['History']
+        OWNER = str(self.bot.get_user(Data['UserID']))
+        ID = Data['ID']
+        Date = Data['Date']
+        image = url + '/image'
+        if History == []:
+            History = '없음'
+        if OWNER == None:
+            OWNER = '키위봇이 그 유저를 찾기 못했어요!'
+        em = discord.Embed(colour=0xffff00, title='Cutock 계좌 안내!')
+        em.add_field(name='통장 유형', value=Type, inline=False)
+        em.add_field(name='통장 주인', value=OWNER, inline=False)
+        em.add_field(name='통장 잔고', value=f'{Balance}원', inline=False)
+        em.add_field(name='통장 계좌', value=ID, inline=False)
+        em.add_field(name='통장 생성 날짜', value=datetime.datetime.fromtimestamp(int(Date)), inline=False)
+        em.add_field(name='통장 이용 내역', value=History, inline=False)
+        em.set_image(url=image)
+        em.set_footer(text=f'Request by {ctx.author}', icon_url=ctx.author.avatar_url)
+        return await ctx.send(ctx.author.mention, embed=em)
+
+    @commands.group(no_pm=True, name='translate', description='The translate(papago) API command! | 파파고 명령어입니다!', aliases=['ㅅㄱ무님ㅅㄷ', '파파고', 'papago', 'vkvkrh', 'ㅔ멤해', '번역', 'qjsdur', 'qjsdurrl', ])
     async def translate(self, ctx):
         """번역 명령어입니다!"""
-        if ctx.invoked_subcommand is None:
-            await ctx.send('```\n지원하는 언어:\n한국어 : ko\n영어 : en\n일본어 : ja\n중국어: zh-CN\n```')
+        a = ['한글 - ko', '영어 - en', '일본어 - ja', '중국어 간체 - zh-CN', '중국어 번체 - zh-TW', '스페인어 - es', '프랑스어 - fr', '러시아어 - ru', '베트남어 - vi', '태국어 - th', '인도네시아어 - id', '독일어 - de', '이탈리아어 - it']
+        if ctx.invoked_subcommand is None or ctx.invoked_subcommand in a:
+            em = discord.Embed(colour=discord.Colour.green())
+            em.add_field(name='지원되는 언어:', value='\n'.join(a), inline=False)
+            em.add_field(name='사용방법', value=f'{ctx.prefix}translate en 안녕하세요', inline=False)
+            await ctx.send(f'{ctx.author.mention}, 🔴 잘못된 사용 방법입니다!', embed=em)
 
-    
+    @translate.command(no_pm=True, name='en', description='Papago command that translates into English! | 영어로 번역해주는 파파고 명령어입니다!')
+    async def en(self, ctx, *, message=None):
+        return await self.translating(ctx, message, ctx.command.name)
+
+    @translate.command(no_pm=True, name='ko', description='Papago command that translates into Korean! | 한글로 번역해주는 파파고 명령어입니다!')
+    async def ko(self, ctx, *, message=None):
+        return await self.translating(ctx, message, ctx.command.name)
+
+    @translate.command(no_pm=True, name='ja', description='Papago command that translates into Japanese! | 일본어로 번역해주는 파파고 명령어입니다!')
+    async def ja(self, ctx, *, message=None):
+        return await self.translating(ctx, message, ctx.command.name)
+
+    @translate.command(no_pm=True, name='cn', description='Papago command that translates into Korean! zh-CN(China-new)! | 중국어 간체로 번역해주는 파파고 명령어입니다!')
+    async def cn(self, ctx, *, message=None):
+        return await self.translating(ctx, message, 'zh-CN')
+
+    @translate.command(no_pm=True, name='tw', description='Papago command that translates into zh-TW(China-old)! | 중국어 번체로 번역해주는 파파고 명령어입니다!')
+    async def tw(self, ctx, *, message=None):
+        return await self.translating(ctx, message, 'zh-TW')
+
+    @translate.command(no_pm=True, name='es', description='Papago command that translates into español(Spain)! | 스페인어로 번역해주는 파파고 명령어입니다!')
+    async def es(self, ctx, *, message=None):
+        return await self.translating(ctx, message, ctx.command.name)
+
+    @translate.command(no_pm=True, name='fr', description='Papago command that translates into français(France)! | 프랑스어로 번역해주는 파파고 명령어입니다!')
+    async def fr(self, ctx, *, message=None):
+        return await self.translating(ctx, message, ctx.command.name)
+
+    @translate.command(no_pm=True, name='ru', description='Papago command that translates into Русский(Russian)! | 러시아어로 번역해주는 파파고 명령어입니다!')
+    async def ru(self, ctx, *, message=None):
+        return await self.translating(ctx, message, ctx.command.name)
+
+    @translate.command(no_pm=True, name='vi', description='Papago command that translates into Tiếng Việt(Vietnam)! | 베트남어 번역해주는 파파고 명령어입니다!')
+    async def vi(self, ctx, *, message=None):
+        return await self.translating(ctx, message, ctx.command.name)
+
+    @translate.command(no_pm=True, name='th', description='Papago command that translates into ภาษาไทย(Thailand)! | 태국어로 번역해주는 파파고 명령어입니다!')
+    async def th(self, ctx, *, message=None):
+        return await self.translating(ctx, message, ctx.command.name)
+
+    @translate.command(no_pm=True, name='id', description='Papago command that translates into Bahasa Indonesia! | 인도네시아어로 번역해주는 파파고 명령어입니다!')
+    async def id(self, ctx, *, message=None):
+        return await self.translating(ctx, message, ctx.command.name)
+
+    @translate.command(no_pm=True, name='de', description='Papago command that translates into Deutsch(German)! | 독일어로 번역해주는 파파고 명령어입니다!')
+    async def de(self, ctx, *, message=None):
+        return await self.translating(ctx, message, ctx.command.name)
+
+    @translate.command(no_pm=True, name='it', description='Papago command that translates into Italiano(Italia)! | 이탈리아어로 번역해주는 파파고 명령어입니다!')
+    async def it(self, ctx, *, message=None):
+        return await self.translating(ctx, message, ctx.command.name)
+
+
+    async def translating(self, ctx, message, target):
+        try:
+            if message == None:
+                return await ctx.send(':x: **번역할 메시지를 적어주세요!**')
+            ID = "2I8Gx9HnoSDyGUTBft48"
+            SECERT = "oDB5O8NxgI"
+            encQuery = urllib.parse.quote(message)
+            data = "query=" + encQuery
+            url = "https://openapi.naver.com/v1/papago/detectLangs"
+            request = urllib.request.Request(url)
+            request.add_header("X-Naver-Client-Id",ID)
+            request.add_header("X-Naver-Client-Secret",SECERT)
+            response = urllib.request.urlopen(request, data=data.encode("utf-8"))
+            rescode = response.getcode()
+            if(rescode==200):
+                response_body = response.read()
+                lang = json.loads(response_body.decode('utf-8'))['langCode']
+            else:
+                return await ctx.send(f"Error Code: {rescode}")
+            client_id = "uRl36eTH0DLB1uqbmKjl"
+            client_secret = "eM7loxbRvt"
+            encText = urllib.parse.quote(message)
+            data = f"source={lang}&target={target}&text=" + encText
+            url = "https://openapi.naver.com/v1/papago/n2mt"
+            request = urllib.request.Request(url)
+            request.add_header("X-Naver-Client-Id",client_id)
+            request.add_header("X-Naver-Client-Secret",client_secret)
+            response = urllib.request.urlopen(request, data=data.encode("utf-8"))
+            rescode = response.getcode()
+            if(rescode==200):
+                response_body = response.read()
+                em = discord.Embed(colour=discord.Colour.green())
+                em.add_field(name='파파고 번역 결과', value=json.loads(response_body.decode('utf-8'))['message']['result']['translatedText'])
+                return await ctx.send(embed=em)
+            else:
+                return await ctx.send(f"Error Code: {rescode}")
+        except urllib.error.HTTPError:
+            return await ctx.send("""지원되는 언어는 아래와 같습니다! | Supports Language:```
+한국어(ko)-영어(en)
+한국어(ko)-일본어(ja)
+한국어(ko)-중국어 간체(zh-CN)
+한국어(ko)-중국어 번체(zh-TW)
+한국어(ko)-스페인어(es)
+한국어(ko)-프랑스어(fr)
+한국어(ko)-러시아어(ru)
+한국어(ko)-베트남어(vi)
+한국어(ko)-태국어(th)
+한국어(ko)-인도네시아어(id)
+한국어(ko)-독일어(de)
+한국어(ko)-이탈리아어(it)
+중국어 간체(zh-CN) - 중국어 번체(zh-TW)
+중국어 간체(zh-CN) - 일본어(ja)
+중국어 번체(zh-TW) - 일본어(ja)
+영어(en)-일본어(ja)
+영어(en)-중국어 간체(zh-CN)
+영어(en)-중국어 번체(zh-TW)
+영어(en)-프랑스어(fr)
+```
+""")
+        except Exception as e:
+            await self.bot.get_user(431085681847042048).send(f'`번역` 명령어에 문제가 발생하였습니다!\n```\n{e}\n```')
+            return await ctx.send('관리자 에게 에러 내용을 전달 하였습니다!\n빠른 시일 내에 에러가 고쳐지도록 노력하겠습니다!')
+
 def check_folder():
     if not os.path.exists('data/general'):
         print('data/general 풀더생성을 완료하였습니다!')

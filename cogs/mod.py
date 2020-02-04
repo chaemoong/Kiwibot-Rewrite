@@ -26,6 +26,7 @@ class Mod(commands.Cog):
         self.level = 'data/mod/settings.json'
         self.leveling = dataIO.load_json(self.level)
         self.welcome = 'data/mod/welcome.json'
+        self.welcome2 = dataIO.load_json(self.welcome)
 
     async def owner(ctx):
         return ctx.author.id == 431085681847042048
@@ -530,7 +531,132 @@ class Mod(commands.Cog):
             else:
                 return await a.edit(content='이상한 이모지를 추가하지 마세요!')
 
-                
+    @commands.group(no_pm=True, name='welcomeset', description='Commands to set welcome functions! | 환영/퇴장 기능들을 설정하는 명령어입니다!', aliases=['ㅈ디채ㅡㄷㄴㄷㅅ', '웰컴기능설정', 'dnpfzjarlsmdtjfwjd'])
+    @commands.check(administrator)
+    async def welcomeset(self, ctx):
+        if ctx.invoked_subcommand is None:
+            em = discord.Embed(colour=discord.Colour.orange(), title='환영기능 설정 | Welcome Funcion Settings', timestamp=datetime.datetime.utcnow())
+            em.add_field(name='아래에는 사용 가능한 명령어들입니다!', value='channel - 유저 환영/퇴장 메시지를 보내는 채널을 설정합니다!\nhimsg - 유저 환영 메시지를 설정하는 명령어에욧!\nbyemsg - 유저 퇴장 메시지를 설정하는 명령어에욧!')
+            return await ctx.send(ctx.author.mention, embed=em)
+
+    @welcomeset.command(pass_context=True)
+    async def channel(self, ctx, channel:discord.TextChannel=None):
+        print(ctx)
+        author = ctx.author
+        server = ctx.guild
+        if channel == None:
+            return await ctx.send(f'{author.mention}, 채널의 멘션 혹은 ID를 적어주세요!')
+        em = discord.Embed(colour=discord.Colour.gold(), title='채널 설정 | CHANNEL SETTINGS', timestamp=datetime.datetime.utcnow())
+        em.add_field(name='지정하시려면 ⭕ 취소하리면 ❌에 반응해주세요!', value=f'정말로 {channel.mention} 채널을 환영 메시지 보내는 채널로 지정하실건가요???')
+        if author.avatar_url:
+            em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
+        else:
+            em.set_footer(text=f'Request By {author}')
+        a = await ctx.send(embed=em)
+        await a.add_reaction('⭕')
+        await a.add_reaction('❌')
+        asdf = ['⭕', '❌']
+        def check(reaction, user):
+            if user == ctx.author and str(reaction.emoji) in asdf: 
+                return True 
+        try:
+            reaction, user = await self.bot.wait_for('reaction_add', timeout=30.0, check=check)
+        except asyncio.TimeoutError:
+            return await a.edit(content='> 시간초과로 인해 취소되었습니다!')
+        if True:
+            await a.delete()
+            em2 = discord.Embed(colour=discord.Colour.gold(), title='채널 설정 | CHANNEL SETTINGS', timestamp=datetime.datetime.utcnow())
+            if reaction.emoji == '⭕':
+                if self.welcome2.get(f'{server.id}') == None:
+                    self.welcome2[str(server.id)] = {}
+                self.welcome2[str(server.id)].update({"channel": channel.id})
+                dataIO.save_json(self.welcome, self.welcome2)
+                em2.add_field(name='성공!', value=f'이제 환영 메시지를 {channel.mention} 채널에 보냅니다!')
+                return await ctx.send(author.mention, embed=em2)
+            if reaction.emoji == '❌':
+                em2.add_field(name='에러!', value='취소되었습니다!')
+                return await ctx.send(author.mention, embed=em2)
+            else:
+                return await ctx.send(f'{author.mention}, 다른 이모지를 추가하지 마세요!')
+
+    @welcomeset.command(pass_context=True)
+    async def himsg(self, ctx, *, message=None):
+        server = ctx.guild
+        author = ctx.author
+        em = discord.Embed(colour=discord.Colour.gold(), title='메세지 설정 | MESSAGE SETTINGS', timestamp=datetime.datetime.utcnow())
+        if message == None:
+            em.add_field(name='메시지를 제대로 적어주세요!', value="예: {0.name} == 들어온 사람의 이름\n{0.mention} == 들어온 사람의 멘션\n{0} == 들어온 사람의 태그")
+            return await ctx.send(author.mention, embed=em)
+        em.add_field(name='지정하시려면 ⭕ 취소하리면 ❌에 반응해주세요!', value=f'정말로 `{message}` 메시지를 환영 메시지로 지정하실건가요???')
+        if author.avatar_url:
+            em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
+        else:
+            em.set_footer(text=f'Request By {author}')
+        a = await ctx.send(embed=em)
+        await a.add_reaction('⭕')
+        await a.add_reaction('❌')
+        asdf = ['⭕', '❌']
+        def check(reaction, user):
+            if user == ctx.author and str(reaction.emoji) in asdf: 
+                return True 
+        try:
+            reaction, user = await self.bot.wait_for('reaction_add', timeout=30.0, check=check)
+        except asyncio.TimeoutError:
+            return await a.edit(content='> 시간초과로 인해 취소되었습니다!')
+        if True:
+            await a.delete()
+            em2 = discord.Embed(colour=discord.Colour.gold(), title='메세지 설정 | MESSAGE SETTINGS', timestamp=datetime.datetime.utcnow())
+            if reaction.emoji == '⭕':
+                if self.welcome2.get(f'{server.id}') == None:
+                    self.welcome2[f'{server.id}'] = {}
+                self.welcome2[f'{server.id}'].update({"message1": message})
+                dataIO.save_json(self.welcome, self.welcome2)
+                em2.add_field(name='성공!', value=f'이제 환영 메시지를 {message}로 설정하였습니다!')
+                return await ctx.send(author.mention, embed=em2)
+            if reaction.emoji == '❌':
+                em2.add_field(name='에러!', value='취소되었습니다!')
+                return await ctx.send(author.mention, embed=em2)
+            else:
+                return await ctx.send(f'{author.mention}, 다른 이모지를 추가하지 마세요!')
+
+    @welcomeset.command(pass_context=True)
+    async def byemsg(self, ctx, *, 메시지=None):
+        author = ctx.author
+        server = ctx.guild.id
+        em = discord.Embed(colour=discord.Colour.gold(), title='메세지 설정 | MESSAGE SETTINGS', timestamp=datetime.datetime.utcnow())
+        if 메시지 == None:
+            em.add_field(name='메시지를 제대로 적어주세요!', value="예: {0.name} == 들어온 사람의 이름\n{0.mention} == 들어온 사람의 멘션\n{0} == 들어온 사람의 태그")
+            return await ctx.send(author.mention, embed=em)
+        em.add_field(name='지정하시려면 ⭕ 취소하리면 ❌에 반응해주세요!', value=f'정말로 `{메시지}` 메시지를 퇴장 메시지로 지정하실건가요???')
+        if author.avatar_url:
+            em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
+        else:
+            em.set_footer(text=f'Request By {author}')
+        a = await ctx.send(embed=em)
+        await a.add_reaction('⭕')
+        await a.add_reaction('❌')
+        asdf = ['⭕', '❌']
+        def check(reaction, user):
+            if user == ctx.author and str(reaction.emoji) in asdf: 
+                return True 
+        try:
+            reaction, user = await self.bot.wait_for('reaction_add', timeout=30.0, check=check)
+        except asyncio.TimeoutError:
+            return await a.edit(content='> 시간초과로 인해 취소되었습니다!')
+        if True:
+            em2 = discord.Embed(colour=discord.Colour.gold(), title='메세지 설정 | MESSAGE SETTINGS', timestamp=datetime.datetime.utcnow())
+            if reaction.emoji == '⭕':
+                if self.welcome2.get(f'{server}') == None:
+                    self.welcome2[f'{server.id}'] = {}
+                self.welcome2[f'{server.id}'].update({"message2": 메시지})
+                dataIO.save_json(self.welcome, self.welcome2)
+                em2.add_field(name='성공!', value=f'이제 퇴장 메시지를 {메시지}로 설정하였습니다!')
+                return await ctx.send(author.mention, embed=em2)
+            if reaction.emoji == '❌':
+                em2.add_field(name='에러!', value='취소되었습니다!')
+                return await ctx.send(author.mention, embed=em2)
+            else:
+                return await ctx.send(f'{author.mention}, 다른 이모지를 추가하지 마세요!')
 
     @commands.group(no_pm=True, name='modset', description='Commands to set administrator functions! | 관리자 기능들을 설정하는 명령어입니다!', aliases=['ㅡㅐㅇㄴㄷㅅ', '관리자기능설정', 'rhksflwkrlsmdtjfwjd'])
     @commands.check(administrator)
@@ -793,35 +919,6 @@ class Mod(commands.Cog):
         await ctx.send(embed=em)
         dataIO.save_json(self.ang, self.data)
 
-    @modset.command(pass_context=True)
-    async def channel(self, ctx, channel:discord.TextChannel=None):
-        server = ctx.guild
-        asdf = dataIO.load_json(self.setting)
-        await ctx.send(channel.id)
-        try:
-            if asdf[f'{server.id}']['language'] == 'ko':
-                data = dataIO.load_json(self.ko)['modset']['channel']
-            else:
-                data = dataIO.load_json(self.en)['modset']['channel']
-        except:
-            data = dataIO.load_json(self.en)['modset']['channel']
-        if channel == None:
-            return await ctx.send(data['1'])
-        author = ctx.author
-        try:
-            if self.data[f'{server.id}']: pass
-        except:
-            self.data[f'{server.id}'] = {}
-        self.data[f'{server.id}'].update({"channel": channel.id})
-        em = discord.Embed(colour=author.colour)
-        if author.avatar_url:
-            em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
-        else:
-            em.set_footer(text=f'Request By {author}')
-        em.add_field(name=data['2'], value=data['3'].format(channel.name))
-        await ctx.send(embed=em)
-        dataIO.save_json(self.ang, self.data)
-
     async def language_setting(self, ctx):
         author = ctx.author
         c = self.bot.get_channel(ctx.message.channel.id)
@@ -852,7 +949,7 @@ class Mod(commands.Cog):
         if reason == None:
             reason = data['1']
         time = time.strftime(data['2'].encode('unicode-escape').decode()).encode().decode('unicode-escape')
-        em = discord.Embed(colour=author.colour)
+        em = discord.Embed(colour=discord.Colour.red())
         em.add_field(name=action, value=data['3'].format(time), inline=False)
         em.add_field(name=data['4'], value=f'{author.mention} ({author.id}) | {user.mention} ({user.id})', inline=False)
         em.add_field(name=data['5'], value=reason, inline=False)

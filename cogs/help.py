@@ -5,7 +5,7 @@ from os import listdir
 from os.path import isfile, join
 import traceback
 
-class Embed(commands.Cog):
+class Help(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
@@ -20,7 +20,7 @@ class Embed(commands.Cog):
 
         author = ctx.author
         help_embed = discord.Embed(
-            title='Help',
+            title='HELP',
             color=author.colour
         )
         help_embed.set_thumbnail(url=self.bot.user.avatar_url)
@@ -33,21 +33,19 @@ class Embed(commands.Cog):
         if cog == 'all':
             for cog in cogs:
                 cog_commands = self.bot.get_cog(cog).get_commands()
-                commands_list = ''
+                commands_list = []
                 for comm in cog_commands:
-                    commands_list += f'`{comm.name}`, '             
+                    commands_list.append(f'`{ctx.prefix}{comm.name}`')
+                asdf = ", ".join(commands_list)
                 if not cog == 'error':
                     help_embed.add_field(
                         name=cog,
-                        value=commands_list,
+                        value=asdf,
                         inline=False
                     )
-                if cog == 'notice':
-                    pass
                 else:
                     pass
         else:
-
             # If the cog was specified
 
             lower_cogs = [c.lower() for c in cogs]
@@ -87,6 +85,4 @@ class Embed(commands.Cog):
 
 def setup(bot):
     bot.remove_command('help')
-    bot.add_cog(Embed(bot))
-    # Adds the Basic commands to the bot
-    # Note: The "setup" function has to be there in every cog file
+    bot.add_cog(Help(bot))

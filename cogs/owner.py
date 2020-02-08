@@ -11,6 +11,7 @@ from cogs.utils.dataIO import dataIO
 from discord import VoiceRegion
 from discord import Game
 from discord.utils import get
+from copy import deepcopy
 import subprocess
 import sys
 import time
@@ -25,7 +26,7 @@ import zipfile
 class owner(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-
+        self.asdf = 'data/general/money.json'
 
     async def is_owner(ctx):
         return ctx.author.id == 431085681847042048
@@ -91,6 +92,30 @@ class owner(commands.Cog):
             em.set_footer(text=f'Request By {author}')
         em.add_field(name='성공!', value='그 유저는 정상적으로 블랙리스트에서 삭제되었습니다!')
         return await ctx.send(embed=em)
+
+    @commands.command(no_pm=True, pass_context=True)
+    async def moneydata(self, ctx, user:discord.Member=None, money:int=None):
+        author = ctx.author
+        asdf = dataIO.load_json(self.asdf)
+        if user == None:
+            return
+        if money == None:
+            return
+        try:
+            a = asdf[str(user.id)]
+        except:
+            asdf[str(user.id)] = {}
+            a = asdf[str(user.id)]
+        a.update({'money': money})
+        dataIO.save_json(self.asdf, asdf)
+        em = discord.Embed(colour=author.colour)
+        em.add_field(name=f'{user}님의 잔고가 수정되었습니다!', value=f'잔고: {money}')
+        if author.avatar_url:
+            em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
+        else:
+            em.set_footer(text=f'Request By {author}')
+        return await ctx.send(em)
+
 
 
     @commands.command(pass_context=True)

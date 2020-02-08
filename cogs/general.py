@@ -104,6 +104,13 @@ class general(commands.Cog):
             await self.bot.wait_for('reaction_add', timeout=30.0, check=check)
         except asyncio.TimeoutError:
             return await dfdf.edit(content='> 반응을 안해주셔서 취소했어요!')
+        await dfdf.delete()
+        first = await ctx.send('과연...')
+        for i in range(4):
+            c = int(i + 1)
+            dugu = '두구'
+            await first.edit(content= '과연... ' + dugu * c) 
+            await asyncio.sleep(1)
         choice = random.choice(self.choice)
         if choice == True:
             chaemoong = '성공! '
@@ -119,7 +126,7 @@ class general(commands.Cog):
             em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
         else:
             em.set_footer(text=f'Request By {author}')
-        return await dfdf.edit(content=author.mention, embed=em)
+        return await first.edit(content=author.mention, embed=em)
 
 
     @commands.command(no_pm=True, name='userinfo', description='The userinfo command! | 유저정보 명령어입니다!', aliases=['유저정보', 'ㅕㄴㄷ갸ㅜ래', 'dbwjwjdqh'])
@@ -306,8 +313,9 @@ class general(commands.Cog):
         """Helping Another method Screen Share!\n화면공유를 할수 있게 도와주는 명령어에요!"""
         author = ctx.author
         server = author.guild
+        asdf = dataIO.load_json(self.setting)
         try:
-            if yee[f'{server.id}']['language'] == 'ko':
+            if asdf[f'{server.id}']['language'] == 'ko':
                 a = '화면 공유'
                 b = '**서버: {server.name}\n음성 채널: [{a.name}]({url})**'
                 c = '먼저 채팅방에 접속해주세요!'
@@ -348,6 +356,8 @@ class general(commands.Cog):
         before = time.monotonic()
         msg = await ctx.send(embed=em)
         msgping = round((time.monotonic() - before) * 1000)
+        if not Color:
+            Color = 0x95f0ad
         em2 = discord.Embed(title='PING! PONG!', colour=Color, timestamp=datetime.datetime.utcnow())
         em2.add_field(name=f"**Discord API: `{ping}ms`**", value=f'Message: `{msgping}ms`')
         if author.avatar_url:
@@ -359,6 +369,7 @@ class general(commands.Cog):
     @commands.command(no_pm=True, name='chinobot', description='The chinobot API command! | 치노봇에 대한 정보 명령어입니다!', aliases=['치노봇', '초ㅑㅜㅐㅠㅐㅅ', 'clshqht'])
     async def chinobot(self, ctx):
         """Loading ChinoBot's API info!\n치노봇 API를 불러와요!"""
+        asdf = dataIO.load_json(self.setting)
         try:
             if asdf[f'{ctx.guild.id}']['language'] == 'ko':
                 data = dataIO.load_json(self.ko)[ctx.command.name]
@@ -383,7 +394,10 @@ class general(commands.Cog):
         if ping > 400: Color = 0xf0bf95
         if ping > 500: Color = 0xf09595
         if ping > 600: Color = 0xe86666
-        em=discord.Embed(colour=Color)
+        try:
+            em=discord.Embed(colour=Color)
+        except:
+            em=discord.Embed(colour=0x95f0ad)
         em.add_field(name=data['1'], value=str(ping) + 'ms', inline=False)
         em.add_field(name=data['2'], value=str(user) + data['3'], inline=False)
         em.add_field(name=data['4'], value=str(server) + data['5'], inline=False)
@@ -405,7 +419,7 @@ class general(commands.Cog):
             return await ctx.send(ctx.author.mention, embed=em)
 
     @cutock.command(no_pm=True, name='account', description="Cutock봇의 계좌 정보를 가져오는 명령어입니다! | Get Cutock Bot's Account API!", aliases=['ㅁㅊ채ㅕㅜㅅ', '계좌', 'rPwhk'])
-    async def account(self, ctx, account:int=None):
+    async def account(self, ctx, account=None):
         url = f"http://maryst.iptime.org:90/api/account/{account}"
         try:
             one = await ctx.send('> 조회 중 입니다! 잠시만 기달려주세요!')
@@ -441,7 +455,49 @@ class general(commands.Cog):
         em.add_field(name='통장 이용 내역', value=History, inline=False)
         em.set_image(url=image)
         em.set_footer(text=f'Request by {ctx.author}', icon_url=ctx.author.avatar_url)
+        await one.delete()
         return await ctx.send(ctx.author.mention, embed=em)
+
+    @commands.command(name='contact', description='봇 주인한테 연락하는 명령어입니다!', ailases=['채ㅜㅅㅁㅊㅅ', '연락', 'dusfkr'])
+    async def contact(self, ctx, *, message=None):
+        author = ctx.author
+        if message == None:
+            return await ctx.send(f'{author.mention}, 메시지를 적어주세요!')
+        em = discord.Embed(colour=0xff78cb)
+        em.add_field(name='정말로 이 메시지를 보내시겠습니까?', value='이 메시지를 보낼것을 동의하면 봇 관리진에게 이 메시지가 전달됩니다. 그리고 이 모든 말의 책임은 모두 본인에게 있으며, 욕설등의 언행을 하실경우 불이익이 발생될수도 있습니다. 정말 보내시겠습니까?')
+        a = await ctx.send(author.mention, embed=em)
+        await a.add_reaction('⭕')
+        await a.add_reaction('❌')
+        asdf = ['⭕', '❌']
+        def check(reaction, user):
+            if user == ctx.author and str(reaction.emoji) in asdf: 
+                return True 
+        try:
+            reaction, user = await self.bot.wait_for('reaction_add', timeout=30.0, check=check)
+        except asyncio.TimeoutError:
+            return await a.edit(content='> 시간초과로 인해 취소되었습니다!')
+        await a.delete()
+        if True:
+            em2 = discord.Embed(colour=discord.Colour.gold(), title='봇 문의 | BOT CONTACT', timestamp=datetime.datetime.utcnow())
+            if reaction.emoji == '⭕':
+                em2.add_field(name='성공!', value='메시지를 보냈습니다.')
+                em3 = discord.Embed(colour=discord.Colour.gold(), title='봇 문의 | BOT CONTACT', timestamp=datetime.datetime.utcnow())
+                em3.add_field(name='문의가 들어왔습니다!', value=message)
+                if ctx.guild == None:
+                    server = 'Direct Message'
+                else:
+                    server = ctx.guild
+                em3.add_field(name='보낸곳, 보낸이', value=f'{server}에서 보내졌으며, {author}({author.id})님이 보내셨습니다!')
+                await self.bot.get_user(431085681847042048).send(embed=em3)
+                return await ctx.send(author.mention, embed=em2)
+            if reaction.emoji == '❌':
+                em2.add_field(name='에러!', value='취소되었습니다!')
+                return await ctx.send(author.mention, embed=em2)
+            else:
+                return await ctx.send(f'{author.mention}, 다른 이모지를 추가하지 마세요!')
+       
+
+        
 
     @commands.group(no_pm=True, name='translate', description='The translate(papago) API command! | 파파고 명령어입니다!', aliases=['ㅅㄱ무님ㅅㄷ', '파파고', 'papago', 'vkvkrh', 'ㅔ멤해', '번역', 'qjsdur', 'qjsdurrl', ])
     async def translate(self, ctx):

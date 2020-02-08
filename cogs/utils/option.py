@@ -10,7 +10,7 @@ owner = [431085681847042048]
 #봇의 토큰 입력
 token = "NTM4NjU5NTgwODU1NDUxNjQ4.XgtjlA.K4cufv3qWHWL87gGlUytP6kDXJw"
 #봇의 접두사 입력
-first = "!"
+first = ".."
 #봇의 공지 명령어 입력
 no = "공지"
 

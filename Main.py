@@ -37,6 +37,15 @@ async def on_ready():
     print('{0.user} 계정에 로그인 하였습니다!'.format(bot))
     bot.load_extension('music')
 
+@bot.before_invoke
+async def before_any_command(ctx):
+    blacklist = dataIO.load_json('blacklist.json')
+    try:
+        if str(ctx.author.id) in blacklist['blacklist']:
+            raise commands.CommandNotFound
+    except KeyError:
+        return
+
 async def playing():
     await bot.wait_until_ready()
 

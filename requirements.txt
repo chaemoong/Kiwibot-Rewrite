@@ -1,7 +1,8 @@
 pip
 git+git://github.com/Rapptz/discord.py.git#egg=discord.py[voice]
-pytz
+datetime
 aiohttp
-bs4
 lavalink
-zipfile
+pytz
+bs4
+requests

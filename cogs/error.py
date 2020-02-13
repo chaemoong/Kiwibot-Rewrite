@@ -123,6 +123,14 @@ __Sending With DPNK__""")
             data = dataIO.load_json(self.en)
         if isinstance(error, commands.CommandInvokeError):
             # A bit hacky, couldn't find a better way
+            try:
+                checkbot = dataIO.load_json('data/owner/check.json')
+                em = discord.Embed(title=':outbox_tray: 잠시만요! :outbox_tray:', timestamp=datetime.datetime.utcnow())
+                em.set_thumbnail(url=ctx.bot.user.avatar_url)
+                em.add_field(name='지금 봇이 점검중이에요!', value=f'사유는 아래와 같습니다!\n사유: `{checkbot.get("reason")}`')
+                return await ctx.send(embed=em)
+            except:
+                pass
             no_dms = "Cannot send messages to this user"
             is_help_cmd = ctx.command.qualified_name == "help"
             is_forbidden = isinstance(error.original, discord.Forbidden)
@@ -134,6 +142,8 @@ __Sending With DPNK__""")
             for page in pagify(log):
                 asdf = f'```py\n{log}\n```'
             embed = discord.Embed(title=f'{ctx.command.qualified_name} 명령어에 에러가 발생하였습니다!', colour=discord.Colour.green())
+            embed.add_field(name='유저', value=ctx.author)
+            embed.add_field(name='서버', value=ctx.guild)
             await ctx.send('에러 내용을 봇 관리진에게 보냈습니다! 빠른 시일내에 고치도록 하겠습니다!\nI send Error code to Bot Administrator! I will fix that!')
             await dddd.send(embed=embed, content=asdf)
         elif isinstance(error, commands.CommandNotFound):
@@ -145,18 +155,42 @@ __Sending With DPNK__""")
                     return await ctx.send(embed=em)
             except KeyError:
                 pass
+            try:
+                checkbot = dataIO.load_json('data/owner/check.json')
+                em = discord.Embed(title=':outbox_tray: 잠시만요! :outbox_tray:', timestamp=datetime.datetime.utcnow())
+                em.set_thumbnail(url=ctx.bot.user.avatar_url)
+                em.add_field(name='지금 봇이 점검중이에요!', value=f'사유는 아래와 같습니다!\n사유: `{checkbot.get("reason")}`')
+                return await ctx.send(embed=em)
+            except:
+                pass
             lan = data['command_none']
             em = discord.Embed(colour=ctx.author.colour)
             em.add_field(name=lan['1'], value=lan['2'].format(ctx))
             em.set_footer(text=lan['3'])
             return await ctx.send(embed=em)
         elif isinstance(error, commands.CheckFailure):
+            try:
+                checkbot = dataIO.load_json('data/owner/check.json')
+                em = discord.Embed(title=':outbox_tray: 잠시만요! :outbox_tray:', timestamp=datetime.datetime.utcnow())
+                em.set_thumbnail(url=ctx.bot.user.avatar_url)
+                em.add_field(name='지금 봇이 점검중이에요!', value=f'사유는 아래와 같습니다!\n사유: `{checkbot.get("reason")}`')
+                return await ctx.send(embed=em)
+            except:
+                pass
             lan = data['admin_command']
             em = discord.Embed(colour=ctx.author.colour)
             em.add_field(name=lan['1'], value=lan['2'].format(ctx))
             em.set_footer(text=lan['3'])
             return await ctx.send(embed=em)
         elif isinstance(error, commands.CommandOnCooldown):
+            try:
+                checkbot = dataIO.load_json('data/owner/check.json')
+                em = discord.Embed(title=':outbox_tray: 잠시만요! :outbox_tray:', timestamp=datetime.datetime.utcnow())
+                em.set_thumbnail(url=ctx.bot.user.avatar_url)
+                em.add_field(name='지금 봇이 점검중이에요!', value=f'사유는 아래와 같습니다!\n사유: `{checkbot.get("reason")}`')
+                return await ctx.send(embed=em)
+            except:
+                pass
             asdf = time.strftime("%M", time.gmtime(error.retry_after))
             asss = time.strftime("%S", time.gmtime(error.retry_after))
             em = discord.Embed(colour=ctx.author.colour)

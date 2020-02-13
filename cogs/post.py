@@ -5,7 +5,7 @@ from discord.ext import commands
 from cogs.utils.dataIO import dataIO
 import os
 
-class post(commands.Cog):
+class Post(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.company = dataIO.load_json('data/post/company_name.json')
@@ -111,4 +111,4 @@ def check_file():
 def setup(bot):
     check_folder()
     check_file()
-    bot.add_cog(post(bot))
+    bot.add_cog(Post(bot))

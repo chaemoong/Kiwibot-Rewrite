@@ -23,7 +23,7 @@ import asyncio
 from discord.utils import get
 import urllib.request
 
-class general(commands.Cog):
+class General(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.client = dataIO.load_json('data/general/status.json')
@@ -190,7 +190,7 @@ class general(commands.Cog):
         em.add_field(name=data['13'], value=str(fg) + ' (UTC+9)', inline=False)
         try:
             status = user.activities[0].type
-            if status == 4:
+            if status == discord.ActivityType.custom:
                 em.add_field(name='Custom Status', value=user.activities[0].state)
         except:
             pass
@@ -347,6 +347,7 @@ class general(commands.Cog):
         em = discord.Embed(colour=author.colour, title='PING! || 핑!', timestamp=datetime.datetime.utcnow())
         em.set_author(name=self.bot.user.name, icon_url=self.bot.user.avatar_url)
         ping = round(self.bot.latency * 1000)
+        if ping > 10: Color = 0x95f0ad
         if ping > 100: Color = 0x95f0ad
         if ping > 200: Color = 0x8ddcf0
         if ping > 300: Color = 0xf0dc8d
@@ -356,8 +357,10 @@ class general(commands.Cog):
         before = time.monotonic()
         msg = await ctx.send(embed=em)
         msgping = round((time.monotonic() - before) * 1000)
-        if not Color:
-            Color = 0x95f0ad
+        try:
+            em2 = discord.Embed(title='PING! PONG!', colour=Color, timestamp=datetime.datetime.utcnow())
+        except:
+            em2 = discord.Embed(title='PING! PONG!', colour=0x95f0ad, timestamp=datetime.datetime.utcnow())
         em2 = discord.Embed(title='PING! PONG!', colour=Color, timestamp=datetime.datetime.utcnow())
         em2.add_field(name=f"**Discord API: `{ping}ms`**", value=f'Message: `{msgping}ms`')
         if author.avatar_url:
@@ -438,7 +441,7 @@ class general(commands.Cog):
         Type = a[Data['Type']]
         Balance = Data['Balance']
         History = Data['History']
-        OWNER = str(self.bot.get_user(Data['UserID']))
+        OWNER = str(self.bot.fetch_user(Data['UserID']))
         ID = Data['ID']
         Date = Data['Date']
         image = url + '/image'
@@ -495,9 +498,6 @@ class general(commands.Cog):
                 return await ctx.send(author.mention, embed=em2)
             else:
                 return await ctx.send(f'{author.mention}, 다른 이모지를 추가하지 마세요!')
-       
-
-        
 
     @commands.group(no_pm=True, name='translate', description='The translate(papago) API command! | 파파고 명령어입니다!', aliases=['ㅅㄱ무님ㅅㄷ', '파파고', 'papago', 'vkvkrh', 'ㅔ멤해', '번역', 'qjsdur', 'qjsdurrl', ])
     async def translate(self, ctx):
@@ -668,4 +668,4 @@ def check_file():
 def setup(bot):
     check_folder()
     check_file()
-    bot.add_cog(general(bot))
+    bot.add_cog(General(bot))

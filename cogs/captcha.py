@@ -8,7 +8,7 @@ import json
 import asyncio
 from discord.utils import get
 
-class captcha(commands.Cog):
+class Captcha(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.error = dataIO.load_json('data/captcha/error.json')
@@ -138,4 +138,4 @@ def check_file():
 def setup(bot):
     check_folder()
     check_file()
-    bot.add_cog(captcha(bot))
+    bot.add_cog(Captcha(bot))

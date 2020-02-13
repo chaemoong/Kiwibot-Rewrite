@@ -35,7 +35,7 @@ class Help(commands.Cog):
                 cog_commands = self.bot.get_cog(cog).get_commands()
                 commands_list = []
                 for comm in cog_commands:
-                    commands_list.append(f'`{ctx.prefix}{comm.name}`')
+                    commands_list.append(f'`{comm.name}`')
                 asdf = ", ".join(commands_list)
                 if not cog == 'error':
                     help_embed.add_field(

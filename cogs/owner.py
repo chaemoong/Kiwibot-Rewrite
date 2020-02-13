@@ -23,13 +23,48 @@ import zipfile
 
 
 
-class owner(commands.Cog):
+class Owner(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.asdf = 'data/general/money.json'
+        self.check = 'data/owner/check.json'
+
 
     async def is_owner(ctx):
         return ctx.author.id == 431085681847042048
+
+    @commands.command(pass_context=True)
+    @commands.check(is_owner)
+    async def 점검(self, ctx, *, reason=None):
+        author = ctx.author
+        if reason == None:
+            reason = '없음'
+        check = dataIO.load_json(self.check)
+        em = discord.Embed(colour=discord.Colour.blue())
+        if author.avatar_url:
+            em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
+        else:
+            em.set_footer(text=f'Request By {author}')
+        try:
+            if not check.get('check') == None:
+                check = {}
+                dataIO.save_json(self.check, check)
+                if author.avatar_url:
+                    em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
+                else:
+                    em.set_footer(text=f'Request By {author}')
+                return await ctx.send(embed=em)
+        except KeyError:
+            pass
+        example = {
+            'check': 'on',
+            'reason': reason
+            }
+        check.update(example)
+        dataIO.save_json(self.check, check)
+        em.add_field(name='성공!', value='그 유저는 정상적으로 블랙리스트에 추가되었습니다!')
+        return await ctx.send(embed=em)
+
 
     @commands.group(pass_context=True)
     @commands.check(is_owner)
@@ -170,6 +205,8 @@ class owner(commands.Cog):
         embed.add_field(name=':outbox_tray: **OUTPUT**', value=python.format(result), inline=False)
         await ctx.send(embed=embed)
 
+
+
     @commands.command()
     @commands.check(is_owner)
     async def 소개(self, ctx):
@@ -244,8 +281,73 @@ class owner(commands.Cog):
         except:
             await ctx.send('그 기능을 찾을수 없습니다!')
 
+    @commands.command()
+    async def version(self, ctx):
+        """Show's Github Commit"""
+        response = self.bot.loop.run_in_executor(None, self._get_version)
+        result = await asyncio.wait_for(response, timeout=60)
+        try:
+            await ctx.send(embed=result)
+        except discord.HTTPException:
+            await ctx.send("권한이 없습니다!")
+
+    def _get_version(self):
+        if not os.path.isdir(".git"):
+            msg = "This instance of Red hasn't been installed with git."
+            e = discord.Embed(title=msg,
+                              colour=discord.Colour.red())
+            return e
+
+        commands = " && ".join((
+            r'git config --get remote.origin.url',         # Remote URL
+            r'git rev-list --count HEAD',                  # Number of commits
+            r'git rev-parse --abbrev-ref HEAD',            # Branch name
+            r'git show -s -n 3 HEAD --format="%cr|%s|%H"'  # Last 3 commits
+        ))
+        result = os.popen(commands, 'r')
+        result = result.encoding('utf-8')
+
+        url, ncommits, branch, commits = result.split("\n", 3)
+        if url.endswith(".git"):
+            url = url[:-4]
+        if url.startswith("git@"):
+            domain, _, resource = url[4:].partition(':')
+            url = 'https://{}/{}'.format(domain, resource)
+        repo_name = url.split("/")[-1]
+
+        embed = discord.Embed(title="Updates of " + repo_name,
+                              description="Last three updates",
+                              colour=discord.Colour.green(),
+                              url="{}/tree/{}".format(url, branch))
+
+        for line in commits.split('\n'):
+            if not line:
+                continue
+            when, commit, chash = line.split("|")
+            commit_url = url + "/commit/" + chash
+            content = "[{}]({}) - {} ".format(chash[:6], commit_url, commit)
+            embed.add_field(name=when, value=content, inline=False)
+
+        embed.set_footer(text="Total commits: " + ncommits)
+
+        return embed
+
+def check_folder():
+    if not os.path.exists('data/owner'):
+        print('data/owner 풀더생성을 완료하였습니다!')
+        os.makedirs('data/owner')
+
+def check_file():
+    data = {}
+    f = "data/owner/check.json"
+    if not dataIO.is_valid_json(f):
+        print(f"{f} 파일생성을 완료하였습니다!")
+        dataIO.save_json(f,
+                         data)
 
         
 def setup(bot):
-    bot.add_cog(owner(bot))
+    check_folder()
+    check_file()
+    bot.add_cog(Owner(bot))
 

@@ -1,12 +1,12 @@
+try:
+    import discord
+except ModuleNotFoundError:
+    os.system('pip install -r requirements.txt')
+    import discord
 import asyncio
 import os
 import sys
 from discord.ext import commands
-try:
-    import discord
-except ModuleNotFoundError:
-    os.system('python3 -m pip install -U discord.py[voice]')
-    import discord
 import random
 import json
 from discord.ext.commands import AutoShardedBot as a
@@ -14,6 +14,8 @@ from os import listdir
 from os.path import isfile, join
 import traceback
 from cogs.utils.dataIO import dataIO
+import time
+import datetime
 default_prefixes = ['c!']
 
 async def determine_prefix(bot, message):
@@ -34,13 +36,20 @@ bot = a(command_prefix=determine_prefix)
 
 @bot.event
 async def on_ready():
+    print("=" * 50)
     print('{0.user} 계정에 로그인 하였습니다!'.format(bot))
+    print("=" * 50)
     bot.load_extension('music')
 
 @bot.before_invoke
 async def before_any_command(ctx):
-    blacklist = dataIO.load_json('blacklist.json')
     try:
+        if ctx.author.id == 431085681847042048:
+            return
+        checkbot = dataIO.load_json('data/owner/check.json')
+        blacklist = dataIO.load_json('blacklist.json')
+        if checkbot.get('check') == 'on':
+            raise commands.CommandNotFound
         if str(ctx.author.id) in blacklist['blacklist']:
             raise commands.CommandNotFound
     except KeyError:

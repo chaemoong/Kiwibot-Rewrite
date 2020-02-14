@@ -49,10 +49,7 @@ class Owner(commands.Cog):
             if not check.get('check') == None:
                 check = {}
                 dataIO.save_json(self.check, check)
-                if author.avatar_url:
-                    em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
-                else:
-                    em.set_footer(text=f'Request By {author}')
+                em.add_field(name='성공!', value='점검 모드가 종료되었습니다!')
                 return await ctx.send(embed=em)
         except KeyError:
             pass
@@ -62,7 +59,7 @@ class Owner(commands.Cog):
             }
         check.update(example)
         dataIO.save_json(self.check, check)
-        em.add_field(name='성공!', value='그 유저는 정상적으로 블랙리스트에 추가되었습니다!')
+        em.add_field(name='성공!', value='점검 모드가 실행되었습니다! 이제 키위봇 관리진 외에는 아무도 명령어를 사용할수 없습니다!')
         return await ctx.send(embed=em)
 
 
@@ -173,7 +170,6 @@ class Owner(commands.Cog):
     @commands.check(is_owner)
     async def cmd(self, ctx, *, code=None):
         """eval 시킵니다!"""
-        산군 = '멍청한 놈'
         result = None
         global_vars = globals().copy()
         global_vars['self'] = self
@@ -183,10 +179,6 @@ class Owner(commands.Cog):
         global_vars['author'] = ctx.message.author
         global_vars['channel'] = ctx.message.channel
         global_vars['server'] = ctx.message.guild
-        global_vars['산군'] = 산군
-        global_vars['sangoon'] = 산군
-        global_vars['tksrns'] = 산군
-        global_vars['ㄴ무해ㅐㅜ'] = 산군
         try:
             python = '```py\n{}\n```'
             res = eval(code, global_vars)

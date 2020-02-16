@@ -211,31 +211,6 @@ __Sending With DPNK__""")
         else:
             a = f"{message.guild}({message.guild.id})"
         print(f'Server: {a}, Author: {message.author}({message.author.id}), Content: {message.content}')
-        author = message.author
-        blacklist = dataIO.load_json('blacklist.json')
-        level = 'level.json'
-        asdf = dataIO.load_json(level)
-        data = dataIO.load_json(self.setting)
-        try:
-            if str(author.id) in blacklist['blacklist']:
-                return
-        except KeyError:
-            pass
-        if not str(author.id) in asdf:
-            asdf[str(author.id)] = {"exp": 0, "level": 1}
-        dddddd = asdf[str(author.id)]['level']
-        exp = asdf[str(author.id)]['exp'] + 1
-        asdf[str(author.id)] = {"exp": exp, "level": dddddd}
-        dataIO.save_json(level, asdf)
-        if exp == dddddd * 20:
-            dddddd = dddddd + 1
-            asdf[str(author.id)] = {"exp": 0, "level": dddddd}    
-            dataIO.save_json(level, asdf)
-            a = data.get(str(author.guild.id))
-            if not a == None:
-                if a.get('level') == 'off':
-                    return
-            await message.channel.send(f'{author.mention}, 당신은 이제 {dddddd}레벨 입니다!')    
         await self.process_command(message)
 
     @commands.Cog.listener()

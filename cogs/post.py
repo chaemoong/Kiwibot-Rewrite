@@ -35,31 +35,31 @@ class Post(commands.Cog):
                 em.add_field(name='보낸 시각', value=f'{d}') # 이부분 데이터 형식을 모르겠어서 못고침
             
             Text = []
+            other = []
+            ymd = []
             for item in data['progresses']:
-                if item.get('time'):
-                    time = item.get('time')[:10] + ' ' + item.get('time')[11:19]
+                a = item.get('time')
+                if a:
+                    if not a[:10] in other: other.append(a[:10])
+                    time = a[11:16]
                 else:
-                    time = ''
-                
-                if item.get('status') and item.get('status').get('text'):
-                    status = item.get('status').get('text')
-                else:
-                    status = ''
-                    
+                    time = ''                    
                 if item.get('location'):
                     location = item.get('location').get('name')
                 else:
-                    location = ''
-                    
+                    location = ''               
                 if item.get('description'):
                     desc = item.get('description')
                 else:
                     desc = ''
-                
-                Text.append(f'{location} - {status} {desc}\n**{time}** (UTC)')
+                ymd.append(f'{a[:10]} [{location}] **{time}** - {desc}')
             
-                
-            em.add_field(name='현황', value='\n'.join(Text), inline=False)
+            for asdf in other:    
+                real = []
+                for cd in ymd:
+                    if cd.startswith(asdf):
+                        real.append(cd[11:])
+                em.add_field(name=asdf, value='\n'.join(real), inline=False)
             em.set_footer(text=f'Request by: {ctx.author} || Helped By: {self.bot.get_user(351613953769603073)}')
             await ctx.send(embed=em)
         except Exception as e:

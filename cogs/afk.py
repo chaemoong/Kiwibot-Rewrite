@@ -61,8 +61,10 @@ class Afk(commands.Cog):
         except:
             data = dataIO.load_json(self.en)["end"]
         if f'{message.author.id}' in self.riceCog:
-            if 'afk' in message.content:
-                return
+            aliases= ['ㅁ라', '잠수', 'wkatn']
+            for a in aliases:
+                if a in message.content:
+                    return
             else:
                 try:
                     b = self.riceCog[f'{author.id}']['reason']

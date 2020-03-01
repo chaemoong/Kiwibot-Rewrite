@@ -160,9 +160,12 @@ class Music(commands.Cog):
         """노래 플레이어의 볼륨을 설정하는 명령어야!"""
         player = self.bot.lavalink.players.get(ctx.guild.id)
         em=discord.Embed(colour=ctx.author.colour)
-
+        try:
+            vol = int(volume) / 10
+        except:
+            vol = player.volume * 10
         if volume is None:
-            em.add_field(name='현재 볼륨', value=f'🔈 | {player.volume}%')
+            em.add_field(name='현재 볼륨', value=f'🔈 | {vol}%')
         try:
             if volume == 0 or volume < 0 or volume > 150:
                 return await ctx.send('볼륨은 1~150% 로 맞춰야되요!')
@@ -170,12 +173,12 @@ class Music(commands.Cog):
             pass
         else:
             try:
-                self.setting[f'{ctx.author.guild.id}'].update({"volume": volume})
+                self.setting[f'{ctx.author.guild.id}'].update({"volume": volume * 10})
             except KeyError:
                 self.setting[f'{ctx.author.guild.id}'] = {}
-                self.setting[f'{ctx.author.guild.id}'].update({"volume": volume})
+                self.setting[f'{ctx.author.guild.id}'].update({"volume": volume * 10})
             await player.set_volume(volume)
-            em.add_field(name='볼륨 설정', value=f'🔈 | {player.volume}% 으로 설정했어요!')
+            em.add_field(name='볼륨 설정', value=f'🔈 | {player.volume * 10}% 으로 설정했어요!')
         await ctx.send(embed=em)
         dataIO.save_json(self.a, self.setting)
 
@@ -242,10 +245,10 @@ class Music(commands.Cog):
 
         if player.paused:
             await player.set_pause(False)
-            await ctx.send('⏯ | 다시 음악좀 올릴게유!')
+            await ctx.send('⏯ | 다시 재생하겠습니다!')
         else:
             await player.set_pause(True)
-            await ctx.send('⏯ | 잠시 음악좀 멈출게유!')
+            await ctx.send('⏯ | 잠시 멈추겠습니다!')
 
     @commands.command()
     async def shuffle(self, ctx):
@@ -277,7 +280,7 @@ class Music(commands.Cog):
             return await ctx.send('노래를 재생하고 있지 않아요!')
 
         if index > len(player.queue) or index < 1:
-            return await ctx.send(f'**무조건** 1 아니면 {len(player.queue)} 보다 커야되!')
+            return await ctx.send(f'**무조건** 1 혹은 {len(player.queue)} 보다 작아야되요!')
 
         removed = player.queue.pop(index - 1)  # Account for 0-index.
 

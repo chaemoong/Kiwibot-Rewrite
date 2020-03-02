@@ -1,7 +1,12 @@
 import discord, datetime, os, time, json
 from discord.ext import commands
 from cogs.utils.dataIO import dataIO
-
+from pymongo import MongoClient
+try:
+    client = MongoClient()
+    db = client['afk']
+except:
+    print("몽고DB를 연결할 수 없습니다!")
 
 class Afk(commands.Cog):
     """asdf!"""
@@ -9,8 +14,6 @@ class Afk(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.data = {}
-        self.profile = "data/afk/afk.json"
-        self.riceCog = dataIO.load_json(self.profile)
         self.setting = 'data/mod/settings.json'
         self.ko = 'data/language/ko.json'
         self.en = 'data/language/en.json'
@@ -37,13 +40,14 @@ class Afk(commands.Cog):
             em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
         else:
             em.set_footer(text=f'Request By {author}')
-        self.riceCog[f'{author.id}'] = {}
+        dbdata = {"_id": author.id, "reason": f"{reason}"}
         if reason:
             em.add_field(name=data['4'], value=reason, inline=False)
-            self.riceCog[f'{author.id}'].update({"reason": f"{reason}"})
-        else:
-            self.riceCog[f'{author.id}'].update({"reason": None})
-        dataIO.save_json(self.profile, self.riceCog)
+        try:
+            db.afk.insert_one(dbdata)
+        except:
+            db.afk.delete_one({"_id": author.id})
+            db.afk.insert_one(dbdata)
         await ctx.send(author.mention, embed=em)
 
     @commands.Cog.listener()
@@ -60,46 +64,30 @@ class Afk(commands.Cog):
                 data = dataIO.load_json(self.en)["end"]
         except:
             data = dataIO.load_json(self.en)["end"]
-        if f'{message.author.id}' in self.riceCog:
-            aliases= ['ㅁ라', '잠수', 'wkatn']
+        if db.afk.find_one({"_id": author.id}):
+            aliases= ['afk', 'ㅁ라', '잠수', 'wkatn']
             for a in aliases:
                 if a in message.content:
                     return
             else:
                 try:
-                    b = self.riceCog[f'{author.id}']['reason']
+                    b = db.afk.find_one({"_id": author.id})
                 except:
                     return
-                if b:
-                    a = data['1'].format(author.name, b)
-                else:
+                if str(b['reason']) == str(None):
                     a = data['2'].format(author.name)
-                self.riceCog[f'{author.id}'] = {}
-                del self.riceCog[f'{author.id}']
+                else:
+                    a = data['1'].format(author.name, b['reason'])
+                db.afk.delete_one({"_id": author.id})
                 em = discord.Embed(colour=message.author.colour, timestamp=utc)
                 try:
                     em.add_field(name=data['3'], value=a, inline=False)
                 except: return
                 em.set_footer(text=f'Request By: {author}', icon_url=author.avatar_url)
                 await message.channel.send(embed=em)
-                dataIO.save_json(self.profile, self.riceCog)
                 return
         else:
             return
-
-
-def check_folder():
-    if not os.path.exists('data/afk'):
-        print('data/afk 풀더생성을 완료하였습니다!')
-        os.makedirs('data/afk')
-
-def check_file():
-    data = {}
-    f = "data/afk/afk.json"
-    if not dataIO.is_valid_json(f):
-        print("afk.json 파일생성을 완료하였습니다!")
-        dataIO.save_json(f,
-                         data)
 
 def setup(bot):
     check_folder()

@@ -55,6 +55,15 @@ class Mod(commands.Cog):
                 except KeyError:
                     return False
 
+    @commands.command(no_pm=True, name='clear', description='The messages deleting command! | 메시지를 삭제하는 명령어입니다!', aliases=['칟ㅁㄱ', '청소', 'cjdth'])
+    @commands.check(administrator)
+    async def clear(self, ctx, count:int=None):
+        try:
+            await ctx.channel.purge(limit=count+1)
+        except:
+            return await ctx.send('봇에 권한이 없습니다! 권한을 추가해주세요! | No permission')
+        return await ctx.send(f'{count} 개의 메시지를 지웠습니다!')
+
     @commands.command(no_pm=True, name='autorole', description='The autorole setting command! | 자동으로 역할이 들어오게 설정하는 명령어입니다!', aliases=['며새개ㅣㄷ', '자동역할', 'wkehddurgkf'])
     @commands.check(administrator)
     async def autorole(self, ctx, role:discord.Role=None, emoji=None, *, message=None):
@@ -100,7 +109,6 @@ class Mod(commands.Cog):
     @commands.command(no_pm=True, name='language', description='The language setting command! | 언어를 선택하는 명령어입니다!', aliases=['ㅣ무혐ㅎㄷ', '언어', 'djsdj'])
     @commands.check(administrator)
     async def language(self, ctx):
-        """봇의 언어를 설정하는 명령어 입니다!"""
         server = ctx.guild
         author = ctx.author
         em = discord.Embed(colour=author.colour, title='언어 설정 | LANGUAGE SETTINGS', timestamp=datetime.datetime.utcnow())
@@ -119,7 +127,7 @@ class Mod(commands.Cog):
         try:
             reaction, user = await self.bot.wait_for('reaction_add', timeout=30.0, check=check)
         except asyncio.TimeoutError:
-            return await a.edit(content='> 정상적으로 취소되었습니다!')
+            return await a.edit(content='> 정상적으로 취소되었습니다! | Canceled!')
         if True:
             await a.delete()
             if str(reaction.emoji) == '🇰🇷':
@@ -144,7 +152,6 @@ class Mod(commands.Cog):
     @commands.command(no_pm=True, name='ban', description='It is a user-banning command. | 유저를 벤하는 명령어입니다!', aliases=['ㅠ무', '벤', 'qps', '차단', 'ckeks'])
     @commands.check(administrator)
     async def ban(self, ctx, user:discord.Member=None, *, reason=None):
-        """악성 유저를 벤 하는 명령어입니다!\nBanned The Person"""
         server = ctx.guild
         asdf = dataIO.load_json(self.setting)
         try:
@@ -171,7 +178,6 @@ class Mod(commands.Cog):
     @commands.command(no_pm=True, name='unban', description='It is a user-unbanning command. | 유저를 언벤하는 명령어입니다!', aliases=['ㅕㅜㅠ무', '언벤', 'djsqps', '차단해제', 'ckeksgowp'])
     @commands.check(administrator)
     async def unban(self, ctx: commands.Context, user_id: int, *, reason: str = None):
-        """유저를 언벤 하는 명령어입니다!\nKicked The Person"""
         guild = ctx.guild
         asdf = dataIO.load_json(self.setting)
         try:
@@ -208,7 +214,6 @@ class Mod(commands.Cog):
     @commands.command(no_pm=True, name='hackban', description='It is a user-hackbanning command. | 유저를 핵벤하는 명령어입니다!', aliases=['ㅗㅁ차ㅠ무', '핵벤', 'gorqps', '강제차단', 'rkdwpckeks'])
     @commands.check(administrator)
     async def hackban(self, ctx: commands.Context, user_id: int, *, reason: str = None):
-        """악성유저가 이 서버에 없을경우 대처를 하기 위해 벤하는 명령어입니다!\nIf the Person is not in this server, ban to protecting"""
         guild = ctx.guild
         asdf = dataIO.load_json(self.setting)
         try:
@@ -244,7 +249,6 @@ class Mod(commands.Cog):
     @commands.command(no_pm=True, name='warn', description='It is a user-warnning command. | 유저를 경고하는 명령어입니다!', aliases=['ㅈㅁ구', 'rudrh'])
     @commands.check(administrator)
     async def 경고(self, ctx, user:discord.Member=None, *, reason=None):
-        """유저에게 경고를 주는 명령어에요!\nGiving warn to Member"""
         author = ctx.author
         server = ctx.guild
         asdf = dataIO.load_json(self.setting)
@@ -335,7 +339,6 @@ class Mod(commands.Cog):
     @commands.command(no_pm=True, name='unwarn', description='It is a user-unwarnning command. | 유저를 경고한개를 삭제하는 명령어입니다!', aliases=['ㅕㅜㅈㅁ구', '경고지우기', 'rudrhwldnrl'])
     @commands.check(administrator)
     async def unwarn(self, ctx, user:discord.Member=None, reason=None):
-        """유저에게 경고 1개를 지우는 명령어에요!\nDeleting 1 warn to Member"""
         author = ctx.author
         server = ctx.guild
         asdf = dataIO.load_json(self.setting)
@@ -372,7 +375,6 @@ class Mod(commands.Cog):
 
     @commands.command(no_pm=True, name='check', description='It is a user-warnning check command. | 유저의 경고를 확인하는 명령어입니다!', aliases=['경고확인', '촏차', 'rudrhghkrdls'])
     async def check(self, ctx, user:discord.Member=None):
-        """유저의 경고를 확인하는 명령어에요!\nDeleting 1 warn to Member"""
         author = ctx.author
         server = ctx.guild
         if user == None:
@@ -647,8 +649,8 @@ class Mod(commands.Cog):
             em2 = discord.Embed(colour=discord.Colour.gold(), title='메세지 설정 | MESSAGE SETTINGS', timestamp=datetime.datetime.utcnow())
             if reaction.emoji == '⭕':
                 if self.welcome2.get(f'{server}') == None:
-                    self.welcome2[f'{server.id}'] = {}
-                self.welcome2[f'{server.id}'].update({"message2": 메시지})
+                    self.welcome2[f'{server}'] = {}
+                self.welcome2[f'{server}'].update({"message2": 메시지})
                 dataIO.save_json(self.welcome, self.welcome2)
                 em2.add_field(name='성공!', value=f'이제 퇴장 메시지를 {메시지}로 설정하였습니다!')
                 return await ctx.send(author.mention, embed=em2)

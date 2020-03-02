@@ -20,15 +20,18 @@ import lavalink
 import asyncio
 import random
 import zipfile
-
-
+from pymongo import MongoClient
+try:
+    client = MongoClient()
+    db = client['owner']
+except:
+    print("몽고DB에 연결 할 수 없습니다!")
 
 class Owner(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.asdf = 'data/general/money.json'
         self.check = 'data/owner/check.json'
-
 
     async def is_owner(ctx):
         return ctx.author.id == 431085681847042048
@@ -39,26 +42,24 @@ class Owner(commands.Cog):
         author = ctx.author
         if reason == None:
             reason = '없음'
-        check = dataIO.load_json(self.check)
         em = discord.Embed(colour=discord.Colour.blue())
         if author.avatar_url:
             em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
         else:
             em.set_footer(text=f'Request By {author}')
         try:
-            if not check.get('check') == None:
-                check = {}
-                dataIO.save_json(self.check, check)
+            check = {}
+            if db.점검.find_one({"check": "on"}):
+                db.점검.insert_one({})            
                 em.add_field(name='성공!', value='점검 모드가 종료되었습니다!')
                 return await ctx.send(embed=em)
         except KeyError:
             pass
         example = {
-            'check': 'on',
-            'reason': reason
+            "check": "on",
+            "reason": reason
             }
-        check.update(example)
-        dataIO.save_json(self.check, check)
+        db.점검.insert_one(example)
         em.add_field(name='성공!', value='점검 모드가 실행되었습니다! 이제 키위봇 관리진 외에는 아무도 명령어를 사용할수 없습니다!')
         return await ctx.send(embed=em)
 
@@ -196,8 +197,6 @@ class Owner(commands.Cog):
         embed.add_field(name=':inbox_tray: **INPUT**', value='```py\n' + str(code) + '\n```', inline=False)
         embed.add_field(name=':outbox_tray: **OUTPUT**', value=python.format(result), inline=False)
         await ctx.send(embed=embed)
-
-
 
     @commands.command()
     @commands.check(is_owner)

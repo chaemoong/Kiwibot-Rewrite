@@ -191,7 +191,7 @@ class General(commands.Cog):
         try:
             status = user.activities[0].type
             if status == discord.ActivityType.custom:
-                em.add_field(name='Custom Status', value=user.activities[0].state)
+                em.add_field(name='Custom Status', value=f'{user.activities[0]}')
         except:
             pass
         if lll is None:

@@ -8,6 +8,14 @@ import asyncio
 import datetime
 from discord.utils import get
 import os
+from pymongo import MongoClient
+import settings
+set = settings.set()
+try:
+    client = MongoClient(host=set.ip, port=set.port)
+    db = client['mod']
+except:
+    print('Mod Cogs에서 MongoDB에 연결하지 못했습니다!')
 
 original = 10
 
@@ -132,19 +140,17 @@ class Mod(commands.Cog):
             await a.delete()
             if str(reaction.emoji) == '🇰🇷':
                 try:
-                    self.data[f'{server.id}'].update({"language": "ko"})
+                    db.language.delete_one({"_id": server.id})
+                    db.language.insert_one({"_id": server.id, "language": "ko"})
                 except KeyError:
-                    self.data[f'{server.id}'] = {}
-                    self.data[f'{server.id}'].update({"language": "ko"})
-                dataIO.save_json(self.ang, self.data)
+                    db.language.insert_one({"_id": server.id, "language": "ko"})
                 return await ctx.send('> 언어가 성공적으로 `한글` 로 설정 되었습니다!')            
             if str(reaction.emoji) == '🇺🇸':
                 try:
-                    self.data[f'{server.id}'].update({"language": "en"})
+                    db.language.delete_one({"_id": server.id})
+                    db.language.insert_one({"_id": server.id, "language": "en"})
                 except KeyError:
-                    self.data[f'{server.id}'] = {}
-                    self.data[f'{server.id}'].update({"language": "en"})
-                dataIO.save_json(self.ang, self.data)
+                    db.language.insert_one({"_id": server.id, "language": "en"})
                 return await ctx.send('> Language has been successfully set as `English`')        
         else:
             return await ctx.send("> 다른 이모지를 추가하지 마세요! | Please don't add another emoji")
@@ -475,16 +481,6 @@ class Mod(commands.Cog):
         em.add_field(name=data['5'], value=data['6'].format(limit))
         return await ctx.send(embed=em)
     
-    @commands.command(no_pm=True)
-    @commands.check(administrator)
-    async def setprefix(self, ctx, *, prefixes=None):
-        if prefixes == None:
-            return await ctx.send('접두사를 적어주세요! | Write Down Prefix')
-        self.prefix[str(ctx.guild.id)] = {}
-        self.prefix[str(ctx.guild.id)].update({"prefix": prefixes or 'c!'})
-        await ctx.send("Prefixes set!")
-        dataIO.save_json(self.asdfasdf, self.prefix)
-
     @commands.group(no_pm=True, name='lvlset', description='Commands to set leveling functions! | 레벨링 기능들을 설정하는 명령어입니다!', aliases=['ㅣ핀ㄷㅅ', '레벨설정', 'fpqpftjfwjd'])
     @commands.check(administrator)
     async def lvlset(self, ctx):

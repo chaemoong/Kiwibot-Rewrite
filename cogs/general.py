@@ -22,6 +22,22 @@ from enum import Enum
 import asyncio
 from discord.utils import get
 import urllib.request
+from pymongo import MongoClient
+from base64 import b64encode, b64decode
+from json import loads, dumps
+import settings
+set = settings.set()
+try:
+    client = MongoClient(host=set.ip, port=set.port)
+    db = client['general']
+    lang = client['mod'].language.find_one
+except:
+    print("general Cog에서 몽고DB를 연결할 수 없습니다!")
+def Base64Encode(message):
+    return b64encode(message.encode("UTF-8")).decode()
+
+def Base64Decode(message):
+    return b64decode(message.encode()).decode("UTF-8")
 
 class General(commands.Cog):
     def __init__(self, bot):
@@ -33,7 +49,29 @@ class General(commands.Cog):
         self.setting = 'data/mod/settings.json'
         self.ko = 'data/language/ko.json'
         self.en = 'data/language/en.json'
-        self.choice = [True, False]
+        self.choice = [True, False, False, False, True, True, True, True, True, True]
+        self.percent = [2,3,4,5,6]
+
+    @commands.group(no_pm=True, name='exchange', description='타봇 돈으로 환전하는 명령어입니다! | To exchange the other bot money!', aliases=['환전', 'ghkswjs', 'ㄷㅌ초뭏ㄷ'])
+    async def exchange(self, ctx):
+        if ctx.invoked_subcommand is None:
+            em = discord.Embed(colour=discord.Colour.orange(), title='봇끼리 환전 | Leveling Funcion Settings', timestamp=datetime.datetime.utcnow())
+            em.add_field(name='돈 환전이 가능한 봇', value='Cutock - 큐트로 환전')
+            return await ctx.send(embed=em)
+
+    @exchange.command()
+    async def Cutock(self, ctx, money=None):
+        if money == None:
+            return await ctx.send(':warning: **환전할 돈을 적어주세요!**')            
+        try:
+            a = db.money.find_one({"_id": ctx.author.id})
+            a = int(a['money'])
+        except:
+            a = 0
+        if a == None or a == 0 or not -1 < a - int(money):
+            return await ctx.send(f'환전할 돈이 없거나 부족합니다! 부족한돈: `{int(money) - int(a)}`')
+        b = a - int(money)
+        db.money.update({'_id':ctx.author.id}, {"money": int(b)}, upsert=False)
 
     @commands.command(no_pm=True, name='돈', description='The money command! | 돈 명령어입니다!', aliases=['money', 'ㅡㅐㅜ됴', 'ehs'])
     async def 돈(self, ctx, user:discord.Member=None):
@@ -42,7 +80,8 @@ class General(commands.Cog):
             user = author
         asdf = dataIO.load_json(self.asdf)
         try:
-            a = asdf.get(str(user.id)).get('money')
+            a = db.money.find_one({"_id": user.id})
+            a = a['money']
         except:
             a = '0'
         em = discord.Embed(colour=author.colour, title='돈', description=f'\n\n`{user.name}`님의 돈은 {a} 키위 있습니다!')
@@ -66,31 +105,27 @@ class General(commands.Cog):
             em.set_footer(text=f'Request By {author}')
         return await ctx.send(author.mention, embed=em)
 
-    @commands.command(no_pm=True, name='돈받기', description='The money taking command! | 돈받는 명령어입니다!', aliases=['ehsqkerl'])
+    @commands.command(no_pm=True, name='돈받기', description='The money taking command! | 돈받는 명령어입니다!', aliases=['ehsqkerl', 'payday', 'ㅔ묭묘'])
     @commands.cooldown(1, 1800, commands.BucketType.user)
     async def 돈받기(self, ctx):
         author = ctx.author
-        asdf = dataIO.load_json(self.asdf)
-        a = asdf.get(str(author.id))
+        a = db.money.find_one({"_id": author.id})
         if a == None:
-            asdf[str(author.id)] = {}
-        if asdf[str(author.id)].get('money') == None:
-            asdf[str(author.id)].update({'money': 0})
-        bb = asdf[str(author.id)].get('money')
-        c = bb + 1000
+            db.money.insert_one({"_id": author.id, "money": 0})
+            a = db.money.find_one({"_id": author.id})
+        b = a['money'] + 1000
+        db.money.update({'_id':author.id}, {"money": int(b)},upsert=False)
         em = discord.Embed(colour=discord.Colour.green())
-        em.add_field(name='1000키위를 받으셨습니다!', value=f'현재 잔고 `{c}`')
+        em.add_field(name='1000키위를 받으셨습니다!', value=f'현재 잔고: {b}')
         await ctx.send(embed=em)
-        asdf[str(author.id)].update({'money': c})
-        dataIO.save_json(self.asdf, asdf)
     
     @commands.command(no_pm=True, name='올인', description='The allin command! | 올인 명령어입니다!', aliases=['dhfdls', 'allin', '미ㅣㅑㅜ'])
     async def 올인(self, ctx):
         author = ctx.author
-        asdf = dataIO.load_json(self.asdf)
+        liiiist = [2,3,4,5,6]
         try:
-            a = asdf.get(str(author.id))
-            b = a.get('money')
+            a = db.money.find_one({"_id": author.id})            
+            b = a['money']
         except:
             return await ctx.send(f'> 당신은 돈이 없습니다! `{ctx.prefix}돈받기` 명령어로 돈을 받아보세요!')
         if b == 0:
@@ -105,21 +140,22 @@ class General(commands.Cog):
         except asyncio.TimeoutError:
             return await dfdf.edit(content='> 반응을 안해주셔서 취소했어요!')
         await dfdf.delete()
-        first = await ctx.send('과연...')
+        first = await ctx.send('배수 정하는중..')
         for i in range(4):
             c = int(i + 1)
-            dugu = '두구'
-            await first.edit(content= '과연... ' + dugu * c) 
+            asdf = random.choice(liiiist)
+            await first.edit(content=f'배수 정하는중.. `{asdf}`배') 
             await asyncio.sleep(1)
+        await first.edit(content=f'{asdf}배로 올인 진행하겠습니다!')
+        await asyncio.sleep(0.5)
         choice = random.choice(self.choice)
         if choice == True:
             chaemoong = '성공! '
-            c = b * 2
+            c = b * int(asdf)
         elif choice == False:
             chaemoong = '실패'
             c = b * 0
-        a.update({'money': c})
-        dataIO.save_json(self.asdf, asdf)
+        db.money.update({'_id':author.id}, {"money": int(c)},upsert=False)        
         em = discord.Embed(colour=author.colour)
         em.add_field(name=f'올인을 {chaemoong}하셨습니다', value=f'당신의 돈은 {c} 키위가 됩니다')
         if author.avatar_url:
@@ -133,9 +169,9 @@ class General(commands.Cog):
     async def userinfo(self, ctx, user:discord.Member=None):
         author = ctx.author
         server = ctx.guild.id
-        asdf = dataIO.load_json(self.setting)
+        asdf = lang({"_id": server})
         try:
-            if asdf[f'{server}']['language'] == 'ko':
+            if asdf['language'] == 'ko':
                 data = dataIO.load_json(self.ko)[ctx.command.name]
             else:
                 data = dataIO.load_json(self.en)[ctx.command.name]
@@ -213,9 +249,9 @@ class General(commands.Cog):
     async def 멜론(self, ctx):
         """멜론 차트를 뽑는 명령어입니다!"""
         server = ctx.guild.id
-        asdf = dataIO.load_json(self.setting)
+        asdf = lang({"_id": server})
         try:
-            if asdf[f'{server}']['language'] == 'ko':
+            if asdf['language'] == 'ko':
                 a = '멜론 차트'
             else:
                 a = 'Melon Chart'
@@ -273,9 +309,9 @@ class General(commands.Cog):
     async def serverinfo(self, ctx):
         author = ctx.author
         server = ctx.guild
-        asdf = dataIO.load_json(self.setting)
+        asdf = lang({"_id": server.id})
         try:
-            if asdf[f'{server.id}']['language'] == 'ko':
+            if asdf['language'] == 'ko':
                 data = dataIO.load_json(self.ko)[ctx.command.name]
             else:
                 data = dataIO.load_json(self.en)[ctx.command.name]
@@ -313,9 +349,9 @@ class General(commands.Cog):
         """Helping Another method Screen Share!\n화면공유를 할수 있게 도와주는 명령어에요!"""
         author = ctx.author
         server = author.guild
-        asdf = dataIO.load_json(self.setting)
+        asdf = lang({"_id": server.id})
         try:
-            if asdf[f'{server.id}']['language'] == 'ko':
+            if asdf['language'] == 'ko':
                 a = '화면 공유'
                 b = '**서버: {server.name}\n음성 채널: [{a.name}]({url})**'
                 c = '먼저 채팅방에 접속해주세요!'
@@ -372,9 +408,9 @@ class General(commands.Cog):
     @commands.command(no_pm=True, name='chinobot', description='The chinobot API command! | 치노봇에 대한 정보 명령어입니다!', aliases=['치노봇', '초ㅑㅜㅐㅠㅐㅅ', 'clshqht'])
     async def chinobot(self, ctx):
         """Loading ChinoBot's API info!\n치노봇 API를 불러와요!"""
-        asdf = dataIO.load_json(self.setting)
+        asdf = lang({"_id": ctx.guild.id})
         try:
-            if asdf[f'{ctx.guild.id}']['language'] == 'ko':
+            if asdf['language'] == 'ko':
                 data = dataIO.load_json(self.ko)[ctx.command.name]
             else:
                 data = dataIO.load_json(self.en)[ctx.command.name]
@@ -417,7 +453,7 @@ class General(commands.Cog):
     async def cutock(self, ctx):
         """Cutock봇 API를 가져오는 명령어입니다! | Get Cutock Bot's API!"""
         if ctx.invoked_subcommand is None:
-            em = discord.Embed(colour=discord.Colour.orange(), title='레벨링 설정 | Leveling Funcion Settings', timestamp=datetime.datetime.utcnow())
+            em = discord.Embed(colour=discord.Colour.orange(), title='Cutock API 확인 | Cutock API Check', timestamp=datetime.datetime.utcnow())
             em.add_field(name='아래에는 사용 가능한 명령어들입니다!', value='account - 계좌의 정보를 가져옵니다!')
             return await ctx.send(ctx.author.mention, embed=em)
 

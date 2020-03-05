@@ -12,6 +12,23 @@ import datetime
 import time
 from cogs.utils import option
 from cogs.utils.chat_formatting import pagify
+from pymongo import MongoClient
+import settings
+set = settings.set()
+try:
+    client = MongoClient(host=set.ip, port=set.port)
+    db = client['general']
+    lang = client['mod'].language.find_one
+except:
+    print("error Cog에서 몽고DB를 연결할 수 없습니다!")
+from base64 import b64encode, b64decode
+from json import loads, dumps
+
+def Base64Encode(message):
+    return b64encode(message.encode("UTF-8")).decode()
+
+def Base64Decode(message):
+    return b64decode(message.encode()).decode("UTF-8")
 
 class Blacklisted(commands.CheckFailure): pass
 
@@ -114,9 +131,9 @@ __Sending With DPNK__""")
     async def on_command_error(self, ctx, error):
         asdf = dataIO.load_json(self.setting)
         dddd = self.bot.get_user(431085681847042048)
-        checkbot = dataIO.load_json('data/owner/check.json')
+        asdf = lang({"_id": ctx.guild.id})
         try:
-            if asdf[f'{ctx.guild.id}']['language'] == 'ko':
+            if asdf['language'] == 'ko':
                 data = dataIO.load_json(self.ko)
             else:
                 data = dataIO.load_json(self.en)
@@ -124,14 +141,6 @@ __Sending With DPNK__""")
             data = dataIO.load_json(self.en)
         if isinstance(error, commands.CommandInvokeError):
             # A bit hacky, couldn't find a better way
-            if not checkbot.get('check') == None:
-                try:
-                    em = discord.Embed(title=':outbox_tray: 잠시만요! :outbox_tray:', timestamp=datetime.datetime.utcnow())
-                    em.set_thumbnail(url=ctx.bot.user.avatar_url)
-                    em.add_field(name='지금 봇이 점검중이에요!', value=f'사유는 아래와 같습니다!\n사유: `{checkbot.get("reason")}`')
-                    return await ctx.send(embed=em)
-                except:
-                    pass
             no_dms = "Cannot send messages to this user"
             is_help_cmd = ctx.command.qualified_name == "help"
             is_forbidden = isinstance(error.original, discord.Forbidden)
@@ -146,7 +155,7 @@ __Sending With DPNK__""")
             embed.add_field(name='유저', value=ctx.author)
             embed.add_field(name='서버', value=ctx.guild)
             await ctx.send('에러 내용을 봇 관리진에게 보냈습니다! 빠른 시일내에 고치도록 하겠습니다!\nI send Error code to Bot Administrator! I will fix that!')
-            await dddd.send(embed=embed, content=asdf)
+            return await dddd.send(embed=embed, content=asdf)
         elif isinstance(error, commands.CommandNotFound):
             blacklist = dataIO.load_json('blacklist.json')
             try:
@@ -156,42 +165,18 @@ __Sending With DPNK__""")
                     return await ctx.send(embed=em)
             except KeyError:
                 pass
-            if not checkbot.get('check') == None:
-                try:
-                    em = discord.Embed(title=':outbox_tray: 잠시만요! :outbox_tray:', timestamp=datetime.datetime.utcnow())
-                    em.set_thumbnail(url=ctx.bot.user.avatar_url)
-                    em.add_field(name='지금 봇이 점검중이에요!', value=f'사유는 아래와 같습니다!\n사유: `{checkbot.get("reason")}`')
-                    return await ctx.send(embed=em)
-                except:
-                    pass
             lan = data['command_none']
             em = discord.Embed(colour=ctx.author.colour)
             em.add_field(name=lan['1'], value=lan['2'].format(ctx))
             em.set_footer(text=lan['3'])
             return await ctx.send(embed=em)
         elif isinstance(error, commands.CheckFailure):
-            if not checkbot.get('check') == None:
-                try:
-                    em = discord.Embed(title=':outbox_tray: 잠시만요! :outbox_tray:', timestamp=datetime.datetime.utcnow())
-                    em.set_thumbnail(url=ctx.bot.user.avatar_url)
-                    em.add_field(name='지금 봇이 점검중이에요!', value=f'사유는 아래와 같습니다!\n사유: `{checkbot.get("reason")}`')
-                    return await ctx.send(embed=em)
-                except:
-                    pass
             lan = data['admin_command']
             em = discord.Embed(colour=ctx.author.colour)
             em.add_field(name=lan['1'], value=lan['2'].format(ctx))
             em.set_footer(text=lan['3'])
             return await ctx.send(embed=em)
         elif isinstance(error, commands.CommandOnCooldown):
-            if not checkbot.get('check') == None:
-                try:
-                    em = discord.Embed(title=':outbox_tray: 잠시만요! :outbox_tray:', timestamp=datetime.datetime.utcnow())
-                    em.set_thumbnail(url=ctx.bot.user.avatar_url)
-                    em.add_field(name='지금 봇이 점검중이에요!', value=f'사유는 아래와 같습니다!\n사유: `{checkbot.get("reason")}`')
-                    return await ctx.send(embed=em)
-                except:
-                    pass
             asdf = time.strftime("%M", time.gmtime(error.retry_after))
             asss = time.strftime("%S", time.gmtime(error.retry_after))
             em = discord.Embed(colour=ctx.author.colour)
@@ -204,13 +189,39 @@ __Sending With DPNK__""")
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        if message.author.bot == True:
-            return
-        if message.guild == None:
-            a = 'Direct Message'
-        else:
-            a = f"{message.guild}({message.guild.id})"
-        print(f'Server: {a}, Author: {message.author}({message.author.id}), Content: {message.content}')
+        if message.author == self.bot.user: return
+        if message.content.startswith('!~'):
+            if not message.author.id == 556799138205794304: return
+            Data = loads(Base64Decode(message.content[len('!~'):]))
+
+            if not self.bot.user.id in Data.get("To", ""): return
+
+            if Data.get("Query") == 'GetMoney':
+                User = self.bot.get_user(Data.get("User"))
+                try:
+                    a = db.money.find_one({"_id": User.id})
+                    a = int(a['money'])
+                except:
+                    a = 0
+                Money = a
+                Response = Base64Encode(dumps({'Response':'GetMoney', 'User':User.id, 'value':Money}))
+                return await message.channel.send(f'#~{Data["Auth"]}~'+Response)
+            if Data.get("Query") == 'EditMoney':
+                User = self.bot.get_user(Data.get("User"))
+                try:
+                    a = db.money.find_one({"_id": User.id})
+                    a = int(a['money'])
+                except:
+                    a = 0
+                Money = a
+                NewMoney = Money + Data.get('value')
+                a = db.money.find_one({"_id": User.id})
+                if a == None:
+                    db.money.insert_one({"_id": User.id, "money": 0})
+                    a = db.money.find_one({"_id": User.id})
+                db.money.update({'_id':User.id}, {"money": int(NewMoney)},upsert=False)
+                Response = Base64Encode(dumps({'Response':'EditMoney', 'User':User.id, 'value':NewMoney, 'success':True}))
+                return await message.channel.send(f'#~{Data["Auth"]}~'+Response)
         await self.process_command(message)
 
     @commands.Cog.listener()
@@ -259,6 +270,23 @@ __Sending With DPNK__""")
                 await member.guild.owner.send('{0.owner.name}님의 서버인 {0.name}서버에 설정하신 환영 기능에 오류가 생겨 환영 기능 데이터를 초기화 하겠습니다!\n이 메시지를 보시면 환영메시지/채널을 다시 설정해주세요!'.format(member.guild))
                 data[str(member.guild.id)] = {}
                 dataIO.save_json(self.welcome, data)
+
+    @commands.Cog.listener()
+    async def on_server_join(self, guild):
+        dddd = self.bot.get_user(431085681847042048)
+        em = discord.Embed(colour=discord.Colour.green())
+        em.add_field(name='새로운 서버!', value=f'`{guild.name}`서버에서 추가했습니다!')
+        em.set_thumbnail(url=guild.icon_url)
+        return await dddd.send(embed=em)
+
+    @commands.Cog.listener()
+    async def on_server_join(self, guild):
+        dddd = self.bot.get_user(431085681847042048)
+        em = discord.Embed(colour=discord.Colour.green())
+        em.add_field(name='삭제된 서버!', value=f'`{guild.name}`서버에서 삭제됬습니다!')
+        em.set_thumbnail(url=guild.icon_url)
+        return await dddd.send(embed=em)
+
 
 def check_folder():
     if not os.path.exists('data/language'):

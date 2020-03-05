@@ -7,13 +7,19 @@ from cogs.utils.dataIO import dataIO
 import json
 import asyncio
 from discord.utils import get
+import settings
+set = settings.set()
+try:
+    client = MongoClient(host=set.ip, port=set.port)
+    lang = client['mod'].language.find_one
+except:
+    print("captcha Cog에서 몽고DB를 연결할 수 없습니다!")
 
 class Captcha(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.error = dataIO.load_json('data/captcha/error.json')
         self.first = dataIO.load_json('data/mod/settings.json')
-        self.setting = 'data/mod/settings.json'
         self.ko = 'data/language/ko.json'
         self.en = 'data/language/en.json'
 
@@ -24,9 +30,9 @@ class Captcha(commands.Cog):
         server = ctx.guild
         author = ctx.author
         log = dataIO.load_json('data/mod/settings.json')
-        asdf = dataIO.load_json(self.setting)
+        asdf = lang({"_id": server.id})
         try:
-            if asdf[f'{server.id}']['language'] == 'ko':
+            if asdf['language'] == 'ko':
                 data = dataIO.load_json(self.ko)[ctx.command.name]
             else:
                 data = dataIO.load_json(self.en)[ctx.command.name]

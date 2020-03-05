@@ -1,20 +1,20 @@
-import discord, datetime, os, time, json
+import discord, datetime, os, time, json, settings
 from discord.ext import commands
 from cogs.utils.dataIO import dataIO
 from pymongo import MongoClient
+set = settings.set()
 try:
-    client = MongoClient()
+    client = MongoClient(host=set.ip, port=set.port)
     db = client['afk']
+    lang = client['mod'].language.find_one
 except:
-    print("몽고DB를 연결할 수 없습니다!")
+    print("AFK Cog에서 몽고DB를 연결할 수 없습니다!")
 
 class Afk(commands.Cog):
     """asdf!"""
 
     def __init__(self, bot):
         self.bot = bot
-        self.data = {}
-        self.setting = 'data/mod/settings.json'
         self.ko = 'data/language/ko.json'
         self.en = 'data/language/en.json'
 
@@ -26,9 +26,9 @@ class Afk(commands.Cog):
         dt = datetime.datetime.now()
         dt = '{0.year}-{0.month}-{0.day} {0.hour}:{0.minute}:{0.second}'.format(dt)
         author = ctx.author
-        asdf = dataIO.load_json(self.setting)
+        asdf = lang({'_id': ctx.guild.id})
         try:
-            if asdf[f'{ctx.guild.id}']['language'] == 'ko':
+            if asdf['language'] == 'ko':
                 data = dataIO.load_json(self.ko)[ctx.command.name]
             else:
                 data = dataIO.load_json(self.en)[ctx.command.name]
@@ -56,9 +56,9 @@ class Afk(commands.Cog):
             return
         author = message.author
         utc = datetime.datetime.utcnow()
-        asdf = dataIO.load_json(self.setting)
+        asdf = lang({'_id': message.guild.id})
         try:
-            if asdf[f'{message.guild.id}']['language'] == 'ko':
+            if asdf['language'] == 'ko':
                 data = dataIO.load_json(self.ko)["end"]
             else:
                 data = dataIO.load_json(self.en)["end"]
@@ -90,6 +90,4 @@ class Afk(commands.Cog):
             return
 
 def setup(bot):
-    check_folder()
-    check_file()
     bot.add_cog(Afk(bot))

@@ -21,11 +21,14 @@ import asyncio
 import random
 import zipfile
 from pymongo import MongoClient
+import pymongo
+import settings
+set = settings.set()
 try:
-    client = MongoClient()
+    client = MongoClient(host=set.ip, port=set.port)
     db = client['owner']
 except:
-    print("몽고DB에 연결 할 수 없습니다!")
+    print("Owner Cogs에서 몽고DB에 연결 할 수 없습니다!")
 
 class Owner(commands.Cog):
     def __init__(self, bot):
@@ -236,15 +239,17 @@ class Owner(commands.Cog):
     async def load(self, ctx, cogs):
         """cogs를 리로드 하는 명령어 입니다!"""
         try:
-            await ctx.send('그 기능이 로드 되었습니다!')
             self.bot.load_extension(cogs)
+            return await ctx.send('그 기능이 로드 되었습니다!')
         except discord.ext.commands.errors.ExtensionAlreadyLoaded:
-            await ctx.send('그 기능이 이미 로드 되어있습니다!')
+            return await ctx.send('그 기능이 이미 로드 되어있습니다!')
         except discord.ext.commands.errors.ExtensionNotFound:
-            await ctx.send('그 기능을 찾을수 없습니다!')
+            return await ctx.send('그 기능을 찾을수 없습니다!')
         except Exception as e:
             print(e)
-            await ctx.send('그 기능을 로드 되는중 오류가 발생하였습니다!\n터미널이나 콘솔을 확인해주세요!')
+            return await ctx.send('그 기능을 로드 되는중 오류가 발생하였습니다!\n터미널이나 콘솔을 확인해주세요!')
+        except:
+            return await ctx.send('그 기능을 찾을수 없습니다!')
 
     @commands.command()
     @commands.check(is_owner)
@@ -262,9 +267,7 @@ class Owner(commands.Cog):
             else:
                 self.bot.load_extension('cogs.' + cogs)
             await ctx.send('그 기능이 리로드 되었습니다!')
-        except discord.ext.commands.errors.ExtensionNotFound:
-            await ctx.send('그 기능을 찾을수 없습니다!')
-        except discord.ext.commands.errors.CommandInvokeError:
+        except ExtensionNotFound:
             await ctx.send('그 기능을 찾을수 없습니다!')
         except Exception as e:
             print(e)
@@ -322,23 +325,7 @@ class Owner(commands.Cog):
         embed.set_footer(text="Total commits: " + ncommits)
 
         return embed
-
-def check_folder():
-    if not os.path.exists('data/owner'):
-        print('data/owner 풀더생성을 완료하였습니다!')
-        os.makedirs('data/owner')
-
-def check_file():
-    data = {}
-    f = "data/owner/check.json"
-    if not dataIO.is_valid_json(f):
-        print(f"{f} 파일생성을 완료하였습니다!")
-        dataIO.save_json(f,
-                         data)
-
         
 def setup(bot):
-    check_folder()
-    check_file()
     bot.add_cog(Owner(bot))
 

@@ -16,7 +16,7 @@ from pymongo import MongoClient
 import settings
 set = settings.set()
 try:
-    client = MongoClient(host=set.ip, port=set.port)
+    client = MongoClient(host=set.ip, port=set.port, username=set.user, password=set.pwd, authSource=set.user, authMechanism='SCRAM-SHA-256')
     db = client['general']
     lang = client['mod'].language.find_one
 except:
@@ -155,7 +155,7 @@ __Sending With DPNK__""")
             embed.add_field(name='유저', value=ctx.author)
             embed.add_field(name='서버', value=ctx.guild)
             await ctx.send('에러 내용을 봇 관리진에게 보냈습니다! 빠른 시일내에 고치도록 하겠습니다!\nI send Error code to Bot Administrator! I will fix that!')
-            return await dddd.send(embed=embed, content=asdf)
+            return await dddd.send(asdf)
         elif isinstance(error, commands.CommandNotFound):
             blacklist = dataIO.load_json('blacklist.json')
             try:

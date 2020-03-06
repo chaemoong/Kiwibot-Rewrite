@@ -14,7 +14,7 @@ class DataIO():
         """Atomically saves json file"""
         with open(filename, encoding='utf-8', mode="w") as f:
             json.dump(data, f, indent=4,sort_keys=True,
-                separators=(',',' : '))
+                separators=(',',' : '), ensure_ascii=False)
         return data
 
     def load_json(self, filename):

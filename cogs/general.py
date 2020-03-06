@@ -28,7 +28,7 @@ from json import loads, dumps
 import settings
 set = settings.set()
 try:
-    client = MongoClient(host=set.ip, port=set.port)
+    client = MongoClient(host=set.ip, port=set.port, username=set.user, password=set.pwd, authSource=set.user, authMechanism='SCRAM-SHA-256')
     db = client['general']
     lang = client['mod'].language.find_one
 except:

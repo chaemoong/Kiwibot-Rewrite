@@ -12,7 +12,7 @@ from pymongo import MongoClient
 import settings
 set = settings.set()
 try:
-    client = MongoClient(host=set.ip, port=set.port)
+    client = MongoClient(host=set.ip, port=set.port, username=set.user, password=set.pwd, authSource=set.user, authMechanism='SCRAM-SHA-256')
     db = client['mod']
 except:
     print('Mod Cogs에서 MongoDB에 연결하지 못했습니다!')

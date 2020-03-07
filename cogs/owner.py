@@ -25,8 +25,8 @@ import pymongo
 import settings
 set = settings.set()
 try:
-    client = MongoClient(host=set.ip, port=set.port, username=set.user, password=set.pwd, authSource=set.user, authMechanism='SCRAM-SHA-256')
-    db = client['owner']
+    client = MongoClient(host=set.ip, port=set.port, username=set.user, password=set.pwd, authSource=set.user)
+    db = client['chaemoong']['owner']
 except:
     print("Owner Cogs에서 몽고DB에 연결 할 수 없습니다!")
 

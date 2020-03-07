@@ -4,9 +4,9 @@ from cogs.utils.dataIO import dataIO
 from pymongo import MongoClient
 set = settings.set()
 try:
-    client = MongoClient(host=set.ip, port=set.port, username=set.user, password=set.pwd, authSource=set.user, authMechanism='SCRAM-SHA-256')
-    db = client['afk']
-    lang = client['mod'].language.find_one
+    client = MongoClient(host=set.ip, port=set.port, username=set.user, password=set.pwd, authSource=set.user)    
+    db = client['chaemoong']['afk']
+    lang = client['chaemoong']['mod.language'].find_one
 except:
     print("AFK Cog에서 몽고DB를 연결할 수 없습니다!")
 
@@ -26,8 +26,8 @@ class Afk(commands.Cog):
         dt = datetime.datetime.now()
         dt = '{0.year}-{0.month}-{0.day} {0.hour}:{0.minute}:{0.second}'.format(dt)
         author = ctx.author
-        asdf = lang({'_id': ctx.guild.id})
         try:
+            asdf = lang({'_id': ctx.guild.id})
             if asdf['language'] == 'ko':
                 data = dataIO.load_json(self.ko)[ctx.command.name]
             else:
@@ -40,15 +40,17 @@ class Afk(commands.Cog):
             em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
         else:
             em.set_footer(text=f'Request By {author}')
-        dbdata = {"_id": author.id, "reason": f"{reason}"}
-        if reason:
-            em.add_field(name=data['4'], value=reason, inline=False)
         try:
-            db.afk.insert_one(dbdata)
-        except:
-            db.afk.delete_one({"_id": author.id})
-            db.afk.insert_one(dbdata)
-        await ctx.send(author.mention, embed=em)
+            dbdata = {"_id": author.id, "reason": f"{reason}"}
+            if reason:
+                em.add_field(name=data['4'], value=reason, inline=False)
+            try:
+                db.afk.insert_one(dbdata)
+            except:
+                db.afk.delete_one({"_id": author.id})
+                db.afk.insert_one(dbdata)
+            await ctx.send(author.mention, embed=em)
+        except: return await ctx.send('봇에 장애가 발생하였습니다. 잠시후 사용해주세요')
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -56,38 +58,40 @@ class Afk(commands.Cog):
             return
         author = message.author
         utc = datetime.datetime.utcnow()
-        asdf = lang({'_id': message.guild.id})
         try:
-            if asdf['language'] == 'ko':
-                data = dataIO.load_json(self.ko)["end"]
-            else:
-                data = dataIO.load_json(self.en)["end"]
-        except:
-            data = dataIO.load_json(self.en)["end"]
-        if db.afk.find_one({"_id": author.id}):
-            aliases= ['afk', 'ㅁ라', '잠수', 'wkatn']
-            for a in aliases:
-                if a in message.content:
-                    return
-            else:
-                try:
-                    b = db.afk.find_one({"_id": author.id})
-                except:
-                    return
-                if str(b['reason']) == str(None):
-                    a = data['2'].format(author.name)
+            try:
+                asdf = lang({'_id': message.guild.id})
+                if asdf['language'] == 'ko':
+                    data = dataIO.load_json(self.ko)["end"]
                 else:
-                    a = data['1'].format(author.name, b['reason'])
-                db.afk.delete_one({"_id": author.id})
-                em = discord.Embed(colour=message.author.colour, timestamp=utc)
-                try:
-                    em.add_field(name=data['3'], value=a, inline=False)
-                except: return
-                em.set_footer(text=f'Request By: {author}', icon_url=author.avatar_url)
-                await message.channel.send(embed=em)
+                    data = dataIO.load_json(self.en)["end"]
+            except:
+                data = dataIO.load_json(self.en)["end"]
+            if db.afk.find_one({"_id": author.id}):
+                aliases= ['afk', 'ㅁ라', '잠수', 'wkatn']
+                for a in aliases:
+                    if a in message.content:
+                        return
+                else:
+                    try:
+                        b = db.afk.find_one({"_id": author.id})
+                    except:
+                        return
+                    if str(b['reason']) == str(None):
+                        a = data['2'].format(author.name)
+                    else:
+                        a = data['1'].format(author.name, b['reason'])
+                    db.afk.delete_one({"_id": author.id})
+                    em = discord.Embed(colour=message.author.colour, timestamp=utc)
+                    try:
+                        em.add_field(name=data['3'], value=a, inline=False)
+                    except: return
+                    em.set_footer(text=f'Request By: {author}', icon_url=author.avatar_url)
+                    await message.channel.send(embed=em)
+                    return
+            else:
                 return
-        else:
-            return
+        except: return
 
 def setup(bot):
     bot.add_cog(Afk(bot))

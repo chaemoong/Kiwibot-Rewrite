@@ -11,8 +11,8 @@ import settings
 from pymongo import MongoClient
 set = settings.set()
 try:
-    client = MongoClient(host=set.ip, port=set.port, username=set.user, password=set.pwd, authSource=set.user, authMechanism='SCRAM-SHA-256')
-    lang = client['mod'].language.find_one
+    client = MongoClient(host=set.ip, port=set.port, username=set.user, password=set.pwd, authSource=set.user)    
+    lang = client['chaemoong']['mod.language'].find_one
 except:
     print("captcha Cog에서 몽고DB를 연결할 수 없습니다!")
 

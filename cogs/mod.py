@@ -12,8 +12,9 @@ from pymongo import MongoClient
 import settings
 set = settings.set()
 try:
-    client = MongoClient(host=set.ip, port=set.port, username=set.user, password=set.pwd, authSource=set.user, authMechanism='SCRAM-SHA-256')
-    db = client['mod']
+    client = MongoClient(host=set.ip, port=set.port, username=set.user, password=set.pwd, authSource=set.user)
+    db = client['chaemoong']['mod']
+    lang = client['chaemoong']['mod.language'].find_one
 except:
     print('Mod Cogs에서 MongoDB에 연결하지 못했습니다!')
 
@@ -159,9 +160,9 @@ class Mod(commands.Cog):
     @commands.check(administrator)
     async def ban(self, ctx, user:discord.Member=None, *, reason=None):
         server = ctx.guild
-        asdf = dataIO.load_json(self.setting)
         try:
-            if asdf[f'{server.id}']['language'] == 'ko':
+            asdf = lang({'_id': ctx.guild.id})
+            if asdf['language'] == 'ko':
                 data = dataIO.load_json(self.ko)[ctx.command.name]
             else:
                 data = dataIO.load_json(self.en)[ctx.command.name]
@@ -185,9 +186,9 @@ class Mod(commands.Cog):
     @commands.check(administrator)
     async def unban(self, ctx: commands.Context, user_id: int, *, reason: str = None):
         guild = ctx.guild
-        asdf = dataIO.load_json(self.setting)
         try:
-            if asdf[f'{guild.id}']['language'] == 'ko':
+            asdf = lang({'_id': ctx.guild.id})
+            if asdf['language'] == 'ko':
                 data = dataIO.load_json(self.ko)[ctx.command.name]
             else:
                 data = dataIO.load_json(self.en)[ctx.command.name]
@@ -221,9 +222,9 @@ class Mod(commands.Cog):
     @commands.check(administrator)
     async def hackban(self, ctx: commands.Context, user_id: int, *, reason: str = None):
         guild = ctx.guild
-        asdf = dataIO.load_json(self.setting)
         try:
-            if asdf[f'{guild.id}']['language'] == 'ko':
+            asdf = lang({'_id': ctx.guild.id})
+            if asdf['language'] == 'ko':
                 data = dataIO.load_json(self.ko)[ctx.command.name]
             else:
                 data = dataIO.load_json(self.en)[ctx.command.name]
@@ -257,9 +258,9 @@ class Mod(commands.Cog):
     async def 경고(self, ctx, user:discord.Member=None, *, reason=None):
         author = ctx.author
         server = ctx.guild
-        asdf = dataIO.load_json(self.setting)
         try:
-            if asdf[f'{server.id}']['language'] == 'ko':
+            asdf = lang({'_id': ctx.guild.id})
+            if asdf['language'] == 'ko':
                 data = dataIO.load_json(self.ko)['경고']
             else:
                 data = dataIO.load_json(self.en)['경고']
@@ -347,9 +348,9 @@ class Mod(commands.Cog):
     async def unwarn(self, ctx, user:discord.Member=None, reason=None):
         author = ctx.author
         server = ctx.guild
-        asdf = dataIO.load_json(self.setting)
         try:
-            if asdf[f'{server.id}']['language'] == 'ko':
+            asdf = lang({'_id': ctx.guild.id})
+            if asdf['language'] == 'ko':
                 data = dataIO.load_json(self.ko)[ctx.command.name]
             else:
                 data = dataIO.load_json(self.en)[ctx.command.name]
@@ -385,9 +386,9 @@ class Mod(commands.Cog):
         server = ctx.guild
         if user == None:
             user = author
-        asdf = dataIO.load_json(self.setting)
         try:
-            if asdf[f'{server.id}']['language'] == 'ko':
+            asdf = lang({'_id': ctx.guild.id})
+            if asdf['language'] == 'ko':
                 data = dataIO.load_json(self.ko)[ctx.command.name]
             else:
                 data = dataIO.load_json(self.en)[ctx.command.name]
@@ -416,9 +417,9 @@ class Mod(commands.Cog):
     async def clean(self, ctx, user:discord.Member=None, *, reason=None):
         author = ctx.author
         server = ctx.guild
-        asdf = dataIO.load_json(self.setting)
         try:
-            if asdf[f'{server.id}']['language'] == 'ko':
+            asdf = lang({'_id': ctx.guild.id})
+            if asdf['language'] == 'ko':
                 data = dataIO.load_json(self.ko)[ctx.command.name]
             else:
                 data = dataIO.load_json(self.en)[ctx.command.name]
@@ -451,9 +452,9 @@ class Mod(commands.Cog):
         """경고제한 하는 명령어입니다! | This command limits the warning!"""
         author = ctx.author
         server = ctx.guild
-        asdf = dataIO.load_json(self.setting)
         try:
-            if asdf[f'{server.id}']['language'] == 'ko':
+            asdf = lang({'_id': ctx.guild.id})
+            if asdf['language'] == 'ko':
                 data = dataIO.load_json(self.ko)[ctx.command.name]
             else:
                 data = dataIO.load_json(self.en)[ctx.command.name]
@@ -750,9 +751,9 @@ class Mod(commands.Cog):
     @modset.command(pass_context=True)
     async def admin(self, ctx, role:discord.Role=None):
         server = ctx.guild
-        asdf = dataIO.load_json(self.setting)
         try:
-            if asdf[f'{server.id}']['language'] == 'ko':
+            asdf = lang({'_id': ctx.guild.id})
+            if asdf['language'] == 'ko':
                 data = dataIO.load_json(self.ko)['modset']['admin']
             else:
                 data = dataIO.load_json(self.en)['modset']['admin']
@@ -783,9 +784,9 @@ class Mod(commands.Cog):
     @modset.command(pass_context=True)
     async def mod(self, ctx, role:discord.Role=None):
         server = ctx.guild
-        asdf = dataIO.load_json(self.setting)
         try:
-            if asdf[f'{server.id}']['language'] == 'ko':
+            asdf = lang({'_id': ctx.guild.id})
+            if asdf['language'] == 'ko':
                 data = dataIO.load_json(self.ko)['modset']['mod']
             else:
                 data = dataIO.load_json(self.en)['modset']['mod']
@@ -816,9 +817,9 @@ class Mod(commands.Cog):
     @modset.command(pass_context=True)
     async def log(self, ctx, channel:discord.TextChannel=None):
         server = ctx.guild
-        asdf = dataIO.load_json(self.setting)
         try:
-            if asdf[f'{server.id}']['language'] == 'ko':
+            asdf = lang({'_id': ctx.guild.id})
+            if asdf['language'] == 'ko':
                 data = dataIO.load_json(self.ko)['modset']['log']
             else:
                 data = dataIO.load_json(self.en)['modset']['log']
@@ -850,9 +851,9 @@ class Mod(commands.Cog):
     async def 욕필터(self, ctx):
         author = ctx.author
         server = ctx.guild
-        asdf = dataIO.load_json(self.setting)
         try:
-            if asdf[f'{server.id}']['language'] == 'ko':
+            asdf = lang({'_id': ctx.guild.id})
+            if asdf['language'] == 'ko':
                 data = dataIO.load_json(self.ko)['modset']['filter']
             else:
                 data = dataIO.load_json(self.en)['modset']['filter']
@@ -887,9 +888,9 @@ class Mod(commands.Cog):
     @modset.command(pass_context=True)
     async def role(self, ctx, role:discord.Role=None):
         server = ctx.guild
-        asdf = dataIO.load_json(self.setting)
         try:
-            if asdf[f'{server.id}']['language'] == 'ko':
+            asdf = lang({'_id': ctx.guild.id})
+            if asdf['language'] == 'ko':
                 data = dataIO.load_json(self.ko)['modset']['role']
             else:
                 data = dataIO.load_json(self.en)['modset']['role']
@@ -931,9 +932,10 @@ class Mod(commands.Cog):
     async def logger(self, ctx, action, user, reason=None):
         server = ctx.guild
         author = ctx.author
-        asdf = dataIO.load_json(self.setting)
         try:
-            if asdf[f'{server.id}']['language'] == 'ko':
+            asdf = lang({'_id': ctx.guild.id})
+            if asdf['language'] == 'ko':
+
                 data = dataIO.load_json(self.ko)['log']
             else:
                 data = dataIO.load_json(self.en)['log']

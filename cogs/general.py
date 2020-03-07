@@ -28,9 +28,9 @@ from json import loads, dumps
 import settings
 set = settings.set()
 try:
-    client = MongoClient(host=set.ip, port=set.port, username=set.user, password=set.pwd, authSource=set.user, authMechanism='SCRAM-SHA-256')
-    db = client['general']
-    lang = client['mod'].language.find_one
+    client = MongoClient(f'mongodb://{set.user}:{set.pwd}@{set.ip}:{set.port}/?authSource={set.user}&readPreference=primary&ssl=false')
+    db = client['chaemoong']['general']
+    lang = client['chaemoong']['mod.language'].find_one
 except:
     print("general Cog에서 몽고DB를 연결할 수 없습니다!")
 def Base64Encode(message):
@@ -45,7 +45,6 @@ class General(commands.Cog):
         self.client = dataIO.load_json('data/general/status.json')
         self.author = dataIO.load_json('data/general/author.json')
         self.data = dataIO.load_json('data/general/stat.json')
-        self.asdf = 'data/general/money.json'
         self.setting = 'data/mod/settings.json'
         self.ko = 'data/language/ko.json'
         self.en = 'data/language/en.json'
@@ -78,7 +77,6 @@ class General(commands.Cog):
         author = ctx.author
         if user is None:
             user = author
-        asdf = dataIO.load_json(self.asdf)
         try:
             a = db.money.find_one({"_id": user.id})
             a = a['money']
@@ -169,8 +167,8 @@ class General(commands.Cog):
     async def userinfo(self, ctx, user:discord.Member=None):
         author = ctx.author
         server = ctx.guild.id
-        asdf = lang({"_id": server})
         try:
+            asdf = lang({"_id": server})
             if asdf['language'] == 'ko':
                 data = dataIO.load_json(self.ko)[ctx.command.name]
             else:
@@ -249,8 +247,8 @@ class General(commands.Cog):
     async def 멜론(self, ctx):
         """멜론 차트를 뽑는 명령어입니다!"""
         server = ctx.guild.id
-        asdf = lang({"_id": server})
         try:
+            asdf = lang({"_id": server})
             if asdf['language'] == 'ko':
                 a = '멜론 차트'
             else:
@@ -309,8 +307,8 @@ class General(commands.Cog):
     async def serverinfo(self, ctx):
         author = ctx.author
         server = ctx.guild
-        asdf = lang({"_id": server.id})
         try:
+            asdf = lang({"_id": server})
             if asdf['language'] == 'ko':
                 data = dataIO.load_json(self.ko)[ctx.command.name]
             else:
@@ -349,8 +347,8 @@ class General(commands.Cog):
         """Helping Another method Screen Share!\n화면공유를 할수 있게 도와주는 명령어에요!"""
         author = ctx.author
         server = author.guild
-        asdf = lang({"_id": server.id})
         try:
+            asdf = lang({"_id": server})
             if asdf['language'] == 'ko':
                 a = '화면 공유'
                 b = '**서버: {server.name}\n음성 채널: [{a.name}]({url})**'

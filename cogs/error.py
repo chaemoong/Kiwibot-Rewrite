@@ -16,9 +16,9 @@ from pymongo import MongoClient
 import settings
 set = settings.set()
 try:
-    client = MongoClient(host=set.ip, port=set.port, username=set.user, password=set.pwd, authSource=set.user, authMechanism='SCRAM-SHA-256')
-    db = client['general']
-    lang = client['mod'].language.find_one
+    client = MongoClient(host=set.ip, port=set.port, username=set.user, password=set.pwd, authSource=set.user)
+    db = client['chaemoong']['general']
+    lang = client['chaemoong']['mod.language'].find_one
 except:
     print("error Cog에서 몽고DB를 연결할 수 없습니다!")
 from base64 import b64encode, b64decode

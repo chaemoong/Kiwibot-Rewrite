@@ -5,7 +5,7 @@
         "3" : "Don't use Administrator without Administrator permission!"
     },
     "afk" : {
-        "1" : "\uc7a0\uc218 \uc2dc\uc791! | AFK START!",
+        "1" : "잠수 시작! | AFK START!",
         "2" : "{}'s afk started!",
         "3" : "Please fill out any message to terminate the afk!",
         "4" : "Reason"
@@ -47,7 +47,7 @@
     "end" : {
         "1" : "{} has finished afk!\n\nReason: {}\n\nWhere have you been!?",
         "2" : "{} has finished afk!\n\nWhere have you been?",
-        "3" : "\uc7a0\uc218 \ub05d! | AFK END!"
+        "3" : "잠수 끝! | AFK END!"
     },
     "hackban" : {
         "1" : "> Wrote user ID to hackban",
@@ -72,7 +72,7 @@
         "1" : "None",
         "2" : "%Y-%m-%d %H:%M (UTC)",
         "3" : "Time of occurrence: {}",
-        "4" : "USER(ID) | Administrator(ID)",
+        "4" : "Administrator(ID) | USER(ID)",
         "5" : "Reason",
         "6" : "Warning Count"
     },
@@ -132,8 +132,8 @@
         "7" : "Server Owner",
         "8" : "It's over the role, so i can't print any more!",
         "9" : "roles",
-        "extreme" : "**\u253b\u2501\u253b \uff90\u30fd(\u0ca0\u76ca\u0ca0)\u30ce\u5f61\u253b\u2501\u253b(extreme) (Must have a verified phone on their Discord account!)**",
-        "high" : "**(\u256f\u00b0\u25a1\u00b0\uff09\u256f\ufe35 \u253b\u2501\u253b(high) (Must also be a member of  this server for longer than 10 minutes)**",
+        "extreme" : "**┻━┻ ﾐヽ(ಠ益ಠ)ノ彡┻━┻(extreme) (Must have a verified phone on their Discord account!)**",
+        "high" : "**(╯°□°）╯︵ ┻━┻(high) (Must also be a member of  this server for longer than 10 minutes)**",
         "low" : "**Low (Must have a verified email on their Diacord account!)**",
         "medium" : "**Medium (Must also be registered on Discord for longer than 5 minutes!)**",
         "none" : "**None (Unrestricted!)**",
@@ -177,7 +177,7 @@
         "6" : "USERINFO",
         "7" : "USER TAG",
         "9" : "Activity",
-        "Spotify" : "Listening to `{}` of `{}` in Spotify",
+        "Spotify" : "Listening to `{} - {}` in Spotify",
         "game" : "Playing {}",
         "time" : "%Y-%m-%d %H:%M (UTC)"
     },
@@ -195,7 +195,7 @@
         "channel" : "channel",
         "role" : "role"
     },
-    "\uacbd\uace0" : {
+    "경고" : {
         "1" : "You were banned on server {}",
         "10" : "Ban due to over the warnings",
         "2" : "Reason: Ban due to over the warnings",

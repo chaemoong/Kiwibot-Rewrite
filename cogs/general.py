@@ -209,6 +209,7 @@ class General(commands.Cog):
             elif isinstance(activity, Spotify):
                 yee = data["Spotify"].format(str(activity.artist), str(activity.title))
         try:
+            yee = yee.replace(';', ',')
             em = discord.Embed(colour=author.colour, title=data['6'], timestamp=datetime.datetime.utcnow(), description=yee)
         except:
             em = discord.Embed(colour=author.colour, title=data['6'], timestamp=datetime.datetime.utcnow(), description=self.data[f'{user.status}'])

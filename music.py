@@ -144,6 +144,7 @@ class Music(commands.Cog):
                 await player.set_volume(self.setting[f'{ctx.guild.id}']['volume']) 
             else:
                 await player.play()
+                await player.set_volume(7)
 
     @commands.command()
     async def seek(self, ctx, *, seconds: int):
@@ -160,12 +161,10 @@ class Music(commands.Cog):
         """노래 플레이어의 볼륨을 설정하는 명령어야!"""
         player = self.bot.lavalink.players.get(ctx.guild.id)
         em=discord.Embed(colour=ctx.author.colour)
-        try:
-            vol = int(volume) / 10
-        except:
-            vol = player.volume * 10
+        try: vol = int(volume) / 10
+        except: pass
         if volume is None:
-            em.add_field(name='현재 볼륨', value=f'🔈 | {vol}%')
+            em.add_field(name='현재 볼륨', value=f'🔈 | {player.volume * 10}%')
         try:
             if volume == 0 or volume < 0 or volume > 150:
                 return await ctx.send('볼륨은 1~150% 로 맞춰야되요!')
@@ -173,11 +172,11 @@ class Music(commands.Cog):
             pass
         else:
             try:
-                self.setting[f'{ctx.author.guild.id}'].update({"volume": volume * 10})
+                self.setting[f'{ctx.author.guild.id}'].update({"volume": volume})
             except KeyError:
                 self.setting[f'{ctx.author.guild.id}'] = {}
-                self.setting[f'{ctx.author.guild.id}'].update({"volume": volume * 10})
-            await player.set_volume(volume)
+                self.setting[f'{ctx.author.guild.id}'].update({"volume": volume})
+            await player.set_volume(vol)
             em.add_field(name='볼륨 설정', value=f'🔈 | {player.volume * 10}% 으로 설정했어요!')
         await ctx.send(embed=em)
         dataIO.save_json(self.a, self.setting)
@@ -191,7 +190,7 @@ class Music(commands.Cog):
             return await ctx.send('노래를 재생하고 있지 않아요!')
 
         await player.skip()
-        await ctx.send('⏭ | 건너 뛰어 다른 노래로 레츠기릿!')
+        await ctx.send('⏭ | 노래를 건너 뛰어 다른노래를 재생합니다!')
 
     @commands.command(aliases=['np', 'n', 'playing'])
     async def now(self, ctx):
@@ -258,7 +257,7 @@ class Music(commands.Cog):
             return await ctx.send('노래를 재생하고 있지 않아요!')
 
         player.shuffle = not player.shuffle
-        await ctx.send('🔀 | 재생목록 랜덤으로 ' + ('하기!' if player.shuffle else '안하기!'))
+        await ctx.send('🔀 | 재생목록 랜덤으로 ' + ('섞었습니다!' if player.shuffle else '안섞었습니다!'))
 
     @commands.command(aliases=['loop'])
     async def repeat(self, ctx):
@@ -269,7 +268,7 @@ class Music(commands.Cog):
             return await ctx.send('노래를 재생하고 있지 않아요!')
 
         player.repeat = not player.repeat
-        await ctx.send('🔁 | 반복모드 ' + ('켜기!' if player.repeat else '끄기!'))
+        await ctx.send('🔁 | 반복모드 ' + ('켰어요!' if player.repeat else '껐어요!'))
 
     @commands.command()
     async def remove(self, ctx, index: int):
@@ -284,7 +283,7 @@ class Music(commands.Cog):
 
         removed = player.queue.pop(index - 1)  # Account for 0-index.
 
-        await ctx.send(f'**{removed.title}**곡이 재생목록에서 지웠어!')
+        await ctx.send(f'**{removed.title}**곡이 재생목록에서 지웠어요!')
 
     @commands.command()
     async def search(self, ctx, *, query):
@@ -335,6 +334,7 @@ class Music(commands.Cog):
         embed.title = '재생목록에 추가된 노래'
         embed.description = f'[{track["info"]["title"]}]({track["info"]["uri"]})를 재생목록에 추가했어요!'
         player.add(requester=ctx.author.id, track=track)
+        await a.delete()
         await ctx.send(embed=embed)
         if not player.is_playing:
             await ctx.send(f'`[{track["info"]["title"]}]` 노래를 재생할게요!')
@@ -360,7 +360,7 @@ class Music(commands.Cog):
         player.queue.clear()
         await player.stop()
         await self.connect_to(ctx.guild.id, None)
-        await ctx.send('*⃣ | 재생목록을 초기화 하고 보이스채널에서 나왔어!')
+        await ctx.send('*⃣ | 재생목록을 초기화 하고 보이스채널에서 나왔어요!')
 
     @commands.command()
     async def leave(self, ctx):

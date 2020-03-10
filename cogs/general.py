@@ -28,7 +28,7 @@ from json import loads, dumps
 import settings
 set = settings.set()
 try:
-    client = MongoClient(f'mongodb://{set.user}:{set.pwd}@{set.ip}:{set.port}/?authSource={set.user}&readPreference=primary&ssl=false')
+    client = MongoClient(host=set.ip, port=set.port, username=set.user, password=set.pwd, authSource=set.auth)    
     db = client['chaemoong']['general']
     lang = client['chaemoong']['mod.language'].find_one
 except:
@@ -45,16 +45,15 @@ class General(commands.Cog):
         self.client = dataIO.load_json('data/general/status.json')
         self.author = dataIO.load_json('data/general/author.json')
         self.data = dataIO.load_json('data/general/stat.json')
-        self.setting = 'data/mod/settings.json'
         self.ko = 'data/language/ko.json'
         self.en = 'data/language/en.json'
         self.choice = [True, False, False, False, True, True, True, True, True, True]
-        self.percent = [2,3,4,5,6]
+        self.percent = [2,3,4,5,6,7,8,9]
 
     @commands.group(no_pm=True, name='exchange', description='타봇 돈으로 환전하는 명령어입니다! | To exchange the other bot money!', aliases=['환전', 'ghkswjs', 'ㄷㅌ초뭏ㄷ'])
     async def exchange(self, ctx):
         if ctx.invoked_subcommand is None:
-            em = discord.Embed(colour=discord.Colour.orange(), title='봇끼리 환전 | Leveling Funcion Settings', timestamp=datetime.datetime.utcnow())
+            em = discord.Embed(colour=discord.Colour.orange(), title='봇끼리 환전 | Exchange Kiwi money to another bot', timestamp=datetime.datetime.utcnow())
             em.add_field(name='돈 환전이 가능한 봇', value='Cutock - 큐트로 환전')
             return await ctx.send(embed=em)
 
@@ -209,7 +208,7 @@ class General(commands.Cog):
             elif isinstance(activity, Spotify):
                 yee = data["Spotify"].format(str(activity.artist), str(activity.title))
         try:
-            yee = yee.replace(';', ',')
+            yee = yee.replace(";", ",")
             em = discord.Embed(colour=author.colour, title=data['6'], timestamp=datetime.datetime.utcnow(), description=yee)
         except:
             em = discord.Embed(colour=author.colour, title=data['6'], timestamp=datetime.datetime.utcnow(), description=self.data[f'{user.status}'])
@@ -221,8 +220,8 @@ class General(commands.Cog):
             em.add_field(name=data['14'], value=lol, inline=False)
         gf = user.created_at + datetime.timedelta(hours=9)
         fg = user.joined_at + datetime.timedelta(hours=9)
-        em.add_field(name=data['10'], value=str(gf) + ' (UTC+9)', inline=False)
-        em.add_field(name=data['13'], value=str(fg) + ' (UTC+9)', inline=False)
+        em.add_field(name=data['10'], value=str(gf)[:19] + ' (UTC+9)', inline=False)
+        em.add_field(name=data['13'], value=str(fg)[:19] + ' (UTC+9)', inline=False)
         try:
             status = user.activities[0].type
             if status == discord.ActivityType.custom:

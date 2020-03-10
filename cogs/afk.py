@@ -4,7 +4,7 @@ from cogs.utils.dataIO import dataIO
 from pymongo import MongoClient
 set = settings.set()
 try:
-    client = MongoClient(host=set.ip, port=set.port, username=set.user, password=set.pwd, authSource=set.user)    
+    client = MongoClient(host=set.ip, port=set.port, username=set.user, password=set.pwd, authSource=set.auth)    
     db = client['chaemoong']['afk']
     lang = client['chaemoong']['mod.language'].find_one
 except:
@@ -45,10 +45,10 @@ class Afk(commands.Cog):
             if reason:
                 em.add_field(name=data['4'], value=reason, inline=False)
             try:
-                db.afk.insert_one(dbdata)
+                db.insert_one(dbdata)
             except:
-                db.afk.delete_one({"_id": author.id})
-                db.afk.insert_one(dbdata)
+                db.delete_one({"_id": author.id})
+                db.insert_one(dbdata)
             await ctx.send(author.mention, embed=em)
         except: return await ctx.send('봇에 장애가 발생하였습니다. 잠시후 사용해주세요')
 
@@ -67,21 +67,21 @@ class Afk(commands.Cog):
                     data = dataIO.load_json(self.en)["end"]
             except:
                 data = dataIO.load_json(self.en)["end"]
-            if db.afk.find_one({"_id": author.id}):
+            if db.find_one({"_id": author.id}):
                 aliases= ['afk', 'ㅁ라', '잠수', 'wkatn']
                 for a in aliases:
                     if a in message.content:
                         return
                 else:
                     try:
-                        b = db.afk.find_one({"_id": author.id})
+                        b = db.find_one({"_id": author.id})
                     except:
                         return
                     if str(b['reason']) == str(None):
                         a = data['2'].format(author.name)
                     else:
                         a = data['1'].format(author.name, b['reason'])
-                    db.afk.delete_one({"_id": author.id})
+                    db.delete_one({"_id": author.id})
                     em = discord.Embed(colour=message.author.colour, timestamp=utc)
                     try:
                         em.add_field(name=data['3'], value=a, inline=False)

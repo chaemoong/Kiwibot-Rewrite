@@ -12,7 +12,7 @@ from pymongo import MongoClient
 import settings
 set = settings.set()
 try:
-    client = MongoClient(host=set.ip, port=set.port, username=set.user, password=set.pwd, authSource=set.user)
+    client = MongoClient(host=set.ip, port=set.port, username=set.user, password=set.pwd, authSource=set.auth)    
     db = client['chaemoong']['mod']
     lang = client['chaemoong']['mod.language'].find_one
 except:
@@ -408,8 +408,10 @@ class Mod(commands.Cog):
             return await ctx.send(embed=em)
         a = self.data2[f'{server.id}'][f'{user.id}']["reason"]
         em.add_field(name=data['3'], value=data['6'].format(user.mention, count))
+        num = 0
         for reason in a:
-            em.add_field(name=data['7'].format(reason[:2]), value=reason[2:], inline=False)
+            num += 1
+            em.add_field(name=data['7'].format(num), value=reason, inline=False)
         return await ctx.send(embed=em)
 
     @commands.command(no_pm=True, name='clean', description='It is a user-warnning cleaning command. | 유저의 경고를 삭제하는 명령어입니다!', aliases=['칟무', '경고삭제', 'rudrhtkrwp'])
@@ -657,15 +659,15 @@ class Mod(commands.Cog):
             else:
                 return await ctx.send(f'{author.mention}, 다른 이모지를 추가하지 마세요!')
 
-    @commands.group(no_pm=True, name='modset', description='Commands to set administrator functions! | 관리자 기능들을 설정하는 명령어입니다!', aliases=['ㅡㅐㅇㄴㄷㅅ', '관리자기능설정', 'rhksflwkrlsmdtjfwjd'])
+    @commands.group(no_pm=True, name='settings', description='Commands to set administrator functions! | 관리자 기능들을 설정하는 명령어입니다!', aliases=['ㄴㄷㅅ샤ㅜㅎㄴ', '관리자기능설정', 'rhksflwkrlsmdtjfwjd'])
     @commands.check(administrator)
-    async def modset(self, ctx):
+    async def settings(self, ctx):
         author =  ctx.author
         if ctx.invoked_subcommand is None:
             server = ctx.guild
-            asdf = dataIO.load_json(self.setting)
             try:
-                if asdf[f'{server.id}']['language'] == 'ko':
+                asdf = lang({'_id': ctx.guild.id})
+                if asdf['language'] == 'ko':
                     data = dataIO.load_json(self.ko)['modset']
                 else:
                     data = dataIO.load_json(self.en)['modset']
@@ -732,6 +734,7 @@ class Mod(commands.Cog):
                 asdfasdf = self.bot.get_cog('Music').setting.get(str(server.id)).get('volume')
             except:
                 asdfasdf = None
+            repeat = self.bot.lavalink.players.get(ctx.guild.id).repeat
             if not log: log = data['None']
             if asdfasdf == None:
                 volume = '100'
@@ -740,7 +743,7 @@ class Mod(commands.Cog):
             em = discord.Embed(colour=ctx.author.colour)        
             em.add_field(name=':passport_control:' + data['first'], value=data['embed1'].format(admin, mod, rold))
             em.add_field(name=':newspaper:' + data['second'], value=data['embed2'].format(log))
-            em.add_field(name=':musical_note:' + data['third'], value=data['embed3'].format(volume))
+            em.add_field(name=':musical_note:' + data['third'], value=data['embed3'].format(volume, (data['on'] if repeat else data['off'])))
             em.add_field(name=data['basic']['a'], value=data['basic']['admin'].format(ctx))
             if author.avatar_url:
                 em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
@@ -748,7 +751,7 @@ class Mod(commands.Cog):
                 em.set_footer(text=f'Request By {author}')
             return await ctx.send(author.mention, embed=em)
 
-    @modset.command(pass_context=True)
+    @settings.command(pass_context=True)
     async def admin(self, ctx, role:discord.Role=None):
         server = ctx.guild
         try:
@@ -781,7 +784,7 @@ class Mod(commands.Cog):
         await ctx.send(embed=em)
         dataIO.save_json(self.ang, self.data)
 
-    @modset.command(pass_context=True)
+    @settings.command(pass_context=True)
     async def mod(self, ctx, role:discord.Role=None):
         server = ctx.guild
         try:
@@ -814,7 +817,7 @@ class Mod(commands.Cog):
         await ctx.send(embed=em)
         dataIO.save_json(self.ang, self.data)
 
-    @modset.command(pass_context=True)
+    @settings.command(pass_context=True)
     async def log(self, ctx, channel:discord.TextChannel=None):
         server = ctx.guild
         try:
@@ -847,7 +850,7 @@ class Mod(commands.Cog):
         await ctx.send(embed=em)
         dataIO.save_json(self.ang, self.data)
 
-    @modset.command(pass_context=True)
+    @settings.command(pass_context=True)
     async def 욕필터(self, ctx):
         author = ctx.author
         server = ctx.guild
@@ -885,7 +888,7 @@ class Mod(commands.Cog):
         em.add_field(name=data['3'], value=data['4'].format(b))
         await ctx.send(embed=em)
 
-    @modset.command(pass_context=True)
+    @settings.command(pass_context=True)
     async def role(self, ctx, role:discord.Role=None):
         server = ctx.guild
         try:

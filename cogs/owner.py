@@ -25,7 +25,7 @@ import pymongo
 import settings
 set = settings.set()
 try:
-    client = MongoClient(host=set.ip, port=set.port, username=set.user, password=set.pwd, authSource=set.user)
+    client = MongoClient(host=set.ip, port=set.port, username=set.user, password=set.pwd, authSource=set.auth)    
     db = client['chaemoong']['owner']
 except:
     print("Owner Cogs에서 몽고DB에 연결 할 수 없습니다!")
@@ -38,34 +38,6 @@ class Owner(commands.Cog):
 
     async def is_owner(ctx):
         return ctx.author.id == 431085681847042048
-
-    @commands.command(pass_context=True)
-    @commands.check(is_owner)
-    async def 점검(self, ctx, *, reason=None):
-        author = ctx.author
-        if reason == None:
-            reason = '없음'
-        em = discord.Embed(colour=discord.Colour.blue())
-        if author.avatar_url:
-            em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
-        else:
-            em.set_footer(text=f'Request By {author}')
-        try:
-            check = {}
-            if db.점검.find_one({"check": "on"}):
-                db.점검.insert_one({})            
-                em.add_field(name='성공!', value='점검 모드가 종료되었습니다!')
-                return await ctx.send(embed=em)
-        except KeyError:
-            pass
-        example = {
-            "check": "on",
-            "reason": reason
-            }
-        db.점검.insert_one(example)
-        em.add_field(name='성공!', value='점검 모드가 실행되었습니다! 이제 키위봇 관리진 외에는 아무도 명령어를 사용할수 없습니다!')
-        return await ctx.send(embed=em)
-
 
     @commands.group(pass_context=True)
     @commands.check(is_owner)
@@ -267,8 +239,6 @@ class Owner(commands.Cog):
             else:
                 self.bot.load_extension('cogs.' + cogs)
             await ctx.send('그 기능이 리로드 되었습니다!')
-        except ExtensionNotFound:
-            await ctx.send('그 기능을 찾을수 없습니다!')
         except Exception as e:
             print(e)
             await ctx.send('그 기능이 리로드 되는중 오류가 발생하였습니다!\n터미널이나 콘솔을 확인해주세요!')

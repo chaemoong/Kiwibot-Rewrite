@@ -49,6 +49,48 @@ class General(commands.Cog):
         self.en = 'data/language/en.json'
         self.choice = [True, False, False, False, True, True, True, True, True, True]
         self.percent = [2,3,4,5,6,7,8,9]
+    
+    @commands.command()
+    async def mask(self, ctx, page=None, *, address=None):
+        print(page)
+        print(address)
+        if address == None:
+            return await ctx.send('주소를 적어주세요!\nex) 서울특별시 강남구')
+        if page:
+            if not page.isdigit():
+                address = f'{page} {address}'
+                page = 1
+        address = address.replace(" ", "%20")
+        url = f"https://8oi9s0nnth.apigw.ntruss.com/corona19-masks/v1/storesByAddr/json?address={address}"
+        one = await ctx.send('> 조회 중 입니다! 잠시만 기다려주세요!')
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url) as response:
+                    Data = await response.json()
+        except:
+            return await one.edit(content='> 마스크 판매 현황 API 조회에 실패하였습니다!')
+        items_per_page = 10
+        pages = math.ceil(len(Data) / items_per_page)
+        try:
+            start = (int(page) - 1) * items_per_page
+        except:
+            page = 1
+            start = (int(page) - 1) * items_per_page
+        end = start + items_per_page
+
+        queue_list = ''
+        asdf = 0    
+        await one.delete()
+        재고 = {'plenty': '100개 이상', 'some': '30개 이상 100개 미만', 'few': '1개 이하', 'empty': '재고 없음', None: '판매 안함'}
+        embed = discord.Embed(colour=discord.Color.green())
+        for index in enumerate(Data['stores'][start:end], start=start):
+            asdf += 1
+            messi = index[1]['remain_stat']
+            embed.add_field(name=f"{asdf}. {index[1]['name']}", value=f"주소: {index[1]['addr']}: {재고[messi]}\n")
+            if asdf == 10 or asdf > 10:
+                break
+        embed.set_footer(text=f'페이지 수:{page}/{round(Data["count"]/10) + 1}')
+        await ctx.send(embed=embed)
 
     @commands.group(no_pm=True, name='exchange', description='타봇 돈으로 환전하는 명령어입니다! | To exchange the other bot money!', aliases=['환전', 'ghkswjs', 'ㄷㅌ초뭏ㄷ'])
     async def exchange(self, ctx):

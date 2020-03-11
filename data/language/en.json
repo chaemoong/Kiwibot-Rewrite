@@ -114,11 +114,13 @@
         "third": "Music Functions settings",
         "embed1": "Administrator Role: **{}**\nModerator Role: **{}**\nVerify(captcha) Role: **{}**",
         "embed2": "Logging Channel: **{}**",
-        "embed3": "Music Volume: **{}%**\nDJ Role: **Now Developing**",
+        "embed3": "Music Volume: **{}%**\nDJ Role: **Now Developing**\nRepeat Status: {}",
         "basic": {
             "admin": "Settings to Administrator Role: **{0.prefix}{0.command} admin [Role Mention or ID]**\nSettings to Moderator Role: **{0.prefix}{0.command} mod [Role Mention or ID]**\nSettings to Logging Channel: **{0.prefix}{0.command} log [Channel Mention or ID]**\nSettings to Captcha role: **{0.prefix}{0.command} role [Role Mention Or ID]**",
             "a": "How to use it?"
-        }
+        },
+        "on": "ON",
+        "off": "OFF"
     },
     "serverinfo" : {
         "1" : "None",
@@ -196,16 +198,25 @@
         "role" : "role"
     },
     "경고" : {
-        "1" : "You were banned on server {}",
-        "10" : "Ban due to over the warnings",
-        "2" : "Reason: Ban due to over the warnings",
-        "3" : "If you have any complaints, please contact {author}({author.id})",
-        "4" : "Occurred Warnings!",
-        "5" : "{} ({}) was ban due to over-warnings",
-        "6" : "{} received one warning!\n If the user has {} warnings, the user will be Ban!\n Reason: {}\n Current number of warnings: {}",
+        "10" : "Ban due to over the warnings\nFinal Reason: ",
+        "2" : "Reason",
+        "4" : "Warning number | The maximum number of warnings",
         "7" : "> Please mention users give a warning",
         "8" : "> Warn command not available for bot!",
         "9" : "None",
-        "me": "> You can't warn yourself!"
+        "me": "> You can't warn yourself!",
+        "permission": "You do not have permission or the user has more permission than the bot!\nPlease add permissions or increase permissions to bot!"
+    },
+    "올인": {
+        "1": "You don't have the money! Get money by `{ctx.prefix}payday` instructions!",
+        "2": "> Are you really going to do all-in?\n> If you want to go all-in, please respond to ⭕ emoji!",
+        "3": "Deciding the Multiples...",
+        "4": "Deciding the Multiples... `{}` Multiples",
+        "5": "We'll go all in on the {} Multiples!",
+        "6": "Success",
+        "7": "Failed",
+        "8": "You have {} all-in.",
+        "9": "Now, Your money is become a {} Kiwi",
+        "10": "> I cancelled it because you didn't reacted!"
     }
 }

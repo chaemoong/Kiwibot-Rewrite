@@ -26,6 +26,7 @@ from pymongo import MongoClient
 from base64 import b64encode, b64decode
 from json import loads, dumps
 import settings
+import math
 set = settings.set()
 try:
     client = MongoClient(host=set.ip, port=set.port, username=set.user, password=set.pwd, authSource=set.auth)    
@@ -49,17 +50,20 @@ class General(commands.Cog):
         self.en = 'data/language/en.json'
         self.choice = [True, False, False, False, True, True, True, True, True, True]
         self.percent = [2,3,4,5,6,7,8,9]
-    
-    @commands.command()
+
+    @commands.command(no_pm=True, name='mask', description='This command works only in Korea! | 마스크 판매현황을  명령어입니다!', aliases=['ㅡㅁ나', '마스크', 'aktmzm'])
     async def mask(self, ctx, page=None, *, address=None):
-        print(page)
-        print(address)
-        if address == None:
-            return await ctx.send('주소를 적어주세요!\nex) 서울특별시 강남구')
         if page:
             if not page.isdigit():
-                address = f'{page} {address}'
+                if address== None:
+                    address = f'{page}'
+                else:
+                    address = f'{page} {address}'
                 page = 1
+        else:
+            return await ctx.send('주소를 적어주세요!\nex) 서울특별시 강남구')
+        print(page)
+        print(address)
         address = address.replace(" ", "%20")
         url = f"https://8oi9s0nnth.apigw.ntruss.com/corona19-masks/v1/storesByAddr/json?address={address}"
         one = await ctx.send('> 조회 중 입니다! 잠시만 기다려주세요!')
@@ -82,13 +86,16 @@ class General(commands.Cog):
         asdf = 0    
         await one.delete()
         재고 = {'plenty': '100개 이상', 'some': '30개 이상 100개 미만', 'few': '1개 이하', 'empty': '재고 없음', None: '판매 안함'}
-        embed = discord.Embed(colour=discord.Color.green())
+        오부재= {'0': '오늘은 1, 6년생 분들만 구매하실수 있습니다!', '1': '오늘은 2, 7년생 분들만 구매하실수 있습니다!', '2': '오늘은 3, 8년생 분들만 구매하실수 있습니다!', '3': '오늘은 4, 9년생 분들만 구매하실수 있습니다!', '4': '오늘은 5, 0년생 분들만 구매하실수 있습니다!', '5': '오늘은 평일에 구매하지 못하신분들만 구매하실수 있습니다!', '6': '오늘은 평일에 구매하지 못하신분들만 구매하실수 있습니다!'}
+        embed = discord.Embed(colour=discord.Color.green(), title=오부재[str(datetime.datetime.now().weekday())])
         for index in enumerate(Data['stores'][start:end], start=start):
             asdf += 1
             messi = index[1]['remain_stat']
-            embed.add_field(name=f"{asdf}. {index[1]['name']}", value=f"주소: {index[1]['addr']}: {재고[messi]}\n")
+            embed.add_field(name=f"{asdf}. {index[1]['name']} | {재고[messi]}", value=f"주소: {index[1]['addr']}\n", inline=False)
             if asdf == 10 or asdf > 10:
                 break
+        if int(Data['count']) == 0:
+            return await ctx.send('> 지역을 찾을수 없습니다! 다시 작성해주세요!')
         embed.set_footer(text=f'페이지 수:{page}/{round(Data["count"]/10) + 1}')
         await ctx.send(embed=embed)
 
@@ -163,13 +170,21 @@ class General(commands.Cog):
         author = ctx.author
         liiiist = [2,3,4,5,6]
         try:
+            asdf = lang({"_id": server})
+            if asdf['language'] == 'ko':
+                data = dataIO.load_json(self.ko)[ctx.command.name]
+            else:
+                data = dataIO.load_json(self.en)[ctx.command.name]
+        except:
+            data = dataIO.load_json(self.en)[ctx.command.name]
+        try:
             a = db.money.find_one({"_id": author.id})            
             b = a['money']
         except:
-            return await ctx.send(f'> 당신은 돈이 없습니다! `{ctx.prefix}돈받기` 명령어로 돈을 받아보세요!')
+            return await ctx.send(data['1'].format(ctx.prefix))
         if b == 0:
-            return await ctx.send(f'> 당신은 돈이 없습니다! `{ctx.prefix}돈받기` 명령어로 돈을 받아보세요!')
-        dfdf = await ctx.send('> 정말 올인을 하실꺼에요?\n~~탕진하다 다 잃으시면 배상 안해드립니다!~~\n> 올인을 하시려면 ⭕ 이모지에 반응해주세요!')
+            return await ctx.send(data['1'].format(ctx.prefix))
+        dfdf = await ctx.send(data['2'])
         await dfdf.add_reaction('⭕')
         def check(reaction, user):
             if user == ctx.author and str(reaction.emoji) == "⭕": 
@@ -177,26 +192,26 @@ class General(commands.Cog):
         try:
             await self.bot.wait_for('reaction_add', timeout=30.0, check=check)
         except asyncio.TimeoutError:
-            return await dfdf.edit(content='> 반응을 안해주셔서 취소했어요!')
+            return await dfdf.edit(content=data['10'])
         await dfdf.delete()
-        first = await ctx.send('배수 정하는중..')
+        first = await ctx.send(data['3'])
         for i in range(4):
             c = int(i + 1)
             asdf = random.choice(liiiist)
-            await first.edit(content=f'배수 정하는중.. `{asdf}`배') 
+            await first.edit(content=data['4'].format(asdf)) 
             await asyncio.sleep(1)
-        await first.edit(content=f'{asdf}배로 올인 진행하겠습니다!')
+        await first.edit(content=data['5'].format(asdf))
         await asyncio.sleep(0.5)
         choice = random.choice(self.choice)
         if choice == True:
-            chaemoong = '성공! '
+            chaemoong = data['6']
             c = b * int(asdf)
         elif choice == False:
-            chaemoong = '실패'
+            chaemoong = data['7']
             c = b * 0
         db.money.update({'_id':author.id}, {"money": int(c)},upsert=False)        
         em = discord.Embed(colour=author.colour)
-        em.add_field(name=f'올인을 {chaemoong}하셨습니다', value=f'당신의 돈은 {c} 키위가 됩니다')
+        em.add_field(name=data['8'].format(chaemoong), value=data['9'])
         if author.avatar_url:
             em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
         else:

@@ -1,5 +1,4 @@
 """coding: UTF-8, coding by: discordtag: chaemoong#9454"""
-import discord
 import datetime
 import inspect
 import os
@@ -26,7 +25,8 @@ from pymongo import MongoClient
 from base64 import b64encode, b64decode
 from json import loads, dumps
 import settings
-import math
+from math import ceil
+import discord
 set = settings.set()
 try:
     client = MongoClient(host=set.ip, port=set.port, username=set.user, password=set.pwd, authSource=set.auth)    
@@ -51,54 +51,93 @@ class General(commands.Cog):
         self.choice = [True, False, False, False, True, True, True, True, True, True]
         self.percent = [2,3,4,5,6,7,8,9]
 
+    async def async_add_reactions(self, message, reactions):
+        try:
+            for react in reactions:
+                await message.add_reaction(react)
+        finally:
+            return
+
     @commands.command(no_pm=True, name='mask', description='This command works only in Korea! | 마스크 판매현황을  명령어입니다!', aliases=['ㅡㅁ나', '마스크', 'aktmzm'])
-    async def mask(self, ctx, page=None, *, address=None):
-        if page:
-            if not page.isdigit():
-                if address== None:
-                    address = f'{page}'
-                else:
-                    address = f'{page} {address}'
-                page = 1
-        else:
-            return await ctx.send('주소를 적어주세요!\nex) 서울특별시 강남구')
-        print(page)
-        print(address)
-        address = address.replace(" ", "%20")
-        url = f"https://8oi9s0nnth.apigw.ntruss.com/corona19-masks/v1/storesByAddr/json?address={address}"
-        one = await ctx.send('> 조회 중 입니다! 잠시만 기다려주세요!')
+    async def mask(self, ctx, *, address):
+        _message = await ctx.send('> 조회 중 입니다! 잠시만 기다려주세요!')
         try:
             async with aiohttp.ClientSession() as session:
-                async with session.get(url) as response:
+                async with session.get(f"https://8oi9s0nnth.apigw.ntruss.com/corona19-masks/v1/storesByAddr/json?address={address}") as response:
                     Data = await response.json()
         except:
-            return await one.edit(content='> 마스크 판매 현황 API 조회에 실패하였습니다!')
-        items_per_page = 10
-        pages = math.ceil(len(Data) / items_per_page)
-        try:
-            start = (int(page) - 1) * items_per_page
-        except:
-            page = 1
-            start = (int(page) - 1) * items_per_page
+            return await _message.edit(content='> 마스크 판매 현황 API 조회에 실패하였습니다!')
+
+        page = 1
+        items_per_page = 5
+        pages = ceil(Data.get('count') / items_per_page)
+        start = (page - 1) * items_per_page
         end = start + items_per_page
 
-        queue_list = ''
-        asdf = 0    
-        await one.delete()
-        재고 = {'plenty': '100개 이상', 'some': '30개 이상 100개 미만', 'few': '1개 이하', 'empty': '재고 없음', None: '판매 안함'}
-        오부재= {'0': '오늘은 1, 6년생 분들만 구매하실수 있습니다!', '1': '오늘은 2, 7년생 분들만 구매하실수 있습니다!', '2': '오늘은 3, 8년생 분들만 구매하실수 있습니다!', '3': '오늘은 4, 9년생 분들만 구매하실수 있습니다!', '4': '오늘은 5, 0년생 분들만 구매하실수 있습니다!', '5': '오늘은 평일에 구매하지 못하신분들만 구매하실수 있습니다!', '6': '오늘은 평일에 구매하지 못하신분들만 구매하실수 있습니다!'}
-        embed = discord.Embed(colour=discord.Color.green(), title=오부재[str(datetime.datetime.now().weekday())])
-        for index in enumerate(Data['stores'][start:end], start=start):
-            asdf += 1
-            messi = index[1]['remain_stat']
-            embed.add_field(name=f"{asdf}. {index[1]['name']} | {재고[messi]}", value=f"주소: {index[1]['addr']}\n", inline=False)
-            if asdf == 10 or asdf > 10:
-                break
-        if int(Data['count']) == 0:
-            return await ctx.send('> 지역을 찾을수 없습니다! 다시 작성해주세요!')
-        embed.set_footer(text=f'페이지 수:{page}/{round(Data["count"]/10) + 1}')
-        await ctx.send(embed=embed)
+        오부제= {
+            0: '오늘은 1, 6년생 분들만 구매하실수 있습니다!', 
+            1: '오늘은 2, 7년생 분들만 구매하실수 있습니다!', 
+            2: '오늘은 3, 8년생 분들만 구매하실수 있습니다!', 
+            3: '오늘은 4, 9년생 분들만 구매하실수 있습니다!', 
+            4: '오늘은 5, 0년생 분들만 구매하실수 있습니다!', 
+            5: '오늘은 평일에 구매하지 못하신분들만 구매하실수 있습니다!',
+            6: '오늘은 평일에 구매하지 못하신분들만 구매하실수 있습니다!'
+        }
 
+        재고 = {
+            'plenty': ('100개 이상', 1), 
+            'some': ('30개 이상 100개 미만', 2), 
+            'few': ('1개 이하', 3), 
+            'empty': ('재고 없음', 4), 
+            None: ('판매 안함', 5), 
+            'break': ('판매 중단', 6)
+        }
+
+        Stores = sorted(Data.get('stores', []), key=lambda _Data: 재고[_Data["remain_stat"]][1])
+
+        StringData = [
+            {'name':f'{Stores.index(_Data)+1}. {_Data["name"]} | {재고[_Data["remain_stat"]][0]}', 'value':f'주소: {_Data["addr"]}'}
+            for _Data in Stores
+        ]
+
+        if not Data.get('stores', []): return await _message.edit(content='> 마스크 판매 현황 API 조회에 실패하였습니다!')
+
+        embed = discord.Embed(colour=discord.Color.green(), title=오부제[datetime.datetime.now().weekday()])
+        embed.set_footer(text=f'페이지 수: {page} / {pages}')
+        for _Item in StringData[start:end]: embed.add_field(name=_Item['name'], value=_Item['value'], inline=False)
+        await _message.delete()
+        _message = await ctx.send(embed=embed)
+        self.bot.loop.create_task(self.async_add_reactions(_message, ['⬅️', '⏹️', '➡️']))
+
+        def _check(reaction, user):
+            return reaction.message.id == _message.id and user == ctx.author and str(reaction.emoji) in ['⬅️', '⏹️', '➡️']
+        try:
+            while not self.bot.is_closed():
+                reaction, _user = await self.bot.wait_for('reaction_add', timeout=30.0, check=_check)
+                
+                if str(reaction.emoji) == '⏹️': break
+                
+                await _message.remove_reaction(reaction, _user)
+                if str(reaction.emoji) == '⬅️':
+                    page += -1
+                    if page <= 0: page = 1
+                if str(reaction.emoji) == '➡️':
+                    page += 1
+                    if page > pages: page = pages
+
+                start = (page - 1) * items_per_page
+                end = start + items_per_page
+                embed = discord.Embed(colour=discord.Color.green(), title=오부제[datetime.datetime.now().weekday()])
+                for _Item in StringData[start:end]: embed.add_field(name=_Item['name'], value=_Item['value'], inline=False)
+                embed.set_footer(text=f'페이지 수: {page} / {pages}')
+                await _message.edit(embed=embed)
+        finally:
+            try:
+                return await _message.clear_reactions()
+            except:
+                await _message.delete()
+                return await ctx.send('권한이 없습니다! 관리자 권한을 추가해주세요!')
+            
     @commands.group(no_pm=True, name='exchange', description='타봇 돈으로 환전하는 명령어입니다! | To exchange the other bot money!', aliases=['환전', 'ghkswjs', 'ㄷㅌ초뭏ㄷ'])
     async def exchange(self, ctx):
         if ctx.invoked_subcommand is None:
@@ -274,7 +313,7 @@ class General(commands.Cog):
         if len(lol) > 1024:
             em.add_field(name=data['14'], value=data['15'], inline=False)
         else:
-            em.add_field(name=data['14'], value=lol, inline=False)
+            em.add_field(name=data['14'], value=lol.replace(f'<@&{str(server)}>', str(ctx.guild.default_role)), inline=False)
         gf = user.created_at + datetime.timedelta(hours=9)
         fg = user.joined_at + datetime.timedelta(hours=9)
         em.add_field(name=data['10'], value=str(gf)[:19] + ' (UTC+9)', inline=False)

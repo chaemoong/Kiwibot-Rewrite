@@ -37,9 +37,6 @@ class Mod(commands.Cog):
         self.welcome = 'data/mod/welcome.json'
         self.welcome2 = dataIO.load_json(self.welcome)
 
-    async def owner(ctx):
-        return ctx.author.id == 431085681847042048
-
     async def administrator(ctx):
         a = 'data/mod/settings.json'
         b = dataIO.load_json(a)
@@ -71,49 +68,7 @@ class Mod(commands.Cog):
             await ctx.channel.purge(limit=count+1)
         except:
             return await ctx.send('봇에 권한이 없습니다! 권한을 추가해주세요! | No permission')
-        return await ctx.send(f'{count} 개의 메시지를 지웠습니다!')
-
-    @commands.command(no_pm=True, name='autorole', description='The autorole setting command! | 자동으로 역할이 들어오게 설정하는 명령어입니다!', aliases=['며새개ㅣㄷ', '자동역할', 'wkehddurgkf'])
-    @commands.check(administrator)
-    async def autorole(self, ctx, role:discord.Role=None, emoji=None, *, message=None):
-        author = ctx.author
-        server = ctx.guild
-        if role == None:
-            return await ctx.send('> 역할을 멘션 해주시거나 역할의 ID를 적어주셔야죠!')
-        if emoji == None:
-            return await ctx.send('> 이모지를 적어주셔야죠!')
-        if message == None:
-            return await ctx.send('> 메시지를 적어주셔야죠!')
-        em = discord.Embed(colour=author.colour)
-        if author.avatar_url:
-            em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
-        else:
-            em.set_footer(text=f'Request By {author}')
-        if message.startswith == '@everyone':
-            a = message[9:]
-            em.add_field(name='메시지', value=a)
-            asdf = await ctx.send('@everyone', embed=em)
-        else:
-            a = message
-            em.add_field(name='메시지', value=a)
-            asdf = await ctx.send(embed=em)
-        await asdf.add_reaction(emoji)
-        def check(reaction, user):
-            if user.bot == True:
-                return False
-            if server.id == user.guild.id and str(reaction.emoji) == emoji: 
-                return True
-        thinking = await self.bot.wait_for('reaction_add', check=check)
-        while True:
-            if True:
-                fffffff = thinking[1].id
-                try:
-                    await server.get_member(fffffff).add_roles(role)
-                    thinking = await self.bot.wait_for('reaction_add', check=check)
-                except:
-                    await ctx.send('> 역할이 삭제 되었거나 권한이 부족합니다! 메시지를 삭제하겠습니다!')
-                    await asdf.delete()
-                    break
+        return await ctx.send(f'{count} 개의 메시지를 지웠습니다!\nDeleting {count} messages')
 
     @commands.command(no_pm=True, name='language', description='The language setting command! | 언어를 선택하는 명령어입니다!', aliases=['ㅣ무혐ㅎㄷ', '언어', 'djsdj'])
     @commands.check(administrator)
@@ -134,7 +89,7 @@ class Mod(commands.Cog):
             if user == ctx.author and str(reaction.emoji) in asdf: 
                 return True 
         try:
-            reaction, user = await self.bot.wait_for('reaction_add', timeout=30.0, check=check)
+            reaction, users = await self.bot.wait_for('reaction_add', timeout=30.0, check=check)
         except asyncio.TimeoutError:
             return await a.edit(content='> 정상적으로 취소되었습니다! | Canceled!')
         if True:
@@ -159,7 +114,6 @@ class Mod(commands.Cog):
     @commands.command(no_pm=True, name='ban', description='It is a user-banning command. | 유저를 벤하는 명령어입니다!', aliases=['ㅠ무', '벤', 'qps', '차단', 'ckeks'])
     @commands.check(administrator)
     async def ban(self, ctx, user:discord.Member=None, *, reason=None):
-        server = ctx.guild
         try:
             asdf = lang({'_id': ctx.guild.id})
             if asdf['language'] == 'ko':
@@ -313,8 +267,8 @@ class Mod(commands.Cog):
             em2 = discord.Embed(colour=author.colour, title=server.name, timestamp=datetime.datetime.utcnow())
             em2.add_field(name='Administrator', value=author)
             em2.add_field(name='USER', value=user, inline=False)
-            em2.add_field(name='사유', value='경고 초과로 인한 벤', inline=False)
-            em2.add_field(name='경고 갯수', value=f'{asdf} / {dkdk}', inline=False)
+            em2.add_field(name=data['2'], value=data['10'] + reason, inline=False)
+            em2.add_field(name=data['4'], value=f'{asdf} / {dkdk}', inline=False)
             if author.avatar_url:
                 em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
             else:
@@ -323,9 +277,9 @@ class Mod(commands.Cog):
                 await server.ban(user, reason=data['10'])
                 await user.send(embed=em2)
             except:
-                self.data2[f'{server.id}'][f'{user.id}']["reason"].append(f'{count} ' + reason)
+                self.data2[f'{server.id}'][f'{user.id}']["reason"].append(reason)
                 dataIO.save_json(self.warn, self.data2)
-                return await ctx.send('권한이 없거나 그 유저가 봇보다 권한이 높습니다!\n봇에 권한을 추가 해주시거나 권한을 높여주세요!')
+                return await ctx.send(data['permission'])
             em.add_field(name=data['4'], value=data['5'].format(user.mention, user.id))
             self.data2[f'{server.id}'][f'{user.id}'].update({"count": 0})
             self.data2[f'{server.id}'][f'{user.id}']["reason"] = []
@@ -334,10 +288,10 @@ class Mod(commands.Cog):
             really = self.data2[f'{server.id}'][f'{user.id}'].get('count')
             em.add_field(name='Administrator', value=author)
             em.add_field(name='USER', value=user, inline=False)
-            em.add_field(name='사유', value=reason, inline=False)
-            em.add_field(name='경고 갯수 / 경고 제한', value=f'{really} / {dkdk}', inline=False)
+            em.add_field(name=data['2'], value=reason, inline=False)
+            em.add_field(name=data['4'], value=f'{really} / {dkdk}', inline=False)
             em.set_thumbnail(url=server.icon_url)
-            self.data2[f'{server.id}'][f'{user.id}']["reason"].append(f'{count} ' + reason)
+            self.data2[f'{server.id}'][f'{user.id}']["reason"].append(reason)
             dataIO.save_json(self.warn, self.data2)
         await ctx.send(embed=em)
         return await self.logger(ctx, action='경고 | WARN', user=user, reason=reason)   
@@ -411,7 +365,7 @@ class Mod(commands.Cog):
         num = 0
         for reason in a:
             num += 1
-            em.add_field(name=data['7'].format(num), value=reason, inline=False)
+            em.add_field(name=data['7'] + f' {num}', value=reason, inline=False)
         return await ctx.send(embed=em)
 
     @commands.command(no_pm=True, name='clean', description='It is a user-warnning cleaning command. | 유저의 경고를 삭제하는 명령어입니다!', aliases=['칟무', '경고삭제', 'rudrhtkrwp'])
@@ -510,7 +464,7 @@ class Mod(commands.Cog):
             if user == ctx.author and str(reaction.emoji) in asdf: 
                 return True 
         try:
-            reaction, user = await self.bot.wait_for('reaction_add', timeout=30.0, check=check)
+            reaction = await self.bot.wait_for('reaction_add', timeout=30.0, check=check)
         except asyncio.TimeoutError:
             return await a.edit(content='> 정상적으로 취소되었습니다!')
         if True:
@@ -561,7 +515,7 @@ class Mod(commands.Cog):
             if user == ctx.author and str(reaction.emoji) in asdf: 
                 return True 
         try:
-            reaction, user = await self.bot.wait_for('reaction_add', timeout=30.0, check=check)
+            reaction = await self.bot.wait_for('reaction_add', timeout=30.0, check=check)
         except asyncio.TimeoutError:
             return await a.edit(content='> 시간초과로 인해 취소되었습니다!')
         if True:
@@ -601,7 +555,7 @@ class Mod(commands.Cog):
             if user == ctx.author and str(reaction.emoji) in asdf: 
                 return True 
         try:
-            reaction, user = await self.bot.wait_for('reaction_add', timeout=30.0, check=check)
+            reaction = await self.bot.wait_for('reaction_add', timeout=30.0, check=check)
         except asyncio.TimeoutError:
             return await a.edit(content='> 시간초과로 인해 취소되었습니다!')
         if True:
@@ -641,7 +595,7 @@ class Mod(commands.Cog):
             if user == ctx.author and str(reaction.emoji) in asdf: 
                 return True 
         try:
-            reaction, user = await self.bot.wait_for('reaction_add', timeout=30.0, check=check)
+            reaction = await self.bot.wait_for('reaction_add', timeout=30.0, check=check)
         except asyncio.TimeoutError:
             return await a.edit(content='> 시간초과로 인해 취소되었습니다!')
         if True:
@@ -734,7 +688,10 @@ class Mod(commands.Cog):
                 asdfasdf = self.bot.get_cog('Music').setting.get(str(server.id)).get('volume')
             except:
                 asdfasdf = None
-            repeat = self.bot.lavalink.players.get(ctx.guild.id).repeat
+            try:
+                repeat = self.bot.lavalink.players.get(ctx.guild.id).repeat
+            except:
+                repeat = None
             if not log: log = data['None']
             if asdfasdf == None:
                 volume = '100'
@@ -938,7 +895,6 @@ class Mod(commands.Cog):
         try:
             asdf = lang({'_id': ctx.guild.id})
             if asdf['language'] == 'ko':
-
                 data = dataIO.load_json(self.ko)['log']
             else:
                 data = dataIO.load_json(self.en)['log']
@@ -947,6 +903,8 @@ class Mod(commands.Cog):
         try:
             log = dataIO.load_json('data/mod/settings.json')[f'{server.id}']['log']
         except KeyError: 
+            return
+        if log == None:
             return
         time = datetime.datetime.now()
         if reason == None:
@@ -957,14 +915,17 @@ class Mod(commands.Cog):
         em.add_field(name=data['4'], value=f'{author.mention} ({author.id}) | {user.mention} ({user.id})', inline=False)
         em.add_field(name=data['5'], value=reason, inline=False)
         if action == '경고 | WARN' or action == '경고 삭제 | DELETED WARN' or action == '경고 초기화 | RESET WARN':
-            a = dataIO.load_json('data/mod/warning.json')[f'{server.id}'][f'{user.id}']['count']
+            a = dataIO.load_json('data/mod/warning.json')[f'{server.id}'][f'{user.id}'].get('count')
             b = dataIO.load_json('data/mod/warning.json')[f'{server.id}']['all']
             em.add_field(name=data['6'], value=f'{a}/{b}')
         if author.avatar_url:
             em.set_footer(text=f'Request By {author}', icon_url=author.avatar_url)
         else:
             em.set_footer(text=f'Request By {author}')
-        return await ctx.guild.get_channel(int(log)).send(embed=em)
+        try:
+            return await ctx.guild.get_channel(int(log)).send(embed=em)
+        except:
+            return
 
 def check_folder():
     if not os.path.exists('data/mod'):

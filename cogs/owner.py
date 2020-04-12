@@ -1,4 +1,4 @@
-"""coding: UTF-8, coding by: discordtag: chaemoong#9454"""
+"""Encoding: UTF-8, coded by: discordtag: chaemoong#9454"""
 import discord
 import datetime
 import inspect
@@ -23,7 +23,9 @@ import zipfile
 from pymongo import MongoClient
 import pymongo
 import settings
+
 set = settings.set()
+
 try:
     client = MongoClient(host=set.ip, port=set.port, username=set.user, password=set.pwd, authSource=set.auth)    
     db = client['chaemoong']['owner']
@@ -105,9 +107,8 @@ class Owner(commands.Cog):
     async def moneydata(self, ctx, user:discord.Member=None, money:int=None):
         author = ctx.author
         asdf = dataIO.load_json(self.asdf)
-        if user == None:
-            return
-        if money == None:
+
+        if user == None or money == None:
             return
         try:
             a = asdf[str(user.id)]
